@@ -12,19 +12,19 @@ export function PostCard({ post, featured = false }: PostCardProps) {
   const { title, date, excerpt, tags, speakerName, speakerTitle, speakerCompany } = frontmatter;
 
   return (
-    <article className={`card hover:shadow-md transition-shadow ${featured ? 'border-primary-200 dark:border-primary-800' : ''}`}>
+    <article className={`card hover:shadow-md transition-shadow ${featured ? 'border-blue-200 dark:border-blue-800' : ''}`}>
       <div className="card-header">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <Link href={getPostUrl(slug)} className="group">
-              <h3 className={`card-title group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors ${featured ? 'text-xl' : 'text-lg'}`}>
+              <h3 className={`card-title group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors ${featured ? 'text-xl' : 'text-lg'}`}>
                 {title}
               </h3>
             </Link>
             
             {speakerName && (
-              <div className="mt-2 text-sm text-light-muted dark:text-dark-muted">
-                <span className="font-medium text-light-text dark:text-dark-text">{speakerName}</span>
+              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-medium text-gray-900 dark:text-gray-100">{speakerName}</span>
                 {speakerTitle && (
                   <>
                     <span className="mx-1">•</span>

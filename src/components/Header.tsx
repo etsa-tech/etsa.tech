@@ -15,8 +15,8 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo and Brand */}
           <div className="flex items-center">
@@ -53,7 +53,7 @@ export function Header() {
                 href="https://github.com/etsa-tech"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                 aria-label="GitHub"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ export function Header() {
             {/* Mobile menu button */}
             <button
               type="button"
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-light-text dark:text-dark-text hover:text-primary-500 dark:hover:text-primary-400 hover:bg-light-surface dark:hover:bg-dark-surface focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-900 dark:text-gray-100 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
               aria-controls="mobile-menu"
               aria-expanded="false"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -111,12 +111,12 @@ export function Header() {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden" id="mobile-menu">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-light-border dark:border-dark-border">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:text-primary-500 dark:hover:text-primary-400 hover:bg-light-surface dark:hover:bg-dark-surface transition-colors"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-gray-100 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
