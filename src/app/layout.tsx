@@ -53,6 +53,7 @@ export default function RootLayout({
       <head />
       <body
         className={`${inter.variable} font-sans antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
+        suppressHydrationWarning
       >
         <ThemeProvider defaultTheme="system" storageKey="etsa-ui-theme">
           <div className="relative flex min-h-screen flex-col">
