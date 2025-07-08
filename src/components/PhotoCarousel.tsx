@@ -47,14 +47,14 @@ export function PhotoCarousel({ photos, autoPlay = true, interval = 5000 }: Phot
 
   if (photos.length === 0) {
     return (
-      <div className="relative w-full h-96 bg-light-surface dark:bg-dark-surface rounded-lg flex items-center justify-center">
-        <p className="text-light-muted dark:text-dark-muted">No photos available</p>
+      <div className="relative w-full h-96 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+        <p className="text-gray-600 dark:text-gray-400">No photos available</p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-96 rounded-lg overflow-hidden bg-light-surface dark:bg-dark-surface">
+    <div className="relative w-full h-96 max-w-2xl rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
       {/* Main Image */}
       <div className="relative w-full h-full">
         <Image

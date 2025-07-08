@@ -4,25 +4,24 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-500 text-white font-bold text-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500 text-white font-bold text-lg">
                 E
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-light-text dark:text-dark-text">
+                <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
                   ETSA
-                </span>
                 </span>
               </div>
             </div>
-            <p className="text-light-muted dark:text-dark-muted max-w-md">
-              A professional meetup organization based in Knoxville, TN, bringing together 
-              systems administrators, DevOps engineers, and technology professionals to share 
+            <p className="text-gray-600 dark:text-gray-400 max-w-md">
+              A professional meetup organization based in Knoxville, TN, bringing together
+              systems administrators, DevOps engineers, and technology professionals to share
               knowledge and build community.
             </p>
             <div className="flex items-center space-x-4 mt-6">
@@ -30,7 +29,7 @@ export function Footer() {
                 href="https://github.com/etsa-tech"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 aria-label="GitHub"
               >
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -64,14 +63,14 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-semibold text-light-text dark:text-dark-text uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
               Quick Links
             </h3>
             <ul className="space-y-3">
               <li>
                 <Link
                   href="/"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   Home
                 </Link>
@@ -79,7 +78,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/speakers"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   Past Speakers
                 </Link>
@@ -87,7 +86,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/about"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   About ETSA
                 </Link>
@@ -95,7 +94,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   Contact Us
                 </Link>
@@ -105,7 +104,7 @@ export function Footer() {
 
           {/* Community */}
           <div>
-            <h3 className="text-sm font-semibold text-light-text dark:text-dark-text uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
               Community
             </h3>
             <ul className="space-y-3">
@@ -114,7 +113,7 @@ export function Footer() {
                   href="https://www.meetup.com/etsa-tech"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   Join Meetup
                 </a>
@@ -124,7 +123,7 @@ export function Footer() {
                   href="https://github.com/etsa-tech"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   GitHub
                 </a>
@@ -134,7 +133,7 @@ export function Footer() {
                   href="https://www.linkedin.com/company/etsa-tech"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   LinkedIn
                 </a>
@@ -142,7 +141,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/speakers"
-                  className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                 >
                   Become a Speaker
                 </Link>
@@ -152,12 +151,12 @@ export function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t border-light-border dark:border-dark-border">
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-light-muted dark:text-dark-muted text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               © {currentYear} ETSA. All rights reserved.
             </p>
-            <p className="text-light-muted dark:text-dark-muted text-sm mt-4 md:mt-0">
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-4 md:mt-0">
               Built with ❤️ in Knoxville, TN
             </p>
           </div>
