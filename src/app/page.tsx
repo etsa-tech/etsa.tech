@@ -72,7 +72,7 @@ export default function Home() {
               <div className="text-gray-600">Members</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">5+</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">{new Date().getFullYear() - 2012}+</div>
               <div className="text-gray-600">Years Active</div>
             </div>
           </div>
