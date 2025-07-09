@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-etsa-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
@@ -79,6 +79,113 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Sponsors Section */}
+          <div className="lg:col-span-1">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">
+              Our Sponsors/Ways to Give
+            </h3>
+            <div className="space-y-3">
+              {/* Eldie Design */}
+              <div className="group">
+                <a
+                  href="https://eldiedesign.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Image
+                        src="/sponsors/eldiedesigns.png"
+                        alt={`Eldie Designs`}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-lg object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                        Elie Design
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                        Creative Solutions
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              {/* Givebutter */}
+              <div className="group">
+                <a
+                  href="https://givebutter.com/etsa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Image
+                        src="/sponsors/givebutter.jpeg"
+                        alt={`Donate via GiveButter`}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-lg object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                        Givebutter
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                        Fundraising Platform
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              {/* TEKsystems */}
+              <div className="group">
+                <a
+                  href="http://www.teksystems.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Image
+                        src="/sponsors/teksystems.jpeg"
+                        alt={`TekSystems`}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-lg object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                        TEKsystems
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                        IT Staffing & Services
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div className="mt-4 text-center">
+              <a
+                href="/contact"
+                className="text-xs text-etsa-primary hover:text-etsa-secondary transition-colors"
+              >
+                Become a Sponsor
+              </a>
+            </div>
+          </div>
+
           {/* Quick Links */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">
@@ -99,6 +206,14 @@ export function Footer() {
                   className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
                 >
                   Past Speakers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/meeting-info"
+                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
+                >
+                  Meeting Info
                 </Link>
               </li>
               <li>
@@ -165,142 +280,6 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
-          {/* Sponsors Section */}
-          <div className="lg:col-span-4">
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
-              <div className="text-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  Our Sponsors/Ways to Give
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Thank you to our amazing sponsors who make ETSA possible
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center justify-items-center max-w-4xl mx-auto">
-                {/* ElDie Design */}
-                <div className="group w-full">
-                  <a
-                    href="https://eldiedesign.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
-                  >
-                    <div className="flex flex-col items-center justify-center h-14">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-2">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
-                          ElDie Design
-                        </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                          Creative Solutions
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-
-                {/* Givebutter */}
-                <div className="group w-full">
-                  <a
-                    href="https://givebutter.com/etsa"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
-                  >
-                    <div className="flex flex-col items-center justify-center h-14">
-                      <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center mb-2">
-                        <span className="text-sm">🧈</span>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
-                          Givebutter
-                        </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                          Fundraising Platform
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-
-                {/* TEKsystems */}
-                <div className="group w-full">
-                  <a
-                    href="http://www.teksystems.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
-                  >
-                    <div className="flex flex-col items-center justify-center h-14">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center mb-2">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"
-                          />
-                        </svg>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
-                          TEKsystems
-                        </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                          IT Staffing & Services
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-
-              <div className="text-center mt-4">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  Interested in sponsoring ETSA?
-                </p>
-                <a
-                  href="/contact"
-                  className="inline-flex items-center text-etsa-primary hover:text-etsa-secondary transition-colors text-sm font-medium"
-                >
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                  Contact us about sponsorship opportunities
-                </a>
-              </div>
-            </div>
           </div>
         </div>
 
