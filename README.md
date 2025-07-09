@@ -31,17 +31,20 @@ The official website for ETSA, a professional meetup organization based in Knoxv
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/etsa-tech/etsa.tech.git
 cd etsa.tech
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -111,7 +114,6 @@ eventLocation: "Event Location"
 featured: false
 published: true
 ---
-
 # Your markdown content here
 ```
 
@@ -128,6 +130,7 @@ published: true
 ### Branding
 
 The site uses a custom color scheme defined in `tailwind.config.ts`:
+
 - **Primary**: Blue tones for ETSA branding
 - **Secondary**: Professional grays
 - **Accent**: Orange highlights
@@ -135,6 +138,7 @@ The site uses a custom color scheme defined in `tailwind.config.ts`:
 ### Theme System
 
 The site supports light/dark modes with:
+
 - System preference detection
 - Manual toggle
 - Persistent user preference
@@ -150,6 +154,7 @@ The site supports light/dark modes with:
 4. Deploy automatically on push to main branch
 
 The `netlify.toml` file includes:
+
 - Build configuration
 - Security headers
 - Performance optimizations

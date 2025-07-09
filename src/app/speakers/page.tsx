@@ -1,25 +1,29 @@
-import { getAllPosts, getAllTags } from '@/lib/blog';
-import { TagCloud } from '@/components/TagList';
-import SearchComponent from '@/components/SearchComponent';
+import { getAllPosts, getAllTags } from "@/lib/blog";
+import { TagCloud } from "@/components/TagList";
+import SearchComponent from "@/components/SearchComponent";
 
 export const metadata = {
-  title: 'Past Speakers - ETSA',
-  description: 'Explore presentations from our amazing speakers at ETSA meetups. Learn from industry experts in systems administration, DevOps, and technology.',
+  title: "Past Speakers - ETSA",
+  description:
+    "Explore presentations from our amazing speakers at ETSA meetups. Learn from industry experts in systems administration, DevOps, and technology.",
 };
 
 export default function SpeakersPage() {
   const posts = getAllPosts();
   const allTags = getAllTags();
-  
+
   // Calculate tag counts
-  const tagCounts = allTags.reduce((acc, tag) => {
-    acc[tag] = posts.filter(post => 
-      post.frontmatter.tags.some(postTag => 
-        postTag.toLowerCase() === tag.toLowerCase()
-      )
-    ).length;
-    return acc;
-  }, {} as Record<string, number>);
+  const tagCounts = allTags.reduce(
+    (acc, tag) => {
+      acc[tag] = posts.filter((post) =>
+        post.frontmatter.tags.some(
+          (postTag) => postTag.toLowerCase() === tag.toLowerCase(),
+        ),
+      ).length;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   return (
     <div className="container py-12">
@@ -29,8 +33,9 @@ export default function SpeakersPage() {
           Past Speakers
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Explore presentations from our amazing speakers at ETSA meetups. Learn from industry
-          experts in systems administration, DevOps, cloud computing, and emerging technologies.
+          Explore presentations from our amazing speakers at ETSA meetups. Learn
+          from industry experts in systems administration, DevOps, cloud
+          computing, and emerging technologies.
         </p>
       </div>
 
@@ -60,16 +65,28 @@ export default function SpeakersPage() {
               </div>
               <div className="card-content space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Total Presentations</span>
-                  <span className="font-semibold text-etsa-primary">{posts.length}</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Total Presentations
+                  </span>
+                  <span className="font-semibold text-etsa-primary">
+                    {posts.length}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Unique Topics</span>
-                  <span className="font-semibold text-etsa-primary">{allTags.length}</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Unique Topics
+                  </span>
+                  <span className="font-semibold text-etsa-primary">
+                    {allTags.length}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Featured</span>
-                  <span className="font-semibold text-etsa-primary">{posts.filter(p => p.frontmatter.featured).length}</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Featured
+                  </span>
+                  <span className="font-semibold text-etsa-primary">
+                    {posts.filter((p) => p.frontmatter.featured).length}
+                  </span>
                 </div>
               </div>
             </div>

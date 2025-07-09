@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { getTagUrl } from '@/lib/utils';
+import Link from "next/link";
+import { getTagUrl } from "@/lib/utils";
 
 interface TagListProps {
   tags: string[];
@@ -8,7 +8,12 @@ interface TagListProps {
   tagCounts?: Record<string, number>;
 }
 
-export function TagList({ tags, currentTag, showCount = false, tagCounts }: TagListProps) {
+export function TagList({
+  tags,
+  currentTag,
+  showCount = false,
+  tagCounts,
+}: TagListProps) {
   if (tags.length === 0) {
     return null;
   }
@@ -18,22 +23,18 @@ export function TagList({ tags, currentTag, showCount = false, tagCounts }: TagL
       {tags.map((tag) => {
         const isActive = currentTag === tag;
         const count = tagCounts?.[tag];
-        
+
         return (
           <Link
             key={tag}
             href={getTagUrl(tag)}
             className={`tag transition-colors ${
-              isActive
-                ? 'tag-primary'
-                : 'tag-default hover:tag-primary'
+              isActive ? "tag-primary" : "tag-default hover:tag-primary"
             }`}
           >
             {tag}
             {showCount && count && (
-              <span className="ml-1 text-xs opacity-75">
-                ({count})
-              </span>
+              <span className="ml-1 text-xs opacity-75">({count})</span>
             )}
           </Link>
         );
@@ -69,34 +70,32 @@ export function TagCloud({ tags, tagCounts, currentTag }: TagCloudProps) {
         {sortedTags.map((tag) => {
           const isActive = currentTag === tag;
           const count = tagCounts[tag] || 0;
-          
+
           // Calculate relative size based on count
           const maxCount = Math.max(...Object.values(tagCounts));
           const minCount = Math.min(...Object.values(tagCounts));
           const range = maxCount - minCount;
           const normalizedCount = range > 0 ? (count - minCount) / range : 0;
-          
+
           // Map to text size classes
-          let sizeClass = 'text-sm';
-          if (normalizedCount > 0.8) sizeClass = 'text-lg';
-          else if (normalizedCount > 0.6) sizeClass = 'text-base';
-          else if (normalizedCount > 0.4) sizeClass = 'text-sm';
-          else sizeClass = 'text-xs';
-          
+          let sizeClass = "text-sm";
+          if (normalizedCount > 0.8) sizeClass = "text-lg";
+          else if (normalizedCount > 0.6) sizeClass = "text-base";
+          else if (normalizedCount > 0.4) sizeClass = "text-sm";
+          else sizeClass = "text-xs";
+
           return (
             <Link
               key={tag}
               href={getTagUrl(tag)}
               className={`inline-flex items-center px-3 py-1 rounded-full transition-colors ${sizeClass} ${
                 isActive
-                  ? 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200'
-                  : 'bg-secondary-100 text-secondary-800 dark:bg-secondary-800 dark:text-secondary-200 hover:bg-primary-100 hover:text-primary-800 dark:hover:bg-primary-900 dark:hover:text-primary-200'
+                  ? "bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
+                  : "bg-secondary-100 text-secondary-800 dark:bg-secondary-800 dark:text-secondary-200 hover:bg-primary-100 hover:text-primary-800 dark:hover:bg-primary-900 dark:hover:text-primary-200"
               }`}
             >
               {tag}
-              <span className="ml-1 text-xs opacity-75">
-                {count}
-              </span>
+              <span className="ml-1 text-xs opacity-75">{count}</span>
             </Link>
           );
         })}

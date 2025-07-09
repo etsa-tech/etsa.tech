@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect } from "react";
+import Image from "next/image";
 
 interface Photo {
   src: string;
@@ -15,7 +15,11 @@ interface PhotoCarouselProps {
   interval?: number;
 }
 
-export function PhotoCarousel({ photos, autoPlay = true, interval = 5000 }: PhotoCarouselProps) {
+export function PhotoCarousel({
+  photos,
+  autoPlay = true,
+  interval = 5000,
+}: PhotoCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -38,7 +42,9 @@ export function PhotoCarousel({ photos, autoPlay = true, interval = 5000 }: Phot
   };
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length);
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + photos.length) % photos.length,
+    );
   };
 
   const goToNext = () => {
@@ -64,10 +70,10 @@ export function PhotoCarousel({ photos, autoPlay = true, interval = 5000 }: Phot
           className="object-cover transition-opacity duration-500"
           priority={currentIndex === 0}
         />
-        
+
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        
+
         {/* Caption */}
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <p className="text-white text-lg font-medium drop-shadow-lg">
@@ -84,18 +90,38 @@ export function PhotoCarousel({ photos, autoPlay = true, interval = 5000 }: Phot
             className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
             aria-label="Previous photo"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
-          
+
           <button
             onClick={goToNext}
             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
             aria-label="Next photo"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </>
@@ -110,8 +136,8 @@ export function PhotoCarousel({ photos, autoPlay = true, interval = 5000 }: Phot
               onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-colors ${
                 index === currentIndex
-                  ? 'bg-white'
-                  : 'bg-white/50 hover:bg-white/75'
+                  ? "bg-white"
+                  : "bg-white/50 hover:bg-white/75"
               }`}
               aria-label={`Go to photo ${index + 1}`}
             />

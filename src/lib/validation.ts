@@ -1,44 +1,51 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Contact form validation schema
 export const contactFormSchema = z.object({
   name: z
     .string()
-    .min(1, 'Name is required')
-    .min(2, 'Name must be at least 2 characters')
-    .max(100, 'Name must be less than 100 characters')
-    .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
-  
+    .min(1, "Name is required")
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be less than 100 characters")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Name can only contain letters, spaces, hyphens, and apostrophes",
+    ),
+
   email: z
     .string()
-    .min(1, 'Email is required')
-    .email('Please enter a valid email address')
-    .max(255, 'Email must be less than 255 characters')
+    .min(1, "Email is required")
+    .email("Please enter a valid email address")
+    .max(255, "Email must be less than 255 characters")
     .toLowerCase(),
-  
+
   subject: z
     .string()
-    .min(1, 'Subject is required')
-    .min(5, 'Subject must be at least 5 characters')
-    .max(200, 'Subject must be less than 200 characters')
+    .min(1, "Subject is required")
+    .min(5, "Subject must be at least 5 characters")
+    .max(200, "Subject must be less than 200 characters")
     .trim(),
-  
+
   message: z
     .string()
-    .min(1, 'Message is required')
-    .min(10, 'Message must be at least 10 characters')
-    .max(2000, 'Message must be less than 2000 characters')
+    .min(1, "Message is required")
+    .min(10, "Message must be at least 10 characters")
+    .max(2000, "Message must be less than 2000 characters")
     .trim(),
-  
-  'h-captcha-response': z
+
+  "h-captcha-response": z
     .string()
-    .min(1, 'Please complete the captcha verification'),
+    .min(1, "Please complete the captcha verification"),
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;
 
 // Validation helper function
-export function validateContactForm(data: unknown): { success: true; data: ContactFormData } | { success: false; errors: Record<string, string[]> } {
+export function validateContactForm(
+  data: unknown,
+):
+  | { success: true; data: ContactFormData }
+  | { success: false; errors: Record<string, string[]> } {
   try {
     const validatedData = contactFormSchema.parse(data);
     return { success: true, data: validatedData };
@@ -46,7 +53,7 @@ export function validateContactForm(data: unknown): { success: true; data: Conta
     if (error instanceof z.ZodError) {
       const errors: Record<string, string[]> = {};
       error.errors.forEach((err) => {
-        const path = err.path.join('.');
+        const path = err.path.join(".");
         if (!errors[path]) {
           errors[path] = [];
         }
@@ -54,29 +61,33 @@ export function validateContactForm(data: unknown): { success: true; data: Conta
       });
       return { success: false, errors };
     }
-    return { 
-      success: false, 
-      errors: { 
-        general: ['An unexpected validation error occurred'] 
-      } 
+    return {
+      success: false,
+      errors: {
+        general: ["An unexpected validation error occurred"],
+      },
     };
   }
 }
 
 // Client-side validation helper
-export function getFieldError(errors: Record<string, string[]> | undefined, fieldName: string): string | undefined {
+export function getFieldError(
+  errors: Record<string, string[]> | undefined,
+  fieldName: string,
+): string | undefined {
   return errors?.[fieldName]?.[0];
 }
 
 // Email validation regex (more permissive for international domains)
-export const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+export const emailRegex =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 // Sanitization helpers
 export function sanitizeInput(input: string): string {
   return input
     .trim()
-    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-    .replace(/[<>]/g, ''); // Remove potential HTML brackets
+    .replace(/\s+/g, " ") // Replace multiple spaces with single space
+    .replace(/[<>]/g, ""); // Remove potential HTML brackets
 }
 
 export function sanitizeEmail(email: string): string {
@@ -84,7 +95,10 @@ export function sanitizeEmail(email: string): string {
 }
 
 // Rate limiting helpers
-export function createRateLimitKey(ip: string, type: 'contact' = 'contact'): string {
+export function createRateLimitKey(
+  ip: string,
+  type: "contact" = "contact",
+): string {
   return `ratelimit:${type}:${ip}`;
 }
 
@@ -95,9 +109,9 @@ export function validateName(name: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || 'Invalid name';
+      return error.errors[0]?.message || "Invalid name";
     }
-    return 'Invalid name';
+    return "Invalid name";
   }
 }
 
@@ -107,9 +121,9 @@ export function validateEmail(email: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || 'Invalid email';
+      return error.errors[0]?.message || "Invalid email";
     }
-    return 'Invalid email';
+    return "Invalid email";
   }
 }
 
@@ -119,9 +133,9 @@ export function validateSubject(subject: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || 'Invalid subject';
+      return error.errors[0]?.message || "Invalid subject";
     }
-    return 'Invalid subject';
+    return "Invalid subject";
   }
 }
 
@@ -131,8 +145,8 @@ export function validateMessage(message: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || 'Invalid message';
+      return error.errors[0]?.message || "Invalid message";
     }
-    return 'Invalid message';
+    return "Invalid message";
   }
 }

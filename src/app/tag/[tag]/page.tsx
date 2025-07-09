@@ -1,7 +1,7 @@
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { getPostsByTag, getAllTags } from '@/lib/blog';
-import { PostCard } from '@/components/PostCard';
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { getPostsByTag, getAllTags } from "@/lib/blog";
+import { PostCard } from "@/components/PostCard";
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps) {
   const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
-  
+
   return {
     title: `${decodedTag} Posts - ETSA`,
     description: `Browse all ETSA presentations and content tagged with "${decodedTag}".`,
@@ -25,15 +25,17 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function TagPage({ params }: PageProps) {
   const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
-  
+
   // Find the actual tag (case-insensitive)
   const allTags = getAllTags();
-  const actualTag = allTags.find(t => t.toLowerCase() === decodedTag.toLowerCase());
-  
+  const actualTag = allTags.find(
+    (t) => t.toLowerCase() === decodedTag.toLowerCase(),
+  );
+
   if (!actualTag) {
     notFound();
   }
-  
+
   const posts = getPostsByTag(actualTag);
 
   return (
@@ -55,7 +57,9 @@ export default async function TagPage({ params }: PageProps) {
               </Link>
             </li>
             <li>/</li>
-            <li className="text-light-text dark:text-dark-text">Tag: {actualTag}</li>
+            <li className="text-light-text dark:text-dark-text">
+              Tag: {actualTag}
+            </li>
           </ol>
         </nav>
 
@@ -65,13 +69,11 @@ export default async function TagPage({ params }: PageProps) {
               Posts tagged with &quot;{actualTag}&quot;
             </h1>
             <p className="text-light-muted dark:text-dark-muted">
-              {posts.length} presentation{posts.length !== 1 ? 's' : ''} found
+              {posts.length} presentation{posts.length !== 1 ? "s" : ""} found
             </p>
           </div>
-          
-          <div className="tag tag-primary text-lg px-4 py-2">
-            {actualTag}
-          </div>
+
+          <div className="tag tag-primary text-lg px-4 py-2">{actualTag}</div>
         </div>
       </div>
 
@@ -89,7 +91,8 @@ export default async function TagPage({ params }: PageProps) {
             No posts found
           </h2>
           <p className="text-light-muted dark:text-dark-muted mb-6">
-            We couldn&apos;t find any presentations tagged with &quot;{actualTag}&quot;.
+            We couldn&apos;t find any presentations tagged with &quot;
+            {actualTag}&quot;.
           </p>
           <Link href="/speakers" className="btn btn-primary">
             Browse All Presentations
@@ -105,7 +108,7 @@ export default async function TagPage({ params }: PageProps) {
           </h2>
           <div className="flex flex-wrap gap-2">
             {allTags
-              .filter(t => t !== actualTag)
+              .filter((t) => t !== actualTag)
               .slice(0, 10)
               .map((relatedTag) => (
                 <Link

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useTheme } from './ThemeProvider';
+import { useEffect, useState } from "react";
+import { useTheme } from "./ThemeProvider";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -18,12 +18,12 @@ export function ThemeToggle() {
   }
 
   const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark');
-    } else if (theme === 'dark') {
-      setTheme('system');
+    if (theme === "light") {
+      setTheme("dark");
+    } else if (theme === "dark") {
+      setTheme("system");
     } else {
-      setTheme('light');
+      setTheme("light");
     }
   };
 
@@ -33,7 +33,7 @@ export function ThemeToggle() {
       className="relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text hover:bg-light-border dark:hover:bg-dark-border transition-colors"
       aria-label="Toggle theme"
     >
-      {theme === 'light' && (
+      {theme === "light" && (
         <svg
           className="h-5 w-5"
           fill="none"
@@ -49,7 +49,7 @@ export function ThemeToggle() {
           />
         </svg>
       )}
-      {theme === 'dark' && (
+      {theme === "dark" && (
         <svg
           className="h-5 w-5"
           fill="none"
@@ -65,7 +65,7 @@ export function ThemeToggle() {
           />
         </svg>
       )}
-      {theme === 'system' && (
+      {theme === "system" && (
         <svg
           className="h-5 w-5"
           fill="none"

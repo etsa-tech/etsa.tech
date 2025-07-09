@@ -26,12 +26,15 @@ In today's complex distributed systems, monitoring and observability are not jus
 ## The Three Pillars of Observability
 
 ### 1. Metrics
+
 Numerical data that changes over time (CPU usage, request rate, error count)
 
 ### 2. Logs
+
 Discrete events that happened at a specific time
 
 ### 3. Traces
+
 The journey of a request through your system
 
 ## Why Prometheus?
@@ -84,20 +87,20 @@ alerting:
   alertmanagers:
     - static_configs:
         - targets:
-          - alertmanager:9093
+            - alertmanager:9093
 
 scrape_configs:
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
-  - job_name: 'node-exporter'
+  - job_name: "node-exporter"
     static_configs:
-      - targets: ['localhost:9100']
+      - targets: ["localhost:9100"]
 
-  - job_name: 'application'
+  - job_name: "application"
     static_configs:
-      - targets: ['app1:8080', 'app2:8080']
+      - targets: ["app1:8080", "app2:8080"]
     metrics_path: /metrics
     scrape_interval: 5s
 ```
@@ -105,7 +108,7 @@ scrape_configs:
 ### Docker Compose Setup
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   prometheus:
     image: prom/prometheus:latest
@@ -116,12 +119,12 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
 
   grafana:
     image: grafana/grafana:latest
@@ -143,10 +146,10 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
 
 volumes:
   prometheus_data:
@@ -203,7 +206,7 @@ func init() {
 func instrumentHandler(next http.HandlerFunc) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         start := time.Now()
-        
+
         // Increment active connections
         activeConnections.Inc()
         defer activeConnections.Dec()
@@ -222,7 +225,7 @@ func main() {
     http.HandleFunc("/", instrumentHandler(func(w http.ResponseWriter, r *http.Request) {
         w.Write([]byte("Hello, World!"))
     }))
-    
+
     http.Handle("/metrics", promhttp.Handler())
     http.ListenAndServe(":8080", nil)
 }
@@ -243,18 +246,18 @@ ACTIVE_USERS = Gauge('active_users', 'Number of active users')
 def process_request():
     """Simulate processing a request"""
     REQUEST_COUNT.labels(method='GET', endpoint='/api/users').inc()
-    
+
     with REQUEST_LATENCY.time():
         # Simulate work
         time.sleep(random.uniform(0.1, 0.5))
-    
+
     # Update active users
     ACTIVE_USERS.set(random.randint(10, 100))
 
 if __name__ == '__main__':
     # Start metrics server
     start_http_server(8000)
-    
+
     # Simulate requests
     while True:
         process_request()
@@ -360,47 +363,47 @@ groups:
 ```yaml
 # alertmanager.yml
 global:
-  smtp_smarthost: 'localhost:587'
-  smtp_from: 'alerts@company.com'
+  smtp_smarthost: "localhost:587"
+  smtp_from: "alerts@company.com"
 
 route:
-  group_by: ['alertname']
+  group_by: ["alertname"]
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 1h
-  receiver: 'web.hook'
+  receiver: "web.hook"
   routes:
     - match:
         severity: critical
-      receiver: 'critical-alerts'
+      receiver: "critical-alerts"
     - match:
         severity: warning
-      receiver: 'warning-alerts'
+      receiver: "warning-alerts"
 
 receivers:
-  - name: 'web.hook'
+  - name: "web.hook"
     webhook_configs:
-      - url: 'http://127.0.0.1:5001/'
+      - url: "http://127.0.0.1:5001/"
 
-  - name: 'critical-alerts'
+  - name: "critical-alerts"
     email_configs:
-      - to: 'oncall@company.com'
-        subject: 'CRITICAL: {{ .GroupLabels.alertname }}'
+      - to: "oncall@company.com"
+        subject: "CRITICAL: {{ .GroupLabels.alertname }}"
         body: |
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
           {{ end }}
     slack_configs:
-      - api_url: 'YOUR_SLACK_WEBHOOK_URL'
-        channel: '#alerts'
-        title: 'CRITICAL Alert'
-        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+      - api_url: "YOUR_SLACK_WEBHOOK_URL"
+        channel: "#alerts"
+        title: "CRITICAL Alert"
+        text: "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}"
 
-  - name: 'warning-alerts'
+  - name: "warning-alerts"
     email_configs:
-      - to: 'team@company.com'
-        subject: 'WARNING: {{ .GroupLabels.alertname }}'
+      - to: "team@company.com"
+        subject: "WARNING: {{ .GroupLabels.alertname }}"
 ```
 
 ## Grafana Dashboards
@@ -408,12 +411,14 @@ receivers:
 ### Essential Dashboard Panels
 
 1. **System Overview**
+
    - CPU usage
    - Memory usage
    - Disk usage
    - Network I/O
 
 2. **Application Metrics**
+
    - Request rate
    - Response time
    - Error rate
@@ -446,9 +451,9 @@ receivers:
             "unit": "percent",
             "thresholds": {
               "steps": [
-                {"color": "green", "value": 0},
-                {"color": "yellow", "value": 70},
-                {"color": "red", "value": 90}
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 70 },
+                { "color": "red", "value": 90 }
               ]
             }
           }
@@ -492,16 +497,19 @@ receivers:
 ## Common Exporters
 
 ### Infrastructure
+
 - **Node Exporter**: System metrics
 - **Blackbox Exporter**: Endpoint monitoring
 - **SNMP Exporter**: Network devices
 
 ### Databases
+
 - **MySQL Exporter**: MySQL metrics
 - **PostgreSQL Exporter**: PostgreSQL metrics
 - **Redis Exporter**: Redis metrics
 
 ### Applications
+
 - **JMX Exporter**: Java applications
 - **.NET Exporter**: .NET applications
 - **Custom exporters**: Application-specific metrics
@@ -509,6 +517,7 @@ receivers:
 ## Troubleshooting Common Issues
 
 ### High Memory Usage
+
 ```bash
 # Check series count
 curl http://localhost:9090/api/v1/label/__name__/values | jq '.data | length'
@@ -521,6 +530,7 @@ done | sort -k2 -nr | head -10
 ```
 
 ### Slow Queries
+
 ```promql
 # Check query performance
 prometheus_engine_query_duration_seconds{quantile="0.9"}
@@ -542,4 +552,4 @@ Remember: The goal is not to collect all possible metrics, but to collect the ri
 
 ---
 
-*This presentation was delivered at the ETSA November 2023 meetup. For hands-on examples and configuration files, visit our [GitHub repository](https://github.com/etsa-tech/prometheus-examples).*
+_This presentation was delivered at the ETSA November 2023 meetup. For hands-on examples and configuration files, visit our [GitHub repository](https://github.com/etsa-tech/prometheus-examples)._

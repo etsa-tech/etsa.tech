@@ -2,7 +2,14 @@
 title: "Ansible Automation: Simplifying Configuration Management"
 date: "2023-10-15"
 excerpt: "Discover how to automate your infrastructure management with Ansible, from basic playbooks to advanced automation patterns and best practices."
-tags: ["Ansible", "Automation", "Configuration Management", "DevOps", "Infrastructure"]
+tags:
+  [
+    "Ansible",
+    "Automation",
+    "Configuration Management",
+    "DevOps",
+    "Infrastructure",
+  ]
 author: "ETSA"
 speakerName: "Jennifer Park"
 speakerTitle: "DevOps Engineer"
@@ -26,6 +33,7 @@ Configuration management is a critical aspect of modern infrastructure operation
 ## What is Ansible?
 
 Ansible is an open-source automation tool that simplifies:
+
 - **Configuration Management**: Ensure systems are configured correctly
 - **Application Deployment**: Deploy applications consistently
 - **Task Automation**: Automate repetitive operational tasks
@@ -88,32 +96,32 @@ ansible_ssh_private_key_file=~/.ssh/production.pem
   vars:
     nginx_port: 80
     app_user: webapp
-  
+
   tasks:
     - name: Install nginx
       package:
         name: nginx
         state: present
-    
+
     - name: Start and enable nginx
       service:
         name: nginx
         state: started
         enabled: yes
-    
+
     - name: Create application user
       user:
         name: "{{ app_user }}"
         system: yes
         shell: /bin/false
-    
+
     - name: Copy nginx configuration
       template:
         src: nginx.conf.j2
         dest: /etc/nginx/nginx.conf
         backup: yes
       notify: restart nginx
-  
+
   handlers:
     - name: restart nginx
       service:
@@ -133,7 +141,7 @@ Ansible modules are the building blocks of playbooks:
   file:
     path: /opt/myapp
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 # Package management
 - name: Install packages
@@ -166,7 +174,7 @@ Ansible modules are the building blocks of playbooks:
     dest: /etc/myapp/app.conf
     owner: myapp
     group: myapp
-    mode: '0644'
+    mode: "0644"
 ```
 
 ### Variables and Facts
@@ -214,17 +222,17 @@ events {
 http {
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
-    
+
     {% for server in nginx_servers %}
     server {
         listen {{ server.port }};
         server_name {{ server.name }};
-        
+
         {% if server.ssl_enabled %}
         ssl_certificate {{ ssl_certificate }};
         ssl_certificate_key {{ ssl_private_key }};
         {% endif %}
-        
+
         location / {
             proxy_pass http://{{ server.backend }};
             proxy_set_header Host $host;
@@ -352,17 +360,17 @@ roles/
       service:
         name: myapp
         state: stopped
-    
+
     - name: Deploy new version
       unarchive:
         src: /tmp/app.tar.gz
         dest: /opt/myapp
         remote_src: yes
-  
+
   rescue:
     - name: Rollback on failure
       command: /opt/scripts/rollback.sh
-  
+
   always:
     - name: Start application
       service:
@@ -382,7 +390,7 @@ roles/
   vars:
     mysql_root_password: "{{ vault_mysql_root_password }}"
     app_domain: example.com
-  
+
   tasks:
     - name: Install LAMP packages
       package:
@@ -393,20 +401,20 @@ roles/
           - php-mysql
           - libapache2-mod-php
         state: present
-    
+
     - name: Configure MySQL root password
       mysql_user:
         name: root
         password: "{{ mysql_root_password }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
-    
+
     - name: Create application database
       mysql_db:
         name: webapp
         state: present
         login_user: root
         login_password: "{{ mysql_root_password }}"
-    
+
     - name: Enable Apache modules
       apache2_module:
         name: "{{ item }}"
@@ -415,24 +423,24 @@ roles/
         - rewrite
         - ssl
       notify: restart apache
-    
+
     - name: Deploy application code
       git:
         repo: https://github.com/company/webapp.git
         dest: /var/www/html
         version: "{{ app_version | default('main') }}"
       notify: restart apache
-    
+
     - name: Configure virtual host
       template:
         src: vhost.conf.j2
         dest: "/etc/apache2/sites-available/{{ app_domain }}.conf"
       notify: restart apache
-    
+
     - name: Enable virtual host
       command: "a2ensite {{ app_domain }}"
       notify: restart apache
-  
+
   handlers:
     - name: restart apache
       service:
@@ -447,24 +455,27 @@ roles/
 - name: System security hardening
   hosts: all
   become: yes
-  
+
   tasks:
     - name: Update all packages
       package:
         name: "*"
         state: latest
-    
+
     - name: Configure SSH security
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
       loop:
-        - { regexp: '^PermitRootLogin', line: 'PermitRootLogin no' }
-        - { regexp: '^PasswordAuthentication', line: 'PasswordAuthentication no' }
-        - { regexp: '^X11Forwarding', line: 'X11Forwarding no' }
+        - { regexp: "^PermitRootLogin", line: "PermitRootLogin no" }
+        - {
+            regexp: "^PasswordAuthentication",
+            line: "PasswordAuthentication no",
+          }
+        - { regexp: "^X11Forwarding", line: "X11Forwarding no" }
       notify: restart ssh
-    
+
     - name: Configure firewall
       ufw:
         rule: "{{ item.rule }}"
@@ -474,12 +485,12 @@ roles/
         - { rule: allow, port: 22, proto: tcp }
         - { rule: allow, port: 80, proto: tcp }
         - { rule: allow, port: 443, proto: tcp }
-    
+
     - name: Enable firewall
       ufw:
         state: enabled
         policy: deny
-    
+
     - name: Install security tools
       package:
         name:
@@ -487,19 +498,19 @@ roles/
           - rkhunter
           - chkrootkit
         state: present
-    
+
     - name: Configure fail2ban
       template:
         src: jail.local.j2
         dest: /etc/fail2ban/jail.local
       notify: restart fail2ban
-  
+
   handlers:
     - name: restart ssh
       service:
         name: ssh
         state: restarted
-    
+
     - name: restart fail2ban
       service:
         name: fail2ban
@@ -574,19 +585,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      
+
       - name: Install dependencies
         run: |
           pip install ansible molecule[docker]
-      
+
       - name: Run molecule tests
         run: molecule test
-      
+
       - name: Run ansible-lint
         run: ansible-lint playbooks/
 ```
@@ -661,4 +672,4 @@ Remember: The goal is to make your infrastructure more reliable and manageable, 
 
 ---
 
-*This presentation was delivered at the ETSA October 2023 meetup. Complete playbook examples and role templates are available in our [GitHub repository](https://github.com/etsa-tech/ansible-examples).*
+_This presentation was delivered at the ETSA October 2023 meetup. Complete playbook examples and role templates are available in our [GitHub repository](https://github.com/etsa-tech/ansible-examples)._
