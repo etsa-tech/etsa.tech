@@ -2,10 +2,10 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-blue-600 text-white py-12">
+      <section className="bg-etsa-primary text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">
-            {process.env.NEXT_PUBLIC_ORG_NAME} - {process.env.NEXT_PUBLIC_ORG_NAME}
+            {process.env.NEXT_PUBLIC_ORG_NAME}
           </h1>
           <p className="text-xl mb-8">
             Professional meetup organization in {process.env.NEXT_PUBLIC_ORG_LOCATION}
@@ -13,7 +13,7 @@ export default function Home() {
           <div className="space-x-4">
             <a
               href={process.env.NEXT_PUBLIC_MEETUP_URL}
-              className="bg-white text-blue-600 px-6 py-3 rounded font-medium inline-block"
+              className="bg-white text-etsa-primary hover:bg-gray-50 hover:text-etsa-secondary px-6 py-3 rounded font-medium inline-block transition-colors"
             >
               Join Meetup
             </a>
@@ -43,7 +43,7 @@ export default function Home() {
             <div className="p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Network</h3>
               <p className="text-gray-600">
-                Connect with like-minded professionals in East Tennessee.
+                Connect with like-minded professionals in East Tennessee and virtually!
               </p>
             </div>
             <div className="p-6">
@@ -64,15 +64,15 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">50+</div>
+              <div className="text-4xl font-bold text-etsa-primary mb-2">{Math.ceil((new Date().getFullYear() - parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || '2012'))*11.6)}+</div>
               <div className="text-gray-600">Presentations</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">250+</div>
+              <div className="text-4xl font-bold text-etsa-primary mb-2">250+</div>
               <div className="text-gray-600">Members</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">{new Date().getFullYear() - parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || '2012')}+</div>
+              <div className="text-4xl font-bold text-etsa-primary mb-2">{new Date().getFullYear() - parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || '2012')}+</div>
               <div className="text-gray-600">Years Active</div>
             </div>
           </div>
