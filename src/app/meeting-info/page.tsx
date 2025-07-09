@@ -1,4 +1,6 @@
 import { getAllPosts } from "@/lib/blog";
+import { getPostSpeakers } from "@/lib/utils";
+import { SpeakerList } from "@/components/SpeakerLink";
 
 export const metadata = {
   title: "Meeting Information - ETSA",
@@ -101,9 +103,22 @@ export default function MeetingInfoPage() {
                       {latestPost.frontmatter.excerpt}
                     </p>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
-                      <span>
-                        Speaker: {latestPost.frontmatter.speakerName || "TBA"}
-                      </span>
+                      {(() => {
+                        const speakers = getPostSpeakers(
+                          latestPost.frontmatter,
+                        );
+                        return speakers.length > 0 ? (
+                          <span>
+                            Speaker{speakers.length > 1 ? "s" : ""}:{" "}
+                            <SpeakerList
+                              speakers={speakers}
+                              showTitles={false}
+                            />
+                          </span>
+                        ) : (
+                          <span>Speaker: TBA</span>
+                        );
+                      })()}
                     </div>
                   </a>
                 </div>

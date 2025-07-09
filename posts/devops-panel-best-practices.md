@@ -25,7 +25,7 @@ speakers:
     twitter: "https://twitter.com/alexsre"
     github: "https://github.com/alexrodriguez"
 presentationSlides: "https://slides.google.com/devops-panel-2024"
-presentationVideo: "https://youtube.com/watch?v=devops-panel"
+recordingUrl: "https://youtube.com/watch?v=devops-panel-recording-2024"
 eventDate: "2024-05-15"
 eventLocation: "Knoxville Entrepreneur Center"
 featured: true

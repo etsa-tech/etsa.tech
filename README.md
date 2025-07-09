@@ -115,7 +115,6 @@ speakerWebsite: "https://speaker.com" # Personal/professional website
 presentationTitle: "Presentation Title" # Specific presentation title (if different from main title)
 presentationDescription: "Detailed description" # Extended description of the content
 presentationSlides: "https://slides.example.com" # Link to slides (Google Slides, SlideShare, etc.)
-presentationVideo: "https://youtube.com/watch?v=..." # Video recording URL
 
 # Event Information (Optional)
 eventDate: "2024-01-15" # Date when presentation was given
@@ -185,7 +184,7 @@ All speaker fields are optional but recommended for speaker presentations. You c
 - **presentationTitle**: Specific presentation title if different from main title
 - **presentationDescription**: Extended description of the presentation content
 - **presentationSlides**: Direct link to slides (Google Slides, SlideShare, PDF, etc.)
-- **presentationVideo**: Link to video recording (YouTube, Vimeo, etc.)
+- **recordingUrl**: Link to the official meeting recording (automatically displayed with friendly "Watch Recording" button)
 
 #### Event Details
 
@@ -234,7 +233,7 @@ published: true
 ---
 ```
 
-#### Full Featured Post
+#### Full Featured Post (New Multiple Speakers Format)
 
 ```yaml
 ---
@@ -243,14 +242,16 @@ date: "2024-03-15"
 excerpt: "Deep dive into Docker networking concepts and best practices"
 tags: ["Docker", "Networking", "Containers"]
 author: "ETSA"
-speakerName: "John Doe"
-speakerTitle: "Senior Platform Engineer"
-speakerCompany: "CloudTech Solutions"
-speakerBio: "John has 8+ years of experience in containerization and cloud infrastructure"
-speakerLinkedIn: "https://linkedin.com/in/johndoe"
-speakerGitHub: "https://github.com/johndoe"
+speakers:
+  - name: "John Doe"
+    title: "Senior Platform Engineer"
+    company: "CloudTech Solutions"
+    bio: "John has 8+ years of experience in containerization and cloud infrastructure"
+    image: "/images/speakers/john-doe.jpg"
+    linkedIn: "https://linkedin.com/in/johndoe"
+    github: "https://github.com/johndoe"
 presentationSlides: "https://slides.google.com/docker-networking"
-presentationVideo: "https://youtube.com/watch?v=abc123"
+recordingUrl: "https://youtube.com/watch?v=docker-recording-2024"
 eventDate: "2024-03-15"
 eventLocation: "Knoxville Tech Hub"
 featured: true
@@ -312,7 +313,7 @@ speakers:
     twitter: "https://twitter.com/alexsre"
     github: "https://github.com/alexrodriguez"
 presentationSlides: "https://slides.google.com/devops-panel-2024"
-presentationVideo: "https://youtube.com/watch?v=devops-panel"
+recordingUrl: "https://youtube.com/watch?v=devops-panel-recording-2024"
 eventDate: "2024-05-15"
 eventLocation: "Knoxville Entrepreneur Center"
 featured: true

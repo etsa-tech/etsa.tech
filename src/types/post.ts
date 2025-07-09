@@ -31,7 +31,7 @@ export interface PostFrontmatter {
   presentationTitle?: string;
   presentationDescription?: string;
   presentationSlides?: string;
-  presentationVideo?: string;
+  recordingUrl?: string;
   eventDate?: string;
   eventLocation?: string;
   meetingDate?: string;
