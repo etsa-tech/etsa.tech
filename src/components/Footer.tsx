@@ -94,18 +94,18 @@ export function Footer() {
                   className="block p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden bg-white">
                       <Image
                         src="/sponsors/eldiedesigns.png"
-                        alt={`Eldie Designs`}
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 rounded-lg object-cover"
+                        alt="Eldie Designs"
+                        width={32}
+                        height={32}
+                        className="w-full h-full rounded-lg object-cover"
                       />
                     </div>
                     <div className="min-w-0">
                       <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
-                        Elie Design
+                        Eldie Design
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
                         Creative Solutions
@@ -124,13 +124,13 @@ export function Footer() {
                   className="block p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden bg-white">
                       <Image
                         src="/sponsors/givebutter.jpeg"
-                        alt={`Donate via GiveButter`}
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 rounded-lg object-cover"
+                        alt="Donate via GiveButter"
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-contain"
                       />
                     </div>
                     <div className="min-w-0">
@@ -154,13 +154,13 @@ export function Footer() {
                   className="block p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden bg-white">
                       <Image
                         src="/sponsors/teksystems.jpeg"
-                        alt={`TekSystems`}
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 rounded-lg object-cover"
+                        alt="TekSystems"
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-contain"
                       />
                     </div>
                     <div className="min-w-0">
