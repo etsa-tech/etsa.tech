@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { PostSummary } from '@/types/post';
-import { formatDate, getPostUrl, getTagUrl } from '@/lib/blog';
+import { formatDate, getPostUrl, getTagUrl } from '@/lib/utils';
 
 interface PostCardProps {
   post: PostSummary;
