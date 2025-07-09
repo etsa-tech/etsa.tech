@@ -12,7 +12,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <Image
-                src="/logo.jpg"
+                src="/static/logo.jpg"
                 alt={`${process.env.NEXT_PUBLIC_ORG_NAME} Logo`}
                 width={40}
                 height={40}
