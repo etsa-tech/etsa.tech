@@ -50,14 +50,14 @@ spec:
     runAsUser: 1000
     fsGroup: 2000
   containers:
-  - name: app
-    image: myapp:latest
-    securityContext:
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      capabilities:
-        drop:
-        - ALL
+    - name: app
+      image: myapp:latest
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
 ```
 
 ### 2. Role-Based Access Control (RBAC)
@@ -71,9 +71,9 @@ metadata:
   namespace: production
   name: pod-reader
 rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "watch", "list"]
 ```
 
 ### 3. Network Policies
@@ -88,8 +88,8 @@ metadata:
 spec:
   podSelector: {}
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
 ```
 
 ## Container Security
@@ -124,6 +124,7 @@ data:
 ```
 
 Consider using external secret management solutions like:
+
 - HashiCorp Vault
 - AWS Secrets Manager
 - Azure Key Vault
@@ -137,10 +138,10 @@ Consider using external secret management solutions like:
 apiVersion: audit.k8s.io/v1
 kind: Policy
 rules:
-- level: Metadata
-  resources:
-  - group: ""
-    resources: ["secrets", "configmaps"]
+  - level: Metadata
+    resources:
+      - group: ""
+        resources: ["secrets", "configmaps"]
 ```
 
 ### Security Monitoring Tools
@@ -169,26 +170,31 @@ rules:
 ## Best Practices Checklist
 
 ✅ **Access Control**
+
 - Implement RBAC with least privilege
 - Use service accounts appropriately
 - Enable audit logging
 
 ✅ **Network Security**
+
 - Implement network policies
 - Use TLS everywhere
 - Secure ingress controllers
 
 ✅ **Container Security**
+
 - Scan images for vulnerabilities
 - Use non-root containers
 - Implement resource limits
 
 ✅ **Secrets Management**
+
 - Use Kubernetes secrets or external solutions
 - Rotate secrets regularly
 - Encrypt secrets at rest
 
 ✅ **Monitoring**
+
 - Implement security monitoring
 - Set up alerting
 - Regular security assessments
@@ -196,16 +202,19 @@ rules:
 ## Tools and Resources
 
 ### Security Scanning Tools
+
 - **Trivy**: Vulnerability scanner
 - **Clair**: Container vulnerability analysis
 - **Anchore**: Container security platform
 
 ### Policy Engines
+
 - **Open Policy Agent (OPA)**: Policy-based control
 - **Gatekeeper**: Kubernetes-native policy controller
 - **Kustomize**: Configuration management
 
 ### Compliance Frameworks
+
 - **CIS Kubernetes Benchmark**: Security configuration guidelines
 - **NSA/CISA Kubernetes Hardening Guide**: Government security recommendations
 - **NIST Cybersecurity Framework**: Comprehensive security framework
@@ -215,6 +224,7 @@ rules:
 Kubernetes security is not a one-time setup but an ongoing process. By implementing these best practices, organizations can significantly reduce their attack surface and protect their cloud-native applications.
 
 Remember:
+
 - Security is everyone's responsibility
 - Start with the basics and build up
 - Automate security wherever possible
@@ -233,4 +243,4 @@ A: Service mesh like Istio can provide excellent security features like mTLS and
 
 ---
 
-*This presentation was delivered at the ETSA January 2024 meetup. For more information about upcoming events, visit our [meetup page](https://www.meetup.com/etsa-tech).*
+_This presentation was delivered at the ETSA January 2024 meetup. For more information about upcoming events, visit our [meetup page](https://www.meetup.com/etsa-tech)._

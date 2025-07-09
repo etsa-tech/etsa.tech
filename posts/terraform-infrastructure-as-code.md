@@ -327,22 +327,22 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.0
-    
-    - name: Terraform Init
-      run: terraform init
-    
-    - name: Terraform Plan
-      run: terraform plan -no-color
-      
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
 ```
 
 ### 3. Code Review Checklist
@@ -446,4 +446,4 @@ Terraform enables teams to manage infrastructure efficiently and safely. Key tak
 
 ---
 
-*This presentation was delivered at the ETSA December 2023 meetup. The complete code examples are available on [GitHub](https://github.com/etsa-tech/terraform-examples).*
+_This presentation was delivered at the ETSA December 2023 meetup. The complete code examples are available on [GitHub](https://github.com/etsa-tech/terraform-examples)._

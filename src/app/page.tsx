@@ -8,7 +8,8 @@ export default function Home() {
             {process.env.NEXT_PUBLIC_ORG_NAME}
           </h1>
           <p className="text-xl mb-8">
-            Professional meetup organization in {process.env.NEXT_PUBLIC_ORG_LOCATION}
+            Professional meetup organization in{" "}
+            {process.env.NEXT_PUBLIC_ORG_LOCATION}
           </p>
           <div className="space-x-4">
             <a
@@ -35,19 +36,26 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Learn</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Learn
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Stay current with the latest technologies and best practices.
               </p>
             </div>
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Network</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Network
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Connect with like-minded professionals in East Tennessee and virtually!
+                Connect with like-minded professionals in East Tennessee and
+                virtually!
               </p>
             </div>
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Grow</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Grow
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Advance your career through knowledge sharing and mentorship.
               </p>
@@ -64,16 +72,35 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <div className="text-4xl font-bold text-etsa-primary mb-2">{Math.ceil((new Date().getFullYear() - parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || '2012'))*11.6)}+</div>
-              <div className="text-gray-600 dark:text-gray-300">Presentations</div>
+              <div className="text-4xl font-bold text-etsa-primary mb-2">
+                {Math.ceil(
+                  (new Date().getFullYear() -
+                    parseInt(
+                      process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || "2012",
+                    )) *
+                    11.6,
+                )}
+                +
+              </div>
+              <div className="text-gray-600 dark:text-gray-300">
+                Presentations
+              </div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-etsa-primary mb-2">250+</div>
+              <div className="text-4xl font-bold text-etsa-primary mb-2">
+                250+
+              </div>
               <div className="text-gray-600 dark:text-gray-300">Members</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-etsa-primary mb-2">{new Date().getFullYear() - parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || '2012')}+</div>
-              <div className="text-gray-600 dark:text-gray-300">Years Active</div>
+              <div className="text-4xl font-bold text-etsa-primary mb-2">
+                {new Date().getFullYear() -
+                  parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || "2012")}
+                +
+              </div>
+              <div className="text-gray-600 dark:text-gray-300">
+                Years Active
+              </div>
             </div>
           </div>
         </div>

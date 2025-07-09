@@ -1,4 +1,4 @@
-import { createTransporter } from './email-config';
+import { createTransporter } from "./email-config";
 
 // Server-only email functions
 export async function sendContactEmail(formData: {
@@ -9,20 +9,20 @@ export async function sendContactEmail(formData: {
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const transporter = createTransporter();
-    
+
     // Verify transporter configuration
     try {
       await transporter.verify();
     } catch (verifyError) {
-      console.error('SMTP configuration error:', verifyError);
-      return { 
-        success: false, 
-        error: 'Email service configuration error. Please try again later.' 
+      console.error("SMTP configuration error:", verifyError);
+      return {
+        success: false,
+        error: "Email service configuration error. Please try again later.",
       };
     }
 
     const { name, email, subject, message } = formData;
-    
+
     // Email content
     const htmlContent = `
       <!DOCTYPE html>
@@ -62,7 +62,10 @@ export async function sendContactEmail(formData: {
               </div>
               <div class="field">
                 <div class="label">Message:</div>
-                <div class="value">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
+                <div class="value">${escapeHtml(message).replace(
+                  /\n/g,
+                  "<br>",
+                )}</div>
               </div>
             </div>
             <div class="footer">
@@ -99,14 +102,13 @@ Timestamp: ${new Date().toISOString()}
       html: htmlContent,
     });
 
-    console.log('Contact email sent successfully:', info.messageId);
+    console.log("Contact email sent successfully:", info.messageId);
     return { success: true };
-
   } catch (error) {
-    console.error('Error sending contact email:', error);
-    return { 
-      success: false, 
-      error: 'Failed to send email. Please try again later.' 
+    console.error("Error sending contact email:", error);
+    return {
+      success: false,
+      error: "Failed to send email. Please try again later.",
     };
   }
 }
@@ -148,12 +150,20 @@ export async function sendAutoReply(formData: {
               <p>Thank you for reaching out to ETSA (East Tennessee Systems Administration). We've received your message and will get back to you as soon as possible.</p>
               <p>In the meantime, we encourage you to:</p>
               <ul>
-                <li>Join our <a href="${process.env.NEXT_PUBLIC_MEETUP_URL}" style="color: #0197d6;">Meetup group</a> for upcoming events</li>
-                <li>Follow us on <a href="${process.env.NEXT_PUBLIC_LINKEDIN_URL}" style="color: #0197d6;">LinkedIn</a> for updates</li>
-                <li>Check out our <a href="${process.env.NEXT_PUBLIC_GITHUB_URL}" style="color: #0197d6;">GitHub</a> for community resources</li>
+                <li>Join our <a href="${
+                  process.env.NEXT_PUBLIC_MEETUP_URL
+                }" style="color: #0197d6;">Meetup group</a> for upcoming events</li>
+                <li>Follow us on <a href="${
+                  process.env.NEXT_PUBLIC_LINKEDIN_URL
+                }" style="color: #0197d6;">LinkedIn</a> for updates</li>
+                <li>Check out our <a href="${
+                  process.env.NEXT_PUBLIC_GITHUB_URL
+                }" style="color: #0197d6;">GitHub</a> for community resources</li>
               </ul>
               <div class="cta">
-                <a href="${process.env.NEXT_PUBLIC_MEETUP_URL}">Join Our Next Meetup</a>
+                <a href="${
+                  process.env.NEXT_PUBLIC_MEETUP_URL
+                }">Join Our Next Meetup</a>
               </div>
               <p>Best regards,<br>The ETSA Team</p>
             </div>
@@ -189,28 +199,27 @@ Professional meetup organization in Knoxville, TN
     await transporter.sendMail({
       from: `"ETSA" <${process.env.SMTP_FROM}>`,
       to: email,
-      subject: 'Thank you for contacting ETSA',
+      subject: "Thank you for contacting ETSA",
       text: textContent,
       html: htmlContent,
     });
 
     return { success: true };
-
   } catch (error) {
-    console.error('Error sending auto-reply:', error);
+    console.error("Error sending auto-reply:", error);
     // Don't fail the main request if auto-reply fails
-    return { success: false, error: 'Auto-reply failed' };
+    return { success: false, error: "Auto-reply failed" };
   }
 }
 
 // HTML escape function to prevent XSS
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }

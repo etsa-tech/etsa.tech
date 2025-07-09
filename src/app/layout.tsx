@@ -13,7 +13,15 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_ORG_NAME,
   description: `A professional meetup organization based in ${process.env.NEXT_PUBLIC_ORG_LOCATION}, bringing together systems administrators, DevOps engineers, and technology professionals.`,
-  keywords: [process.env.NEXT_PUBLIC_ORG_NAME || "ETSA", process.env.NEXT_PUBLIC_ORG_NAME || "East Tennessee Systems Administration", "Systems Administration", "DevOps", process.env.NEXT_PUBLIC_ORG_LOCATION || "Knoxville", "Meetup", "Technology"],
+  keywords: [
+    process.env.NEXT_PUBLIC_ORG_NAME || "ETSA",
+    process.env.NEXT_PUBLIC_ORG_NAME || "East Tennessee Systems Administration",
+    "Systems Administration",
+    "DevOps",
+    process.env.NEXT_PUBLIC_ORG_LOCATION || "Knoxville",
+    "Meetup",
+    "Technology",
+  ],
   authors: [{ name: process.env.NEXT_PUBLIC_ORG_NAME }],
   creator: process.env.NEXT_PUBLIC_ORG_NAME,
   publisher: process.env.NEXT_PUBLIC_ORG_NAME,
@@ -28,7 +36,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ETSA",
-    description: "A professional meetup organization based in Knoxville, TN, bringing together systems administrators, DevOps engineers, and technology professionals.",
+    description:
+      "A professional meetup organization based in Knoxville, TN, bringing together systems administrators, DevOps engineers, and technology professionals.",
   },
   robots: {
     index: true,
@@ -58,9 +67,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="etsa-ui-theme">
           <div className="relative flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1">
-              {children}
-            </main>
+            <main className="flex-1">{children}</main>
             <Footer />
           </div>
         </ThemeProvider>

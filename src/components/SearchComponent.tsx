@@ -1,16 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { PostSummary } from '@/types/post';
-import { PostCard } from '@/components/PostCard';
+import { useState, useMemo } from "react";
+import { PostSummary } from "@/types/post";
+import { PostCard } from "@/components/PostCard";
 
 interface SearchComponentProps {
   posts: PostSummary[];
   className?: string;
 }
 
-export default function SearchComponent({ posts, className = '' }: SearchComponentProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+export default function SearchComponent({
+  posts,
+  className = "",
+}: SearchComponentProps) {
+  const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
   // Debounced search results
@@ -23,7 +26,7 @@ export default function SearchComponent({ posts, className = '' }: SearchCompone
     const searchTerm = searchQuery.toLowerCase();
     return posts.filter((post) => {
       const { title, excerpt, tags } = post.frontmatter;
-      const speakerName = post.frontmatter.speakerName || '';
+      const speakerName = post.frontmatter.speakerName || "";
 
       return (
         title.toLowerCase().includes(searchTerm) ||
@@ -38,7 +41,7 @@ export default function SearchComponent({ posts, className = '' }: SearchCompone
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     if (query.trim()) {
       setIsSearching(true);
       // Simulate search delay for better UX
@@ -49,7 +52,7 @@ export default function SearchComponent({ posts, className = '' }: SearchCompone
   };
 
   const clearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
     setIsSearching(false);
   };
 
@@ -69,7 +72,7 @@ export default function SearchComponent({ posts, className = '' }: SearchCompone
               placeholder="Search by title, speaker, or topic..."
               className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-etsa-primary focus:border-etsa-primary transition-colors"
             />
-            
+
             {/* Search Icon */}
             <svg
               className="absolute left-4 top-3.5 h-5 w-5 text-gray-400"
@@ -115,10 +118,13 @@ export default function SearchComponent({ posts, className = '' }: SearchCompone
           {searchQuery && (
             <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
               {searchResults.length === 0 ? (
-                <span>No presentations found for &quot;{searchQuery}&quot;</span>
+                <span>
+                  No presentations found for &quot;{searchQuery}&quot;
+                </span>
               ) : (
                 <span>
-                  Found {searchResults.length} presentation{searchResults.length !== 1 ? 's' : ''} 
+                  Found {searchResults.length} presentation
+                  {searchResults.length !== 1 ? "s" : ""}
                   {searchQuery && ` for "${searchQuery}"`}
                 </span>
               )}
@@ -161,8 +167,9 @@ export default function SearchComponent({ posts, className = '' }: SearchCompone
               No presentations found
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              We couldn&apos;t find any presentations matching &quot;{searchQuery}&quot;.
-              Try different keywords or browse all presentations.
+              We couldn&apos;t find any presentations matching &quot;
+              {searchQuery}&quot;. Try different keywords or browse all
+              presentations.
             </p>
             <div className="space-x-4">
               <button
@@ -193,7 +200,11 @@ interface SearchSuggestionsProps {
   onSuggestionClick: (suggestion: string) => void;
 }
 
-export function SearchSuggestions({ query, posts, onSuggestionClick }: SearchSuggestionsProps) {
+export function SearchSuggestions({
+  query,
+  posts,
+  onSuggestionClick,
+}: SearchSuggestionsProps) {
   // Get unique tags and speakers that match the query
   const suggestions = useMemo(() => {
     if (!query.trim()) {
@@ -201,15 +212,19 @@ export function SearchSuggestions({ query, posts, onSuggestionClick }: SearchSug
     }
     const allTags = new Set<string>();
     const allSpeakers = new Set<string>();
-    
-    posts.forEach(post => {
-      post.frontmatter.tags.forEach(tag => {
+
+    posts.forEach((post) => {
+      post.frontmatter.tags.forEach((tag) => {
         if (tag.toLowerCase().includes(query.toLowerCase())) {
           allTags.add(tag);
         }
       });
-      
-      if (post.frontmatter.speakerName?.toLowerCase().includes(query.toLowerCase())) {
+
+      if (
+        post.frontmatter.speakerName
+          ?.toLowerCase()
+          .includes(query.toLowerCase())
+      ) {
         allSpeakers.add(post.frontmatter.speakerName);
       }
     });
@@ -220,7 +235,10 @@ export function SearchSuggestions({ query, posts, onSuggestionClick }: SearchSug
     };
   }, [query, posts]);
 
-  if (!query.trim() || (suggestions.tags.length === 0 && suggestions.speakers.length === 0)) {
+  if (
+    !query.trim() ||
+    (suggestions.tags.length === 0 && suggestions.speakers.length === 0)
+  ) {
     return null;
   }
 
@@ -229,9 +247,11 @@ export function SearchSuggestions({ query, posts, onSuggestionClick }: SearchSug
       <div className="p-4 space-y-3">
         {suggestions.tags.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Tags</h4>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+              Tags
+            </h4>
             <div className="flex flex-wrap gap-2">
-              {suggestions.tags.map(tag => (
+              {suggestions.tags.map((tag) => (
                 <button
                   key={tag}
                   onClick={() => onSuggestionClick(tag)}
@@ -243,12 +263,14 @@ export function SearchSuggestions({ query, posts, onSuggestionClick }: SearchSug
             </div>
           </div>
         )}
-        
+
         {suggestions.speakers.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Speakers</h4>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+              Speakers
+            </h4>
             <div className="space-y-1">
-              {suggestions.speakers.map(speaker => (
+              {suggestions.speakers.map((speaker) => (
                 <button
                   key={speaker}
                   onClick={() => onSuggestionClick(speaker)}
