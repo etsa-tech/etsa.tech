@@ -19,6 +19,19 @@ export interface PostFrontmatter {
   presentationVideo?: string;
   eventDate?: string;
   eventLocation?: string;
+  meetingDate?: string;
+  meetingLocation?: {
+    name: string;
+    address: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+    description?: string;
+    parking?: string;
+    accessibility?: string;
+    contact?: string;
+  };
   featured?: boolean;
   published?: boolean;
 }
