@@ -103,7 +103,22 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       script.src = "https://js.hcaptcha.com/1/api.js";
       script.async = true;
       script.defer = true;
+      script.crossOrigin = "anonymous";
+      // Security Note: hCaptcha doesn't provide SRI hashes as their script updates frequently
+      // For production deployment, implement these security measures at the web server level:
+      // 1. Content-Security-Policy header allowing only trusted domains
+      // 2. X-Frame-Options: DENY
+      // 3. X-Content-Type-Options: nosniff
+      // 4. Referrer-Policy: origin-when-cross-origin
+      // Example CSP: "script-src 'self' 'unsafe-inline' https://js.hcaptcha.com; frame-src https://hcaptcha.com"
       script.onload = loadHCaptcha;
+      script.onerror = () => {
+        console.error("Failed to load hCaptcha script");
+        setErrors((prev) => ({
+          ...prev,
+          captcha: "Failed to load captcha. Please refresh the page.",
+        }));
+      };
       document.head.appendChild(script);
     } else {
       loadHCaptcha();
