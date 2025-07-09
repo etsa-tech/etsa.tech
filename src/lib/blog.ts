@@ -3,7 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
-import { Post, PostSummary, PostFrontmatter } from "@/types/post";
+import { Post, PostSummary, PostFrontmatter, Speaker } from "@/types/post";
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
@@ -168,4 +168,89 @@ export function getPostUrl(slug: string): string {
 // Generate tag URL
 export function getTagUrl(tag: string): string {
   return `/tag/${encodeURIComponent(tag.toLowerCase())}`;
+}
+
+// Generate speaker URL
+export function getSpeakerUrl(speakerName: string): string {
+  return `/speaker/${encodeURIComponent(
+    speakerName.toLowerCase().replace(/\s+/g, "-"),
+  )}`;
+}
+
+// Get all speakers from posts (both legacy and new format)
+export function getAllSpeakers(): string[] {
+  const allPosts = getAllPosts();
+  const speakers = new Set<string>();
+
+  allPosts.forEach((post) => {
+    const { frontmatter } = post;
+
+    // Handle legacy single speaker format
+    if (frontmatter.speakerName) {
+      speakers.add(frontmatter.speakerName);
+    }
+
+    // Handle new multiple speakers format
+    if (frontmatter.speakers) {
+      frontmatter.speakers.forEach((speaker) => {
+        speakers.add(speaker.name);
+      });
+    }
+  });
+
+  return Array.from(speakers).sort();
+}
+
+// Get posts by speaker name
+export function getPostsBySpeaker(speakerName: string): PostSummary[] {
+  const allPosts = getAllPosts();
+  const normalizedSpeakerName = speakerName.toLowerCase();
+
+  return allPosts.filter((post) => {
+    const { frontmatter } = post;
+
+    // Check legacy single speaker format
+    if (
+      frontmatter.speakerName &&
+      frontmatter.speakerName.toLowerCase() === normalizedSpeakerName
+    ) {
+      return true;
+    }
+
+    // Check new multiple speakers format
+    if (frontmatter.speakers) {
+      return frontmatter.speakers.some(
+        (speaker) => speaker.name.toLowerCase() === normalizedSpeakerName,
+      );
+    }
+
+    return false;
+  });
+}
+
+// Get all speakers from a post (unified function)
+export function getPostSpeakers(frontmatter: PostFrontmatter): Speaker[] {
+  const speakers: Speaker[] = [];
+
+  // Handle legacy single speaker format
+  if (frontmatter.speakerName) {
+    speakers.push({
+      name: frontmatter.speakerName,
+      title: frontmatter.speakerTitle,
+      company: frontmatter.speakerCompany,
+      bio: frontmatter.speakerBio,
+      image: frontmatter.speakerImage,
+      linkedIn: frontmatter.speakerLinkedIn,
+      twitter: frontmatter.speakerTwitter,
+      github: frontmatter.speakerGitHub,
+      website: frontmatter.speakerWebsite,
+    });
+  }
+
+  // Handle new multiple speakers format
+  if (frontmatter.speakers) {
+    speakers.push(...frontmatter.speakers);
+  }
+
+  return speakers;
 }
