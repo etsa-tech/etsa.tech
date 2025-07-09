@@ -148,7 +148,7 @@ export function Footer() {
               {/* TEKsystems */}
               <div className="group">
                 <a
-                  href="http://www.teksystems.com/"
+                  href="https://www.teksystems.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-105 border border-gray-100 dark:border-gray-700"
