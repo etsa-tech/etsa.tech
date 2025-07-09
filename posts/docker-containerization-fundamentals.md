@@ -5,16 +5,18 @@ excerpt: "Master the basics of Docker containerization, from creating your first
 tags:
   ["Docker", "Containers", "DevOps", "Microservices", "Application Deployment"]
 author: "ETSA"
-speakerName: "David Kim"
-speakerTitle: "Platform Engineer"
-speakerCompany: "ContainerCorp"
-speakerBio: "David is a platform engineer with 5+ years of experience in containerization and orchestration. He's helped organizations migrate from monolithic to containerized architectures and is passionate about developer productivity."
-speakerLinkedIn: "https://linkedin.com/in/david-kim-platform"
-speakerGitHub: "https://github.com/davidkim"
+speakers:
+  - name: "David Kim"
+    title: "Platform Engineer"
+    company: "ContainerCorp"
+    bio: "David is a platform engineer with 5+ years of experience in containerization and orchestration. He's helped organizations migrate from monolithic to containerized architectures and is passionate about developer productivity."
+    image: "/images/speakers/david-kim.jpg"
+    linkedIn: "https://linkedin.com/in/david-kim-platform"
+    github: "https://github.com/davidkim"
 presentationTitle: "Docker Fundamentals: Containerizing Your Applications"
 presentationDescription: "Learn the fundamentals of Docker and how to containerize applications effectively"
 presentationSlides: "https://slides.example.com/docker-fundamentals"
-presentationVideo: "https://youtube.com/watch?v=docker-fundamentals"
+recordingUrl: "https://youtube.com/watch?v=docker-recording-2023"
 eventDate: "2023-09-25"
 eventLocation: "Knoxville Entrepreneur Center"
 featured: true

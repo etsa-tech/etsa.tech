@@ -11,15 +11,18 @@ tags:
     "Infrastructure",
   ]
 author: "ETSA"
-speakerName: "Jennifer Park"
-speakerTitle: "DevOps Engineer"
-speakerCompany: "AutoScale Solutions"
-speakerBio: "Jennifer has been automating infrastructure for 7+ years and is passionate about making complex systems simple. She's an Ansible contributor and has helped numerous organizations adopt infrastructure automation."
-speakerLinkedIn: "https://linkedin.com/in/jennifer-park-devops"
-speakerGitHub: "https://github.com/jpark"
+speakers:
+  - name: "Jennifer Park"
+    title: "DevOps Engineer"
+    company: "AutoScale Solutions"
+    bio: "Jennifer has been automating infrastructure for 7+ years and is passionate about making complex systems simple. She's an Ansible contributor and has helped numerous organizations adopt infrastructure automation."
+    image: "/images/speakers/jennifer-park.jpg"
+    linkedIn: "https://linkedin.com/in/jennifer-park-devops"
+    github: "https://github.com/jpark"
 presentationTitle: "Ansible Automation: Simplifying Configuration Management"
 presentationDescription: "Learn how to automate infrastructure management with Ansible playbooks and best practices"
 presentationSlides: "https://slides.example.com/ansible-automation"
+recordingUrl: "https://youtube.com/watch?v=ansible-recording-2023"
 eventDate: "2023-10-15"
 eventLocation: "Knoxville Public Library"
 featured: false

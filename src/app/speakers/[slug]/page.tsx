@@ -54,7 +54,7 @@ export default async function SpeakerPostPage({ params }: PageProps) {
     date,
     tags,
     presentationSlides,
-    presentationVideo,
+    recordingUrl,
     eventDate,
     eventLocation,
   } = frontmatter;
@@ -254,7 +254,7 @@ export default async function SpeakerPostPage({ params }: PageProps) {
             )}
 
             {/* Presentation Resources */}
-            {(presentationSlides || presentationVideo) && (
+            {(presentationSlides || recordingUrl) && (
               <div className="not-prose card mb-8">
                 <div className="card-header">
                   <h2 className="card-title">Presentation Resources</h2>
@@ -284,12 +284,12 @@ export default async function SpeakerPostPage({ params }: PageProps) {
                         View Slides
                       </a>
                     )}
-                    {presentationVideo && (
+                    {recordingUrl && (
                       <a
-                        href={presentationVideo}
+                        href={recordingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-outline btn-sm"
+                        className="btn btn-primary btn-sm"
                       >
                         <svg
                           className="mr-2 h-4 w-4"
@@ -301,10 +301,10 @@ export default async function SpeakerPostPage({ params }: PageProps) {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10v4a2 2 0 002 2h2a2 2 0 002-2v-4M9 10V8a2 2 0 012-2h2a2 2 0 012 2v2"
+                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                           />
                         </svg>
-                        Watch Video
+                        Watch Recording
                       </a>
                     )}
                   </div>
