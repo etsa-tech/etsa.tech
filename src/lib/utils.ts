@@ -1,4 +1,5 @@
 // Utility functions that can be used on both client and server
+import sanitizeHtml from "sanitize-html";
 // Format date for display
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -42,7 +43,15 @@ export function highlightSearchTerm(text: string, searchTerm: string): string {
     `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
     "gi",
   );
-  return text.replace(regex, "<mark>$1</mark>");
+
+  // Use sanitize-html to ensure the highlighted output is safe
+  const highlighted = text.replace(regex, "<mark>$1</mark>");
+
+  return sanitizeHtml(highlighted, {
+    allowedTags: ["mark"], // Only allow mark tags for highlighting
+    allowedAttributes: {}, // No attributes needed
+    disallowedTagsMode: "escape", // Escape any other tags instead of removing
+  });
 }
 
 // Truncate text to a specific length
@@ -53,9 +62,18 @@ export function truncateText(text: string, maxLength: number): string {
 
 // Get excerpt from content
 export function getExcerpt(content: string, maxLength: number = 160): string {
-  // Remove markdown and HTML using simple regex
-  const plainText = content
-    .replace(/<[^>]*>/g, "") // Remove HTML tags
+  // First, sanitize HTML content properly using sanitize-html
+  const sanitizedContent = sanitizeHtml(content, {
+    allowedTags: [], // Remove all HTML tags
+    allowedAttributes: {}, // Remove all attributes
+    textFilter: function (text) {
+      // Additional text filtering if needed
+      return text;
+    },
+  });
+
+  // Then remove markdown formatting
+  const plainText = sanitizedContent
     .replace(/#{1,6}\s+/g, "") // Remove markdown headers
     .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold
     .replace(/\*(.*?)\*/g, "$1") // Remove italic
