@@ -27,22 +27,31 @@ export function calculateReadingTime(content: string): number {
   return Math.ceil(words / wordsPerMinute);
 }
 
-// Sanitize input for search
+// Sanitize input for search (ReDoS-safe implementation)
 export function sanitizeSearchInput(input: string): string {
-  return input
+  // Limit input length to prevent ReDoS and resource exhaustion
+  const maxInputLength = 200;
+  const limitedInput = input.slice(0, maxInputLength);
+
+  return limitedInput
     .trim()
-    .replace(/\s+/g, " ") // Replace multiple spaces with single space
+    .replace(/\s+/g, " ") // Replace multiple spaces with single space (safe pattern)
     .replace(/[<>]/g, ""); // Remove potential HTML brackets
 }
 
-// Highlight search terms in text
+// Highlight search terms in text (ReDoS-safe implementation)
 export function highlightSearchTerm(text: string, searchTerm: string): string {
   if (!searchTerm.trim()) return text;
 
-  const regex = new RegExp(
-    `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-    "gi",
-  );
+  // Limit search term length to prevent ReDoS attacks
+  const maxSearchLength = 100;
+  const safeTerm = searchTerm.slice(0, maxSearchLength).trim();
+
+  // Escape special regex characters to prevent injection
+  const escapedTerm = safeTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  // Use a simple, non-backtracking regex with word boundaries for safety
+  const regex = new RegExp(`\\b(${escapedTerm})\\b`, "gi");
 
   // Use sanitize-html to ensure the highlighted output is safe
   const highlighted = text.replace(regex, "<mark>$1</mark>");
@@ -72,13 +81,17 @@ export function getExcerpt(content: string, maxLength: number = 160): string {
     },
   });
 
-  // Then remove markdown formatting
+  // Then remove markdown formatting using safe, non-backtracking patterns
   const plainText = sanitizedContent
     .replace(/#{1,6}\s+/g, "") // Remove markdown headers
-    .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold
-    .replace(/\*(.*?)\*/g, "$1") // Remove italic
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove markdown links, keep text
-    .replace(/`([^`]+)`/g, "$1") // Remove inline code backticks
+    .replace(/\*\*[^*]+\*\*/g, (match) => match.slice(2, -2)) // Remove bold, prevent backtracking
+    .replace(/\*[^*]+\*/g, (match) => match.slice(1, -1)) // Remove italic, prevent backtracking
+    .replace(/\[[^\]]*\]\([^)]*\)/g, (match) => {
+      // Safe markdown link removal - extract text between [ and ]
+      const textMatch = match.match(/^\[([^\]]*)\]/);
+      return textMatch ? textMatch[1] : "";
+    })
+    .replace(/`[^`]*`/g, (match) => match.slice(1, -1)) // Remove inline code backticks, prevent backtracking
     .replace(/\n+/g, " ") // Replace newlines with spaces
     .replace(/\s+/g, " ") // Replace multiple spaces with single space
     .trim();

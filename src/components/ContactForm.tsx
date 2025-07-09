@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import {
   validateName,
   validateEmail,
@@ -8,19 +9,7 @@ import {
   validateMessage,
 } from "@/lib/validation";
 
-interface HCaptcha {
-  render: (
-    container: string,
-    options: Record<string, unknown>,
-  ) => { reset: () => void; getResponse: () => string };
-  remove: (widget: { reset: () => void; getResponse: () => string }) => void;
-}
-
-declare global {
-  interface Window {
-    hcaptcha?: HCaptcha;
-  }
-}
+// HCaptcha types are now handled by the official React component
 
 interface ContactFormProps {
   className?: string;
@@ -57,84 +46,33 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
   >("idle");
   const [submitMessage, setSubmitMessage] = useState("");
 
-  const captchaRef = useRef<{
-    reset: () => void;
-    getResponse: () => string;
-  } | null>(null);
-  const [captchaLoaded, setCaptchaLoaded] = useState(false);
+  // Use React ref for the official hCaptcha component
+  const captchaRef = useRef<HCaptcha>(null);
+  const [captchaToken, setCaptchaToken] = useState<string>("");
 
-  // Load HCaptcha
-  useEffect(() => {
-    const loadHCaptcha = () => {
-      if (
-        typeof window !== "undefined" &&
-        window.hcaptcha &&
-        !captchaRef.current
-      ) {
-        try {
-          captchaRef.current = window.hcaptcha.render("hcaptcha-container", {
-            sitekey: process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY,
-            callback: () => {
-              setErrors((prev) => ({ ...prev, captcha: undefined }));
-            },
-            "expired-callback": () => {
-              setErrors((prev) => ({
-                ...prev,
-                captcha: "Captcha expired. Please try again.",
-              }));
-            },
-            "error-callback": () => {
-              setErrors((prev) => ({
-                ...prev,
-                captcha: "Captcha error. Please try again.",
-              }));
-            },
-          });
-          setCaptchaLoaded(true);
-        } catch (error) {
-          console.error("HCaptcha render error:", error);
-        }
-      }
-    };
+  // Handle captcha verification
+  const handleCaptchaVerify = (token: string) => {
+    setCaptchaToken(token);
+    setErrors((prev) => ({ ...prev, captcha: undefined }));
+  };
 
-    // Load script if not already loaded
-    if (!document.querySelector('script[src*="hcaptcha.com"]')) {
-      const script = document.createElement("script");
-      script.src = "https://js.hcaptcha.com/1/api.js";
-      script.async = true;
-      script.defer = true;
-      script.crossOrigin = "anonymous";
-      // Security Note: hCaptcha doesn't provide SRI hashes as their script updates frequently
-      // For production deployment, implement these security measures at the web server level:
-      // 1. Content-Security-Policy header allowing only trusted domains
-      // 2. X-Frame-Options: DENY
-      // 3. X-Content-Type-Options: nosniff
-      // 4. Referrer-Policy: origin-when-cross-origin
-      // Example CSP: "script-src 'self' 'unsafe-inline' https://js.hcaptcha.com; frame-src https://hcaptcha.com"
-      script.onload = loadHCaptcha;
-      script.onerror = () => {
-        console.error("Failed to load hCaptcha script");
-        setErrors((prev) => ({
-          ...prev,
-          captcha: "Failed to load captcha. Please refresh the page.",
-        }));
-      };
-      document.head.appendChild(script);
-    } else {
-      loadHCaptcha();
-    }
+  // Handle captcha expiration
+  const handleCaptchaExpire = () => {
+    setCaptchaToken("");
+    setErrors((prev) => ({
+      ...prev,
+      captcha: "Captcha expired. Please try again.",
+    }));
+  };
 
-    return () => {
-      // Cleanup on unmount
-      if (captchaRef.current && window.hcaptcha) {
-        try {
-          window.hcaptcha.remove(captchaRef.current);
-        } catch (error) {
-          console.error("HCaptcha cleanup error:", error);
-        }
-      }
-    };
-  }, []);
+  // Handle captcha error
+  const handleCaptchaError = () => {
+    setCaptchaToken("");
+    setErrors((prev) => ({
+      ...prev,
+      captcha: "Captcha error. Please try again.",
+    }));
+  };
 
   // Real-time validation
   const validateField = (name: string, value: string) => {
@@ -203,15 +141,9 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       const messageError = validateMessage(formData.message);
       if (messageError) fieldErrors.message = messageError;
 
-      // Get captcha token
-      let captchaToken = "";
-      if (captchaRef.current) {
-        captchaToken = captchaRef.current.getResponse();
-        if (!captchaToken) {
-          fieldErrors.captcha = "Please complete the captcha verification";
-        }
-      } else {
-        fieldErrors.captcha = "Captcha not loaded. Please refresh the page.";
+      // Validate captcha token
+      if (!captchaToken) {
+        fieldErrors.captcha = "Please complete the captcha verification";
       }
 
       if (Object.keys(fieldErrors).length > 0) {
@@ -227,8 +159,9 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       );
       setFormData({ name: "", email: "", subject: "", message: "" });
       setErrors({});
+      setCaptchaToken("");
       if (captchaRef.current) {
-        captchaRef.current.reset();
+        captchaRef.current.resetCaptcha();
       }
     } catch (error) {
       console.error("Form submission error:", error);
@@ -236,8 +169,9 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       setSubmitMessage(
         "Network error. Please check your connection and try again.",
       );
+      setCaptchaToken("");
       if (captchaRef.current) {
-        captchaRef.current.reset();
+        captchaRef.current.resetCaptcha();
       }
     } finally {
       setIsSubmitting(false);
@@ -363,19 +297,18 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
           )}
         </div>
 
-        {/* HCaptcha */}
+        {/* HCaptcha - Secure React Component */}
         <div>
-          <div
-            id="hcaptcha-container"
-            className="flex justify-center min-h-[78px]"
-          >
-            {!captchaLoaded && (
-              <div className="flex items-center justify-center h-[78px] w-full bg-gray-100 dark:bg-gray-700 rounded">
-                <span className="text-gray-500 dark:text-gray-400">
-                  Loading captcha...
-                </span>
-              </div>
-            )}
+          <div className="flex justify-center min-h-[78px]">
+            <HCaptcha
+              ref={captchaRef}
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ""}
+              onVerify={handleCaptchaVerify}
+              onExpire={handleCaptchaExpire}
+              onError={handleCaptchaError}
+              theme="light"
+              size="normal"
+            />
           </div>
           {errors.captcha && (
             <p className="mt-2 text-sm text-red-600 dark:text-red-400 text-center">
