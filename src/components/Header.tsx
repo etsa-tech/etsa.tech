@@ -13,7 +13,7 @@ export function Header() {
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
     { name: "Meeting Info", href: "/meeting-info" },
-    { name: "Speakers", href: "/speakers" },
+    { name: "Past Speakers", href: "/speakers" },
   ];
 
   return (
