@@ -1,8 +1,11 @@
 [build]
+  publish = "out"
   command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# No redirects needed for static export - all pages are pre-generated
 
 [context.production]
   command = "npm run build"
