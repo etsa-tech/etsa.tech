@@ -2,7 +2,7 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-etsa-primary text-white py-12">
+      <section className="bg-etsa-primary dark:bg-etsa-secondary text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">
             {process.env.NEXT_PUBLIC_ORG_NAME}
@@ -28,27 +28,27 @@ export default function Home() {
       </section>
 
       {/* Content Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-gray-800">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">
             About Our Community
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Learn</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Learn</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Stay current with the latest technologies and best practices.
               </p>
             </div>
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Network</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Network</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Connect with like-minded professionals in East Tennessee and virtually!
               </p>
             </div>
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Grow</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Grow</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Advance your career through knowledge sharing and mentorship.
               </p>
             </div>
@@ -57,23 +57,23 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-etsa-secondary">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">
             Our Impact
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="text-4xl font-bold text-etsa-primary mb-2">{Math.ceil((new Date().getFullYear() - parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || '2012'))*11.6)}+</div>
-              <div className="text-gray-600">Presentations</div>
+              <div className="text-gray-600 dark:text-gray-300">Presentations</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-etsa-primary mb-2">250+</div>
-              <div className="text-gray-600">Members</div>
+              <div className="text-gray-600 dark:text-gray-300">Members</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-etsa-primary mb-2">{new Date().getFullYear() - parseInt(process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || '2012')}+</div>
-              <div className="text-gray-600">Years Active</div>
+              <div className="text-gray-600 dark:text-gray-300">Years Active</div>
             </div>
           </div>
         </div>
