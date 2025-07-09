@@ -1,4 +1,4 @@
-import { getAllPosts, getAllTags } from "@/lib/blog";
+import { getAllPosts, getAllTags, getAllSpeakers } from "@/lib/blog";
 import { TagCloud } from "@/components/TagList";
 import SearchComponent from "@/components/SearchComponent";
 
@@ -11,6 +11,7 @@ export const metadata = {
 export default function SpeakersPage() {
   const posts = getAllPosts();
   const allTags = getAllTags();
+  const allSpeakers = getAllSpeakers();
 
   // Calculate tag counts
   const tagCounts = allTags.reduce(
@@ -78,6 +79,14 @@ export default function SpeakersPage() {
                   </span>
                   <span className="font-semibold text-etsa-primary">
                     {allTags.length}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Unique Speakers
+                  </span>
+                  <span className="font-semibold text-etsa-primary">
+                    {allSpeakers.length}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">

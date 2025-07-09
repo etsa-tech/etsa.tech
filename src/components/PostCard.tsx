@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { PostSummary } from "@/types/post";
-import { formatDate, getPostUrl, getTagUrl } from "@/lib/utils";
+import {
+  formatDate,
+  getPostUrl,
+  getTagUrl,
+  getPostSpeakers,
+} from "@/lib/utils";
+import { SpeakerList } from "@/components/SpeakerLink";
 
 interface PostCardProps {
   post: PostSummary;
@@ -9,15 +15,9 @@ interface PostCardProps {
 
 export function PostCard({ post, featured = false }: PostCardProps) {
   const { slug, frontmatter, readingTime } = post;
-  const {
-    title,
-    date,
-    excerpt,
-    tags,
-    speakerName,
-    speakerTitle,
-    speakerCompany,
-  } = frontmatter;
+  const { title, date, excerpt, tags } = frontmatter;
+
+  const speakers = getPostSpeakers(frontmatter);
 
   return (
     <article
@@ -38,23 +38,12 @@ export function PostCard({ post, featured = false }: PostCardProps) {
               </h3>
             </Link>
 
-            {speakerName && (
+            {speakers.length > 0 && (
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {speakerName}
+                <span className="font-medium">
+                  Speaker{speakers.length > 1 ? "s" : ""}:{" "}
                 </span>
-                {speakerTitle && (
-                  <>
-                    <span className="mx-1">•</span>
-                    <span>{speakerTitle}</span>
-                  </>
-                )}
-                {speakerCompany && (
-                  <>
-                    <span className="mx-1">•</span>
-                    <span>{speakerCompany}</span>
-                  </>
-                )}
+                <SpeakerList speakers={speakers} showTitles={false} />
               </div>
             )}
           </div>

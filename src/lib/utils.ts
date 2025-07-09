@@ -1,5 +1,6 @@
 // Utility functions that can be used on both client and server
 import sanitizeHtml from "sanitize-html";
+import { PostFrontmatter, Speaker } from "@/types/post";
 // Format date for display
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -97,6 +98,40 @@ export function getExcerpt(content: string, maxLength: number = 160): string {
     .trim();
 
   return truncateText(plainText, maxLength);
+}
+
+// Get all speakers from a post (unified function for client/server)
+export function getPostSpeakers(frontmatter: PostFrontmatter): Speaker[] {
+  const speakers: Speaker[] = [];
+
+  // Handle legacy single speaker format
+  if (frontmatter.speakerName) {
+    speakers.push({
+      name: frontmatter.speakerName,
+      title: frontmatter.speakerTitle,
+      company: frontmatter.speakerCompany,
+      bio: frontmatter.speakerBio,
+      image: frontmatter.speakerImage,
+      linkedIn: frontmatter.speakerLinkedIn,
+      twitter: frontmatter.speakerTwitter,
+      github: frontmatter.speakerGitHub,
+      website: frontmatter.speakerWebsite,
+    });
+  }
+
+  // Handle new multiple speakers format
+  if (frontmatter.speakers) {
+    speakers.push(...frontmatter.speakers);
+  }
+
+  return speakers;
+}
+
+// Generate speaker URL
+export function getSpeakerUrl(speakerName: string): string {
+  return `/speaker/${encodeURIComponent(
+    speakerName.toLowerCase().replace(/\s+/g, "-"),
+  )}`;
 }
 
 // Debounce function for search

@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export const metadata = {
   title: "About ETSA",
@@ -131,14 +132,14 @@ export default function AboutPage() {
                 Professionals in East TN and beyond! We are an association of IT
                 professionals who want to grow professionally and meet
                 like-minded friends and colleagues. We meet monthly to hear
-                speakers, and get to know fellow IT workers. Whether you're a
-                career professional or a new comer interested in the tech scene.
-                You do not have to be a member to come to the meetings.
+                speakers, and get to know fellow IT workers. Whether you&apos;re
+                a career professional or a new comer interested in the tech
+                scene. You do not have to be a member to come to the meetings.
                 Presentation and discussion topics cover nearly every aspect of
                 Enterprise IT, including DevOps, Software Development, Data
                 Center and Operations Management, Security, Network Engineering,
                 databases -- if you work in IT, you will love it here. Click{" "}
-                <a href="/speakers">here</a> for a sample of some our past
+                <Link href="/speakers">here</Link> for a sample of some our past
                 speaker topics.
               </p>
               <p className="text-light-muted dark:text-dark-muted leading-relaxed mb-6">

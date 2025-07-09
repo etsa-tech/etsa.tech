@@ -153,7 +153,9 @@ published: true # Whether the post is published (false = draft)
 
 #### Speaker Information
 
-All speaker fields are optional but recommended for speaker presentations:
+All speaker fields are optional but recommended for speaker presentations. You can use either the legacy single speaker format or the new multiple speakers format:
+
+**Legacy Single Speaker Format (for backward compatibility):**
 
 - **speakerName**: Full name of the presenter
 - **speakerTitle**: Professional title or role
@@ -164,6 +166,19 @@ All speaker fields are optional but recommended for speaker presentations:
 - **speakerTwitter**: Twitter/X profile URL for social media presence
 - **speakerGitHub**: GitHub profile URL for code repositories
 - **speakerWebsite**: Personal or professional website URL
+
+**New Multiple Speakers Format (recommended):**
+
+- **speakers**: Array of speaker objects, each containing:
+  - **name**: Full name of the presenter (required)
+  - **title**: Professional title or role (optional)
+  - **company**: Current employer or organization (optional)
+  - **bio**: Professional background and expertise (optional)
+  - **image**: Path to speaker's profile photo (optional)
+  - **linkedIn**: LinkedIn profile URL (optional)
+  - **twitter**: Twitter/X profile URL (optional)
+  - **github**: GitHub profile URL (optional)
+  - **website**: Personal or professional website URL (optional)
 
 #### Presentation Resources
 
@@ -263,6 +278,44 @@ meetingLocation:
   parking: "Visitor parking available in Lot 62 ($5/day)"
   accessibility: "Building is fully wheelchair accessible with elevator access"
   contact: "Enter through main entrance, workshop in Room 202"
+published: true
+---
+```
+
+#### Multiple Speakers Example
+
+```yaml
+---
+title: "DevOps Panel: Best Practices and Real-World Experiences"
+date: "2024-05-15"
+excerpt: "Panel discussion with industry experts sharing DevOps insights and experiences"
+tags: ["DevOps", "Panel", "Best Practices", "CI/CD"]
+author: "ETSA"
+speakers:
+  - name: "Sarah Johnson"
+    title: "Senior DevOps Engineer"
+    company: "TechCorp"
+    bio: "Sarah has 8+ years of experience in DevOps and cloud infrastructure, specializing in Kubernetes and CI/CD pipelines."
+    image: "/images/speakers/sarah-johnson.jpg"
+    linkedIn: "https://linkedin.com/in/sarahjohnson"
+    github: "https://github.com/sarahjohnson"
+  - name: "Mike Chen"
+    title: "Platform Engineering Lead"
+    company: "CloudTech Solutions"
+    bio: "Mike leads platform engineering initiatives and has extensive experience with AWS, Terraform, and monitoring systems."
+    linkedIn: "https://linkedin.com/in/mikechen"
+    website: "https://mikechen.dev"
+  - name: "Alex Rodriguez"
+    title: "Site Reliability Engineer"
+    company: "DataFlow Inc"
+    bio: "Alex focuses on system reliability, observability, and incident response with 6+ years in SRE roles."
+    twitter: "https://twitter.com/alexsre"
+    github: "https://github.com/alexrodriguez"
+presentationSlides: "https://slides.google.com/devops-panel-2024"
+presentationVideo: "https://youtube.com/watch?v=devops-panel"
+eventDate: "2024-05-15"
+eventLocation: "Knoxville Entrepreneur Center"
+featured: true
 published: true
 ---
 ```
