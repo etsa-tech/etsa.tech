@@ -15,18 +15,18 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  ETSA
+                  {process.env.NEXT_PUBLIC_ORG_NAME}
                 </span>
               </div>
             </div>
             <p className="text-gray-600 dark:text-gray-400 max-w-md">
-              A professional meetup organization based in Knoxville, TN, bringing together
+              A professional meetup organization based in {process.env.NEXT_PUBLIC_ORG_LOCATION}, bringing together
               systems administrators, DevOps engineers, and technology professionals to share
               knowledge and build community.
             </p>
             <div className="flex items-center space-x-4 mt-6">
               <a
-                href="https://github.com/etsa-tech"
+                href={process.env.NEXT_PUBLIC_GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
@@ -37,7 +37,7 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.linkedin.com/company/etsa-tech"
+                href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
@@ -48,7 +48,7 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.meetup.com/etsa-tech"
+                href={process.env.NEXT_PUBLIC_MEETUP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-light-muted dark:text-dark-muted hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
@@ -110,7 +110,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="https://www.meetup.com/etsa-tech"
+                  href={process.env.NEXT_PUBLIC_MEETUP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
@@ -120,7 +120,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/etsa-tech"
+                  href={process.env.NEXT_PUBLIC_GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
@@ -130,7 +130,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://www.linkedin.com/company/etsa-tech"
+                  href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
@@ -154,10 +154,10 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              © {currentYear} ETSA. All rights reserved.
+              © {currentYear} {process.env.NEXT_PUBLIC_ORG_NAME}. All rights reserved.
             </p>
             <p className="text-gray-600 dark:text-gray-400 text-sm mt-4 md:mt-0">
-              Built with ❤️ in Knoxville, TN
+              Built with ❤️ in {process.env.NEXT_PUBLIC_ORG_LOCATION}
             </p>
           </div>
         </div>
