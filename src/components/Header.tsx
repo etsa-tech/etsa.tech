@@ -26,7 +26,7 @@ export function Header() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  ETSA
+                  {process.env.NEXT_PUBLIC_ORG_NAME}
                 </span>
               </div>
             </Link>
@@ -50,7 +50,7 @@ export function Header() {
             {/* Social Links */}
             <div className="hidden sm:flex items-center space-x-3">
               <a
-                href="https://github.com/etsa-tech"
+                href={process.env.NEXT_PUBLIC_GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
@@ -61,7 +61,7 @@ export function Header() {
                 </svg>
               </a>
               <a
-                href="https://www.linkedin.com/company/etsa-tech"
+                href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
@@ -72,7 +72,7 @@ export function Header() {
                 </svg>
               </a>
               <a
-                href="https://www.meetup.com/etsa-tech"
+                href={process.env.NEXT_PUBLIC_MEETUP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
@@ -126,7 +126,7 @@ export function Header() {
               {/* Mobile Social Links */}
               <div className="flex items-center space-x-4 px-3 py-2">
                 <a
-                  href="https://github.com/etsa-tech"
+                  href={process.env.NEXT_PUBLIC_GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
@@ -137,7 +137,7 @@ export function Header() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.linkedin.com/company/etsa-tech"
+                  href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
@@ -148,7 +148,7 @@ export function Header() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.meetup.com/etsa-tech"
+                  href={process.env.NEXT_PUBLIC_MEETUP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-light-muted dark:text-dark-muted hover:text-light-text dark:hover:text-dark-text transition-colors"
