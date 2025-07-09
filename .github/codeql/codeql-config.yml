@@ -1,0 +1,42 @@
+name: "CodeQL Configuration"
+
+# Disable default queries and use custom query suites
+disable-default-queries: false
+
+# Query suites to run
+queries:
+  - uses: security-and-quality
+  - uses: security-extended
+
+# Paths to include in analysis
+paths:
+  - src/
+  - pages/
+  - components/
+  - lib/
+  - utils/
+
+# Paths to exclude from analysis
+paths-ignore:
+  - node_modules/
+  - .next/
+  - out/
+  - build/
+  - dist/
+  - coverage/
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "**/*.d.ts"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/__tests__/**"
+  - "**/mocks/**"
+  - "**/*.config.js"
+  - "**/*.config.ts"
+
+# Additional packs to include
+packs:
+  - codeql/javascript-queries
+  - codeql/javascript-security-queries
