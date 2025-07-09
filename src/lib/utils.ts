@@ -1,5 +1,4 @@
 // Utility functions that can be used on both client and server
-import sanitizeHtml from "sanitize-html";
 // Format date for display
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -54,16 +53,16 @@ export function truncateText(text: string, maxLength: number): string {
 
 // Get excerpt from content
 export function getExcerpt(content: string, maxLength: number = 160): string {
-  // Remove markdown and HTML
-  const sanitizedContent = sanitizeHtml(content, {
-    allowedTags: [], // Remove all HTML tags
-    allowedAttributes: {}, // Remove all attributes
-  });
-  const plainText = sanitizedContent
+  // Remove markdown and HTML using simple regex
+  const plainText = content
+    .replace(/<[^>]*>/g, "") // Remove HTML tags
     .replace(/#{1,6}\s+/g, "") // Remove markdown headers
     .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold
     .replace(/\*(.*?)\*/g, "$1") // Remove italic
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove markdown links, keep text
+    .replace(/`([^`]+)`/g, "$1") // Remove inline code backticks
     .replace(/\n+/g, " ") // Replace newlines with spaces
+    .replace(/\s+/g, " ") // Replace multiple spaces with single space
     .trim();
 
   return truncateText(plainText, maxLength);
