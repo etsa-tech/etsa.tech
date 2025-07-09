@@ -24,7 +24,7 @@ export function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
               <Image
-                src="/logo.jpg"
+                src="/static/logo.jpg"
                 alt={`${process.env.NEXT_PUBLIC_ORG_NAME} Logo`}
                 width={40}
                 height={40}
