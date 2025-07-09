@@ -77,17 +77,35 @@ export default function MeetingInfoPage() {
               </div>
               {latestPost && (
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                    {latestPost.frontmatter.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {latestPost.frontmatter.excerpt}
-                  </p>
-                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                    <span>
-                      Speaker: {latestPost.frontmatter.speakerName || "TBA"}
-                    </span>
-                  </div>
+                  <a
+                    href={`/speakers/${latestPost.slug}`}
+                    className="block group hover:bg-gray-50 dark:hover:bg-gray-800 -mx-2 px-2 py-2 rounded-lg transition-colors"
+                  >
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-etsa-primary transition-colors">
+                      {latestPost.frontmatter.title}
+                      <svg
+                        className="w-4 h-4 inline-block ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
+                      {latestPost.frontmatter.excerpt}
+                    </p>
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                      <span>
+                        Speaker: {latestPost.frontmatter.speakerName || "TBA"}
+                      </span>
+                    </div>
+                  </a>
                 </div>
               )}
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
