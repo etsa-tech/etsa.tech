@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.12.0",
     "@types/nodemailer": "^6.4.17",
     "gray-matter": "^4.0.3",
     "next": "15.3.5",
