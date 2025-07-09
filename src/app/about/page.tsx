@@ -1,3 +1,5 @@
+import React from "react";
+
 export const metadata = {
   title: "About ETSA",
   description:
@@ -123,20 +125,33 @@ export default function AboutPage() {
           <div className="card">
             <div className="card-content">
               <p className="text-light-muted dark:text-dark-muted leading-relaxed mb-6">
-                ETSA was founded in 2019 by a group of passionate technology
-                professionals who recognized the need for a dedicated community
-                focused on systems administration and infrastructure management
-                in East Tennessee.
+                ETSA is a <a href="/static/irs.pdf">501(c)(3)</a> nonprofit
+                established in 2012 originally under LOPSA-ETENN to primarily to
+                advance the education, community, practice, and support of IT
+                Professionals in East TN and beyond! We are an association of IT
+                professionals who want to grow professionally and meet
+                like-minded friends and colleagues. We meet monthly to hear
+                speakers, and get to know fellow IT workers. Whether you're a
+                career professional or a new comer interested in the tech scene.
+                You do not have to be a member to come to the meetings.
+                Presentation and discussion topics cover nearly every aspect of
+                Enterprise IT, including DevOps, Software Development, Data
+                Center and Operations Management, Security, Network Engineering,
+                databases -- if you work in IT, you will love it here. Click{" "}
+                <a href="/speakers">here</a> for a sample of some our past
+                speaker topics.
               </p>
               <p className="text-light-muted dark:text-dark-muted leading-relaxed mb-6">
-                What started as informal gatherings at local coffee shops has
-                grown into a thriving community of over 200 members, featuring
+                What started as a group of geeks from Oak Ridge National Lab
+                (ORNL) in 2012 has grown into a thriving community of over $
+                {process.env.NEXT_PUBLIC_MEMBER_COUNT}+ members, featuring
                 monthly presentations from industry experts, hands-on workshops,
-                and networking opportunities.
+                and networking opportunities with local recruiters and your
+                peers..
               </p>
               <p className="text-light-muted dark:text-dark-muted leading-relaxed">
                 Throughout our journey, we&apos;ve maintained our core values of
-                inclusivity, knowledge sharing, and professional growth,
+                inclusively, knowledge sharing, and professional growth,
                 creating an environment where both newcomers and seasoned
                 professionals can learn and contribute.
               </p>
