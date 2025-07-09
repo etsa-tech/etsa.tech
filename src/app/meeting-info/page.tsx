@@ -78,7 +78,7 @@ export default function MeetingInfoPage() {
               {latestPost && (
                 <div className="space-y-2">
                   <a
-                    href={`/speakers/${latestPost.slug}`}
+                    href={`/speakers/${encodeURIComponent(latestPost.slug)}`}
                     className="block group hover:bg-gray-50 dark:hover:bg-gray-800 -mx-2 px-2 py-2 rounded-lg transition-colors"
                   >
                     <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-etsa-primary transition-colors">
