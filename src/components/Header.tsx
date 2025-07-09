@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -22,9 +23,11 @@ export function Header() {
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
-              <img
+              <Image
                 src="/logo.jpg"
                 alt={`${process.env.NEXT_PUBLIC_ORG_NAME} Logo`}
+                width={40}
+                height={40}
                 className="h-10 w-10 rounded-lg object-cover"
               />
               <div className="flex flex-col">
