@@ -9,9 +9,10 @@ export function Header() {
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Speakers', href: '/speakers' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
+    { name: 'Meeting Info', href: '/meeting-info' },
+    { name: 'Speakers', href: '/speakers' },
   ];
 
   return (
