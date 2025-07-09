@@ -52,7 +52,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
-        className={`${inter.variable} font-sans antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
+        className={`${inter.variable} font-sans antialiased bg-white dark:bg-etsa-dark text-gray-900 dark:text-gray-100`}
         suppressHydrationWarning
       >
         <ThemeProvider defaultTheme="system" storageKey="etsa-ui-theme">
