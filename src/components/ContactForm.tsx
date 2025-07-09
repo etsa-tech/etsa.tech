@@ -3,6 +3,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { validateName, validateEmail, validateSubject, validateMessage } from '@/lib/validation';
 
+interface HCaptcha {
+  render: (container: string, options: Record<string, unknown>) => { reset: () => void; getResponse: () => string };
+  remove: (widget: { reset: () => void; getResponse: () => string }) => void;
+}
+
+declare global {
+  interface Window {
+    hcaptcha?: HCaptcha;
+  }
+}
+
 interface ContactFormProps {
   className?: string;
 }
@@ -36,17 +47,18 @@ export default function ContactForm({ className = '' }: ContactFormProps) {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
   
-  const captchaRef = useRef<any>(null);
+  const captchaRef = useRef<{ reset: () => void; getResponse: () => string } | null>(null);
   const [captchaLoaded, setCaptchaLoaded] = useState(false);
+
 
   // Load HCaptcha
   useEffect(() => {
     const loadHCaptcha = () => {
-      if (typeof window !== 'undefined' && (window as any).hcaptcha && !captchaRef.current) {
+      if (typeof window !== 'undefined' && window.hcaptcha && !captchaRef.current) {
         try {
-          captchaRef.current = (window as any).hcaptcha.render('hcaptcha-container', {
+          captchaRef.current = window.hcaptcha.render('hcaptcha-container', {
             sitekey: process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY,
-            callback: (token: string) => {
+            callback: () => {
               setErrors(prev => ({ ...prev, captcha: undefined }));
             },
             'expired-callback': () => {
@@ -77,9 +89,9 @@ export default function ContactForm({ className = '' }: ContactFormProps) {
 
     return () => {
       // Cleanup on unmount
-      if (captchaRef.current && (window as any).hcaptcha) {
+      if (captchaRef.current && window.hcaptcha) {
         try {
-          (window as any).hcaptcha.remove(captchaRef.current);
+          window.hcaptcha.remove(captchaRef.current);
         } catch (error) {
           console.error('HCaptcha cleanup error:', error);
         }
