@@ -15,15 +15,17 @@ export function Header() {
   ];
 
   return (
-    <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+    <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-etsa-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500 text-white font-bold text-lg">
-                E
-              </div>
+              <img
+                src="/logo.jpg"
+                alt={`${process.env.NEXT_PUBLIC_ORG_NAME} Logo`}
+                className="h-10 w-10 rounded-lg object-cover"
+              />
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
                   {process.env.NEXT_PUBLIC_ORG_NAME}
@@ -38,7 +40,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
               >
                 {item.name}
               </Link>

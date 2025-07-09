@@ -16,12 +16,20 @@ module.exports = {
           200: '#bae6fd',
           300: '#7dd3fc',
           400: '#38bdf8',
-          500: '#0ea5e9', // Main brand blue
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          500: '#0197d6', // ETSA Primary Blue
+          600: '#00608a', // ETSA Secondary Blue
+          700: '#004a6b', // Darker variant
+          800: '#003d56',
+          900: '#002d41',
+          950: '#001e2c',
+        },
+        // ETSA specific color shortcuts
+        etsa: {
+          primary: '#0197d6',    // Main brand blue
+          secondary: '#00608a',  // Darker professional blue
+          light: '#4db3e3',      // Lighter variant for hover states
+          dark: '#004a6b',       // Darker variant for active states
+          accent: '#f0f9ff',     // Very light blue for backgrounds
         },
         secondary: {
           50: '#f8fafc',
