@@ -93,37 +93,247 @@ npm run dev
 
 ```yaml
 ---
-title: "Presentation Title"
-date: "2024-01-15"
-excerpt: "Brief description of the presentation"
-tags: ["Technology", "Topic", "Category"]
-author: "ETSA"
-speakerName: "Speaker Name"
-speakerTitle: "Job Title"
-speakerCompany: "Company Name"
-speakerBio: "Brief speaker biography"
-speakerLinkedIn: "https://linkedin.com/in/speaker"
-speakerGitHub: "https://github.com/speaker"
-speakerWebsite: "https://speaker.com"
-presentationTitle: "Presentation Title"
-presentationDescription: "Detailed description"
-presentationSlides: "https://slides.example.com"
-presentationVideo: "https://youtube.com/watch?v=..."
-eventDate: "2024-01-15"
-eventLocation: "Event Location"
-featured: false
-published: true
+# Required Fields
+title: "Presentation Title" # Main title of the presentation
+date: "2024-01-15" # Publication date (YYYY-MM-DD format)
+excerpt: "Brief description of the presentation" # Short summary for cards and previews
+tags: ["Technology", "Topic", "Category"] # Array of tags for categorization
+author: "ETSA" # Content author (usually "ETSA")
+
+# Speaker Information (Optional)
+speakerName: "Speaker Name" # Full name of the presenter
+speakerTitle: "Job Title" # Professional title/role
+speakerCompany: "Company Name" # Current employer/organization
+speakerBio: "Brief speaker biography" # Professional background and expertise
+speakerImage: "/images/speakers/speaker.jpg" # Profile photo path (optional)
+speakerLinkedIn: "https://linkedin.com/in/speaker" # LinkedIn profile URL
+speakerTwitter: "https://twitter.com/speaker" # Twitter/X profile URL
+speakerGitHub: "https://github.com/speaker" # GitHub profile URL
+speakerWebsite: "https://speaker.com" # Personal/professional website
+
+# Presentation Details (Optional)
+presentationTitle: "Presentation Title" # Specific presentation title (if different from main title)
+presentationDescription: "Detailed description" # Extended description of the content
+presentationSlides: "https://slides.example.com" # Link to slides (Google Slides, SlideShare, etc.)
+presentationVideo: "https://youtube.com/watch?v=..." # Video recording URL
+
+# Event Information (Optional)
+eventDate: "2024-01-15" # Date when presentation was given
+eventLocation: "Event Location" # Physical location where event occurred
+meetingDate: "First Tuesday of each month at 7:00 PM" # Next meeting date/schedule
+meetingLocation: # Custom meeting location object
+  name: "Knoxville Entrepreneur Center" # Venue name
+  address: "17 Market Square SUITE 101, Knoxville, TN 37902" # Full address
+  coordinates: # GPS coordinates (optional)
+    lat: 35.965179
+    lng: -83.919846
+  description: "Our regular meeting location" # Venue description
+  parking: "Free street parking available" # Parking information
+  accessibility: "Wheelchair accessible" # Accessibility details
+  contact: "Located in downtown Market Square" # Additional contact/location info
+
+# Content Management (Optional)
+featured: false # Whether to feature this post prominently
+published: true # Whether the post is published (false = draft)
 ---
 # Your markdown content here
 ```
 
 3. The post will automatically appear on the speakers page and be available for filtering by tags.
 
+### Metadata Field Descriptions
+
+#### Required Fields
+
+- **title**: The main title displayed on cards and the post page
+- **date**: Publication date in YYYY-MM-DD format, used for sorting posts
+- **excerpt**: Short description shown on post cards and in search results
+- **tags**: Array of technology/topic tags for categorization and filtering
+- **author**: Content author, typically "ETSA" for consistency
+
+#### Speaker Information
+
+All speaker fields are optional but recommended for speaker presentations:
+
+- **speakerName**: Full name of the presenter
+- **speakerTitle**: Professional title or role
+- **speakerCompany**: Current employer or organization
+- **speakerBio**: Professional background, expertise, and relevant experience
+- **speakerImage**: Path to speaker's profile photo (store in `/public/images/speakers/`)
+- **speakerLinkedIn**: LinkedIn profile URL for professional networking
+- **speakerTwitter**: Twitter/X profile URL for social media presence
+- **speakerGitHub**: GitHub profile URL for code repositories
+- **speakerWebsite**: Personal or professional website URL
+
+#### Presentation Resources
+
+- **presentationTitle**: Specific presentation title if different from main title
+- **presentationDescription**: Extended description of the presentation content
+- **presentationSlides**: Direct link to slides (Google Slides, SlideShare, PDF, etc.)
+- **presentationVideo**: Link to video recording (YouTube, Vimeo, etc.)
+
+#### Event Details
+
+- **eventDate**: Date when the presentation was actually given
+- **eventLocation**: Physical location where the event took place
+- **meetingDate**: Custom meeting date/schedule (overrides default "First Tuesday")
+- **meetingLocation**: Custom venue object with detailed location information
+
+#### Meeting Location Object
+
+When specifying a custom meeting location, use this structure:
+
+```yaml
+meetingLocation:
+  name: "Venue Name" # Official venue name
+  address: "Full Street Address" # Complete address for GPS/directions
+  coordinates: # Optional GPS coordinates
+    lat: 35.965179 # Latitude
+    lng: -83.919846 # Longitude
+  description: "Venue description" # Brief description of the location
+  parking: "Parking instructions" # Detailed parking information
+  accessibility: "Accessibility info" # Wheelchair access, elevators, etc.
+  contact: "Additional contact info" # Extra location details or contact info
+```
+
+#### Content Management
+
+- **featured**: Set to `true` to highlight this post prominently on the site
+- **published**: Set to `false` to save as draft (won't appear on public pages)
+
+### Usage Examples
+
+#### Basic Speaker Post
+
+```yaml
+---
+title: "Introduction to Kubernetes"
+date: "2024-03-15"
+excerpt: "Learn the fundamentals of container orchestration with Kubernetes"
+tags: ["Kubernetes", "Containers", "DevOps"]
+author: "ETSA"
+speakerName: "Jane Smith"
+speakerTitle: "DevOps Engineer"
+speakerCompany: "TechCorp"
+published: true
+---
+```
+
+#### Full Featured Post
+
+```yaml
+---
+title: "Advanced Docker Networking"
+date: "2024-03-15"
+excerpt: "Deep dive into Docker networking concepts and best practices"
+tags: ["Docker", "Networking", "Containers"]
+author: "ETSA"
+speakerName: "John Doe"
+speakerTitle: "Senior Platform Engineer"
+speakerCompany: "CloudTech Solutions"
+speakerBio: "John has 8+ years of experience in containerization and cloud infrastructure"
+speakerLinkedIn: "https://linkedin.com/in/johndoe"
+speakerGitHub: "https://github.com/johndoe"
+presentationSlides: "https://slides.google.com/docker-networking"
+presentationVideo: "https://youtube.com/watch?v=abc123"
+eventDate: "2024-03-15"
+eventLocation: "Knoxville Tech Hub"
+featured: true
+published: true
+---
+```
+
+#### Custom Meeting Location
+
+```yaml
+---
+title: "Special Workshop: Infrastructure as Code"
+date: "2024-04-20"
+excerpt: "Hands-on workshop covering Terraform and infrastructure automation"
+tags: ["Terraform", "IaC", "Workshop"]
+author: "ETSA"
+meetingDate: "Saturday, April 20th at 10:00 AM"
+meetingLocation:
+  name: "University of Tennessee - Engineering Building"
+  address: "1512 Middle Dr, Knoxville, TN 37996"
+  coordinates:
+    lat: 35.9544
+    lng: -83.9295
+  description: "Special workshop location at UT campus"
+  parking: "Visitor parking available in Lot 62 ($5/day)"
+  accessibility: "Building is fully wheelchair accessible with elevator access"
+  contact: "Enter through main entrance, workshop in Room 202"
+published: true
+---
+```
+
+### Tag System and Best Practices
+
+#### Recommended Tags
+
+Use consistent, descriptive tags for better categorization and discoverability:
+
+**Technology Categories:**
+
+- `Docker`, `Kubernetes`, `Containers`
+- `AWS`, `Azure`, `GCP`, `Cloud Computing`
+- `Terraform`, `Ansible`, `Infrastructure as Code`
+- `Prometheus`, `Grafana`, `Monitoring`
+- `Linux`, `Windows`, `macOS`
+- `Python`, `Go`, `Bash`, `PowerShell`
+- `Git`, `CI/CD`, `GitHub Actions`
+
+**Topic Areas:**
+
+- `DevOps`, `SRE`, `Platform Engineering`
+- `Security`, `Networking`, `Storage`
+- `Automation`, `Orchestration`
+- `Microservices`, `Architecture`
+- `Performance`, `Scalability`
+- `Backup`, `Disaster Recovery`
+
+**Event Types:**
+
+- `Workshop`, `Tutorial`, `Demo`
+- `Case Study`, `Best Practices`
+- `Beginner`, `Intermediate`, `Advanced`
+
+#### Tag Guidelines
+
+- Use title case for consistency (`Docker` not `docker`)
+- Keep tags specific but not overly granular
+- Limit to 3-7 tags per post for optimal categorization
+- Use existing tags when possible to maintain consistency
+- Add new tags only when existing ones don't fit
+
 ### Managing Photos
 
 1. Add photos to `public/images/meetup-photos/`
 2. Update the photo carousel data in `src/app/page.tsx`
 3. Use high-quality images (recommended: 800x400px minimum)
+
+### Content Guidelines
+
+#### Writing Style
+
+- Use clear, professional language
+- Include practical examples and code snippets
+- Structure content with proper headings (H2, H3, etc.)
+- Add links to relevant resources and documentation
+
+#### Technical Content
+
+- Test all code examples before publishing
+- Include prerequisites and setup instructions
+- Provide troubleshooting tips for common issues
+- Link to presentation slides and video recordings when available
+
+#### SEO Optimization
+
+- Write descriptive titles and excerpts
+- Use relevant tags for better discoverability
+- Include alt text for images
+- Structure content with proper heading hierarchy
 
 ## Customization
 
