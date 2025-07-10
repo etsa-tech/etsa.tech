@@ -133,7 +133,7 @@ export default function Home() {
             </div>
             <div>
               <div className="text-4xl font-bold text-etsa-primary mb-2">
-                ${process.env.NEXT_PUBLIC_MEMBER_COUNT}+
+                {process.env.NEXT_PUBLIC_MEMBER_COUNT}+
               </div>
               <div className="text-gray-600 dark:text-gray-300">Members</div>
             </div>
