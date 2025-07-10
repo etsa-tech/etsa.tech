@@ -2,18 +2,21 @@
 title: "Docker Fundamentals: Containerizing Your Applications"
 date: "2023-09-25"
 excerpt: "Master the basics of Docker containerization, from creating your first container to building production-ready images and managing multi-container applications."
-tags: ["Docker", "Containers", "DevOps", "Microservices", "Application Deployment"]
+tags:
+  ["Docker", "Containers", "DevOps", "Microservices", "Application Deployment"]
 author: "ETSA"
-speakerName: "David Kim"
-speakerTitle: "Platform Engineer"
-speakerCompany: "ContainerCorp"
-speakerBio: "David is a platform engineer with 5+ years of experience in containerization and orchestration. He's helped organizations migrate from monolithic to containerized architectures and is passionate about developer productivity."
-speakerLinkedIn: "https://linkedin.com/in/david-kim-platform"
-speakerGitHub: "https://github.com/davidkim"
+speakers:
+  - name: "David Kim"
+    title: "Platform Engineer"
+    company: "ContainerCorp"
+    bio: "David is a platform engineer with 5+ years of experience in containerization and orchestration. He's helped organizations migrate from monolithic to containerized architectures and is passionate about developer productivity."
+    image: "/images/speakers/david-kim.jpg"
+    linkedIn: "https://linkedin.com/in/david-kim-platform"
+    github: "https://github.com/davidkim"
 presentationTitle: "Docker Fundamentals: Containerizing Your Applications"
 presentationDescription: "Learn the fundamentals of Docker and how to containerize applications effectively"
 presentationSlides: "https://slides.example.com/docker-fundamentals"
-presentationVideo: "https://youtube.com/watch?v=docker-fundamentals"
+recordingUrl: "https://youtube.com/watch?v=docker-recording-2023"
 eventDate: "2023-09-25"
 eventLocation: "Knoxville Entrepreneur Center"
 featured: true
@@ -317,7 +320,7 @@ docker volume inspect mydata
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   web:
@@ -356,7 +359,7 @@ volumes:
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   web:
@@ -383,7 +386,7 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
 
   db:
@@ -586,17 +589,17 @@ spec:
         app: myapp
     spec:
       containers:
-      - name: myapp
-        image: myapp:v1.0.0
-        ports:
-        - containerPort: 3000
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+        - name: myapp
+          image: myapp:v1.0.0
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
 ```
 
 ### 3. Security Scanning
@@ -656,4 +659,4 @@ Remember: Containerization is not just about packaging applications—it's about
 
 ---
 
-*This presentation was delivered at the ETSA September 2023 meetup. Complete Dockerfile examples and compose configurations are available in our [GitHub repository](https://github.com/etsa-tech/docker-examples).*
+_This presentation was delivered at the ETSA September 2023 meetup. Complete Dockerfile examples and compose configurations are available in our [GitHub repository](https://github.com/etsa-tech/docker-examples)._
