@@ -144,7 +144,7 @@ export default function AboutPage() {
               </p>
               <p className="text-light-muted dark:text-dark-muted leading-relaxed mb-6">
                 What started as a group of geeks from Oak Ridge National Lab
-                (ORNL) in 2012 has grown into a thriving community of over $
+                (ORNL) in 2012 has grown into a thriving community of over
                 {process.env.NEXT_PUBLIC_MEMBER_COUNT}+ members, featuring
                 monthly presentations from industry experts, hands-on workshops,
                 and networking opportunities with local recruiters and your
