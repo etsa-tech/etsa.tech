@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { PostSummary } from '@/types/post';
-import { formatDate, getPostUrl } from '@/lib/blog';
+import Link from "next/link";
+import { PostSummary } from "@/types/post";
+import { formatDate, getPostUrl } from "@/lib/blog";
 
 interface CurrentSpeakerProps {
   latestPost: PostSummary | null;
@@ -85,10 +85,7 @@ export function CurrentSpeaker({ latestPost }: CurrentSpeakerProps) {
 
           {/* Call to Action */}
           <div className="pt-4">
-            <Link
-              href={getPostUrl(slug)}
-              className="btn btn-primary btn-sm"
-            >
+            <Link href={getPostUrl(slug)} className="btn btn-primary btn-sm">
               View Presentation Details
               <svg
                 className="ml-2 h-4 w-4"

@@ -1,9 +1,22 @@
+export interface Speaker {
+  name: string;
+  title?: string;
+  company?: string;
+  bio?: string;
+  image?: string;
+  linkedIn?: string;
+  twitter?: string;
+  github?: string;
+  website?: string;
+}
+
 export interface PostFrontmatter {
   title: string;
   date: string;
   excerpt: string;
   tags: string[];
   author: string;
+  // Legacy single speaker fields (for backward compatibility)
   speakerName?: string;
   speakerTitle?: string;
   speakerCompany?: string;
@@ -13,12 +26,27 @@ export interface PostFrontmatter {
   speakerTwitter?: string;
   speakerGitHub?: string;
   speakerWebsite?: string;
+  // New multiple speakers support
+  speakers?: Speaker[];
   presentationTitle?: string;
   presentationDescription?: string;
   presentationSlides?: string;
-  presentationVideo?: string;
+  recordingUrl?: string;
   eventDate?: string;
   eventLocation?: string;
+  meetingDate?: string;
+  meetingLocation?: {
+    name: string;
+    address: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+    description?: string;
+    parking?: string;
+    accessibility?: string;
+    contact?: string;
+  };
   featured?: boolean;
   published?: boolean;
 }

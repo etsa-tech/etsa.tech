@@ -4,17 +4,19 @@ date: "2023-12-10"
 excerpt: "A comprehensive guide to implementing Infrastructure as Code using Terraform, covering best practices, state management, and team collaboration."
 tags: ["Terraform", "Infrastructure as Code", "DevOps", "Cloud", "Automation"]
 author: "ETSA"
-speakerName: "Mike Rodriguez"
-speakerTitle: "Cloud Infrastructure Architect"
-speakerCompany: "TechFlow Inc"
-speakerBio: "Mike has been working with cloud infrastructure for over 10 years and has helped dozens of companies migrate to Infrastructure as Code. He's a HashiCorp Certified Terraform Associate and AWS Solutions Architect."
-speakerLinkedIn: "https://linkedin.com/in/mike-rodriguez-cloud"
-speakerGitHub: "https://github.com/mrodriguez"
-speakerWebsite: "https://mikerodriguez.dev"
+speakers:
+  - name: "Mike Rodriguez"
+    title: "Cloud Infrastructure Architect"
+    company: "TechFlow Inc"
+    bio: "Mike has been working with cloud infrastructure for over 10 years and has helped dozens of companies migrate to Infrastructure as Code. He's a HashiCorp Certified Terraform Associate and AWS Solutions Architect."
+    image: "/images/speakers/mike-rodriguez.jpg"
+    linkedIn: "https://linkedin.com/in/mike-rodriguez-cloud"
+    github: "https://github.com/mrodriguez"
+    website: "https://mikerodriguez.dev"
 presentationTitle: "Infrastructure as Code with Terraform"
 presentationDescription: "Learn how to manage your infrastructure using code, from basic concepts to advanced patterns"
 presentationSlides: "https://slides.example.com/terraform-iac"
-presentationVideo: "https://youtube.com/watch?v=terraform-demo"
+recordingUrl: "https://youtube.com/watch?v=terraform-recording-2023"
 eventDate: "2023-12-10"
 eventLocation: "University of Tennessee, Knoxville"
 featured: false
@@ -327,22 +329,22 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.0
-    
-    - name: Terraform Init
-      run: terraform init
-    
-    - name: Terraform Plan
-      run: terraform plan -no-color
-      
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
 ```
 
 ### 3. Code Review Checklist
@@ -446,4 +448,4 @@ Terraform enables teams to manage infrastructure efficiently and safely. Key tak
 
 ---
 
-*This presentation was delivered at the ETSA December 2023 meetup. The complete code examples are available on [GitHub](https://github.com/etsa-tech/terraform-examples).*
+_This presentation was delivered at the ETSA December 2023 meetup. The complete code examples are available on [GitHub](https://github.com/etsa-tech/terraform-examples)._
