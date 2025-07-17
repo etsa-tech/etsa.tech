@@ -12,7 +12,7 @@ export async function generateStaticParams() {
   return tags.map((tag) => ({ tag: encodeURIComponent(tag.toLowerCase()) }));
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
 
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
-export default async function TagPage({ params }: PageProps) {
+export default async function TagPage({ params }: Readonly<PageProps>) {
   const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
 

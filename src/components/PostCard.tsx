@@ -13,7 +13,7 @@ interface PostCardProps {
   featured?: boolean;
 }
 
-export function PostCard({ post, featured = false }: PostCardProps) {
+export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
   const { slug, frontmatter, readingTime } = post;
   const { title, date, excerpt, tags } = frontmatter;
 

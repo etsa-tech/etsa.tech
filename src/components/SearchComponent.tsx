@@ -12,7 +12,7 @@ interface SearchComponentProps {
 export default function SearchComponent({
   posts,
   className = "",
-}: SearchComponentProps) {
+}: Readonly<SearchComponentProps>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
@@ -54,6 +54,70 @@ export default function SearchComponent({
   const clearSearch = () => {
     setSearchQuery("");
     setIsSearching(false);
+  };
+
+  const renderSearchContent = () => {
+    if (searchResults.length > 0) {
+      return (
+        <>
+          {/* Results Header */}
+          {searchQuery && (
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                Search Results
+              </h2>
+              <button
+                onClick={clearSearch}
+                className="text-sm text-etsa-primary hover:text-etsa-secondary transition-colors"
+              >
+                Show all presentations
+              </button>
+            </div>
+          )}
+
+          {/* Results Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {searchResults.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </>
+      );
+    }
+
+    if (searchQuery) {
+      return (
+        /* No Results */
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🔍</div>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            No presentations found
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            We couldn&apos;t find any presentations matching &quot;
+            {searchQuery}&quot;. Try different keywords or browse all
+            presentations.
+          </p>
+          <div className="space-x-4">
+            <button
+              onClick={clearSearch}
+              className="bg-etsa-primary hover:bg-etsa-secondary text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            >
+              Show All Presentations
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      /* Default View - All Posts */
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {posts.map((post) => (
+          <PostCard key={post.slug} post={post} />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -134,61 +198,7 @@ export default function SearchComponent({
       </div>
 
       {/* Search Results */}
-      <div className="space-y-6">
-        {searchResults.length > 0 ? (
-          <>
-            {/* Results Header */}
-            {searchQuery && (
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  Search Results
-                </h2>
-                <button
-                  onClick={clearSearch}
-                  className="text-sm text-etsa-primary hover:text-etsa-secondary transition-colors"
-                >
-                  Show all presentations
-                </button>
-              </div>
-            )}
-
-            {/* Results Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {searchResults.map((post) => (
-                <PostCard key={post.slug} post={post} />
-              ))}
-            </div>
-          </>
-        ) : searchQuery ? (
-          /* No Results */
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔍</div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              No presentations found
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              We couldn&apos;t find any presentations matching &quot;
-              {searchQuery}&quot;. Try different keywords or browse all
-              presentations.
-            </p>
-            <div className="space-x-4">
-              <button
-                onClick={clearSearch}
-                className="bg-etsa-primary hover:bg-etsa-secondary text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Show All Presentations
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* Default View - All Posts */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {posts.map((post) => (
-              <PostCard key={post.slug} post={post} />
-            ))}
-          </div>
-        )}
-      </div>
+      <div className="space-y-6">{renderSearchContent()}</div>
     </div>
   );
 }
@@ -204,7 +214,7 @@ export function SearchSuggestions({
   query,
   posts,
   onSuggestionClick,
-}: SearchSuggestionsProps) {
+}: Readonly<SearchSuggestionsProps>) {
   // Get unique tags and speakers that match the query
   const suggestions = useMemo(() => {
     if (!query.trim()) {

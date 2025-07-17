@@ -31,7 +31,9 @@ interface FormErrors {
   general?: string;
 }
 
-export default function ContactForm({ className = "" }: ContactFormProps) {
+export default function ContactForm({
+  className = "",
+}: Readonly<ContactFormProps>) {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
