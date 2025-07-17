@@ -15,7 +15,7 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
 
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
-export default async function SpeakerPostPage({ params }: PageProps) {
+export default async function SpeakerPostPage({ params }: Readonly<PageProps>) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
 

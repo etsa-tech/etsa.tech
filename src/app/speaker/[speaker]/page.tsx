@@ -14,7 +14,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { speaker } = await params;
   const decodedSpeaker = decodeURIComponent(speaker).replace(/-/g, " ");
 
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
-export default async function SpeakerPage({ params }: PageProps) {
+export default async function SpeakerPage({ params }: Readonly<PageProps>) {
   const { speaker } = await params;
   const decodedSpeaker = decodeURIComponent(speaker).replace(/-/g, " ");
 

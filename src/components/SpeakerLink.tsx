@@ -11,7 +11,7 @@ export function SpeakerLink({
   speakerName,
   className = "",
   children,
-}: SpeakerLinkProps) {
+}: Readonly<SpeakerLinkProps>) {
   return (
     <Link
       href={getSpeakerUrl(speakerName)}
@@ -33,7 +33,7 @@ export function SpeakerList({
   speakers,
   className = "",
   showTitles = true,
-}: SpeakerListProps) {
+}: Readonly<SpeakerListProps>) {
   if (speakers.length === 0) return null;
 
   return (
