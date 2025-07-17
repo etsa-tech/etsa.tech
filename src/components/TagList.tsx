@@ -13,7 +13,7 @@ export function TagList({
   currentTag,
   showCount = false,
   tagCounts,
-}: TagListProps) {
+}: Readonly<TagListProps>) {
   if (tags.length === 0) {
     return null;
   }
@@ -49,7 +49,11 @@ interface TagCloudProps {
   currentTag?: string;
 }
 
-export function TagCloud({ tags, tagCounts, currentTag }: TagCloudProps) {
+export function TagCloud({
+  tags,
+  tagCounts,
+  currentTag,
+}: Readonly<TagCloudProps>) {
   if (tags.length === 0) {
     return null;
   }
@@ -78,7 +82,7 @@ export function TagCloud({ tags, tagCounts, currentTag }: TagCloudProps) {
           const normalizedCount = range > 0 ? (count - minCount) / range : 0;
 
           // Map to text size classes
-          let sizeClass = "text-sm";
+          let sizeClass: string;
           if (normalizedCount > 0.8) sizeClass = "text-lg";
           else if (normalizedCount > 0.6) sizeClass = "text-base";
           else if (normalizedCount > 0.4) sizeClass = "text-sm";

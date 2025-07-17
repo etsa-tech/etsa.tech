@@ -87,10 +87,42 @@ export function getExcerpt(content: string, maxLength: number = 160): string {
     .replace(/#{1,6}\s+/g, "") // Remove markdown headers
     .replace(/\*\*[^*]+\*\*/g, (match) => match.slice(2, -2)) // Remove bold, prevent backtracking
     .replace(/\*[^*]+\*/g, (match) => match.slice(1, -1)) // Remove italic, prevent backtracking
-    .replace(/\[[^\]]*\]\([^)]*\)/g, (match) => {
-      // Safe markdown link removal - extract text between [ and ]
-      const textMatch = match.match(/^\[([^\]]*)\]/);
-      return textMatch ? textMatch[1] : "";
+    // ReDoS-safe markdown link removal using manual parsing
+    .replace(/\[/g, (match, offset, string) => {
+      // Find the closing bracket for this opening bracket
+      let bracketCount = 1;
+      let i = offset + 1;
+      let linkText = "";
+
+      // Parse until we find the matching closing bracket
+      while (i < string.length && bracketCount > 0) {
+        if (string[i] === "[") bracketCount++;
+        else if (string[i] === "]") bracketCount--;
+
+        if (bracketCount > 0) linkText += string[i];
+        i++;
+      }
+
+      // Check if this is followed by a parenthetical URL
+      if (bracketCount === 0 && i < string.length && string[i] === "(") {
+        // Find the closing parenthesis
+        let parenCount = 1;
+        i++; // Skip the opening parenthesis
+
+        while (i < string.length && parenCount > 0) {
+          if (string[i] === "(") parenCount++;
+          else if (string[i] === ")") parenCount--;
+          i++;
+        }
+
+        // If we found a complete markdown link, return just the text
+        if (parenCount === 0) {
+          return linkText;
+        }
+      }
+
+      // If not a complete markdown link, return the original bracket
+      return match;
     })
     .replace(/`[^`]*`/g, (match) => match.slice(1, -1)) // Remove inline code backticks, prevent backtracking
     .replace(/\n+/g, " ") // Replace newlines with spaces

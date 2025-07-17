@@ -113,7 +113,7 @@ export function getAllTags(): string[] {
     });
   });
 
-  return Array.from(tags).sort();
+  return Array.from(tags).sort((a, b) => a.localeCompare(b));
 }
 
 // Get featured posts
@@ -198,7 +198,7 @@ export function getAllSpeakers(): string[] {
     }
   });
 
-  return Array.from(speakers).sort();
+  return Array.from(speakers).sort((a, b) => a.localeCompare(b));
 }
 
 // Get posts by speaker name
