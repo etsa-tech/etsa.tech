@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Readonly<PageProps>) {
 
   if (!post) {
     return {
-      title: "Post Not Found - ETSA",
+      title: "Presentation Not Found - ETSA",
     };
   }
 
@@ -40,7 +40,9 @@ export async function generateMetadata({ params }: Readonly<PageProps>) {
   };
 }
 
-export default async function SpeakerPostPage({ params }: Readonly<PageProps>) {
+export default async function PresentationPage({
+  params,
+}: Readonly<PageProps>) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
 
@@ -79,8 +81,11 @@ export default async function SpeakerPostPage({ params }: Readonly<PageProps>) {
                 </li>
                 <li>/</li>
                 <li>
-                  <Link href="/speakers" className="hover:text-primary-500">
-                    Speakers
+                  <Link
+                    href="/presentations"
+                    className="hover:text-primary-500"
+                  >
+                    Presentations
                   </Link>
                 </li>
                 <li>/</li>
@@ -263,7 +268,7 @@ export default async function SpeakerPostPage({ params }: Readonly<PageProps>) {
                   <div className="flex flex-wrap gap-4">
                     {presentationSlides && (
                       <a
-                        href={presentationSlides}
+                        href={`/presentation/${slug}/${presentationSlides}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-outline btn-sm"
@@ -333,7 +338,7 @@ export default async function SpeakerPostPage({ params }: Readonly<PageProps>) {
                       className="border-b border-light-border dark:border-dark-border last:border-b-0 pb-4 last:pb-0"
                     >
                       <Link
-                        href={`/speakers/${post.slug}`}
+                        href={`/presentation/${post.slug}`}
                         className="block group"
                       >
                         <h4 className="font-medium text-light-text dark:text-dark-text group-hover:text-primary-500 transition-colors mb-1">
@@ -349,11 +354,11 @@ export default async function SpeakerPostPage({ params }: Readonly<PageProps>) {
               </div>
             )}
 
-            {/* Back to Speakers */}
+            {/* Back to Presentations */}
             <div className="card">
               <div className="card-content">
                 <Link
-                  href="/speakers"
+                  href="/presentations"
                   className="btn btn-outline btn-sm w-full"
                 >
                   <svg
@@ -369,7 +374,7 @@ export default async function SpeakerPostPage({ params }: Readonly<PageProps>) {
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  Back to All Speakers
+                  Back to All Presentations
                 </Link>
               </div>
             </div>

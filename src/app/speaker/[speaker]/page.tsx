@@ -75,10 +75,10 @@ export default async function SpeakerPage({ params }: Readonly<PageProps>) {
           </Link>
           <span>/</span>
           <Link
-            href="/speakers"
+            href="/presentations"
             className="hover:text-primary-500 transition-colors"
           >
-            Speakers
+            Presentations
           </Link>
           <span>/</span>
           <span className="text-gray-900 dark:text-gray-100">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PostSummary } from "@/types/post";
-import { formatDate, getPostUrl } from "@/lib/blog";
+import { formatDate, getPostUrl } from "@/lib/utils";
 
 interface CurrentSpeakerProps {
   latestPost: PostSummary | null;

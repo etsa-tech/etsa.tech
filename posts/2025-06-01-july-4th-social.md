@@ -7,7 +7,6 @@ author: "ETSA"
 eventDate: "2025-06-01"
 eventLocation: "Kerns Food Hall"
 featured: false
-# speakerTitle: "Site Reliability Engineer"
 published: true
 meetingLocation:
   name: "Kerns Food Hall"

@@ -3,12 +3,12 @@ import { TagCloud } from "@/components/TagList";
 import SearchComponent from "@/components/SearchComponent";
 
 export const metadata = {
-  title: "Past Speakers - ETSA",
+  title: "Presentations - ETSA",
   description:
     "Explore presentations from our amazing speakers at ETSA meetups. Learn from industry experts in systems administration, DevOps, and technology.",
 };
 
-export default function SpeakersPage() {
+export default function PresentationsPage() {
   const posts = getAllPosts();
   const allTags = getAllTags();
   const allSpeakers = getAllSpeakers();
@@ -31,7 +31,7 @@ export default function SpeakersPage() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Past Speakers
+          Presentations
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
           Explore presentations from our amazing speakers at ETSA meetups. Learn

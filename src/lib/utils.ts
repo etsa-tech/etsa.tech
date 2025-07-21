@@ -11,9 +11,9 @@ export function formatDate(dateString: string): string {
   });
 }
 
-// Generate post URL
+// Generate presentation URL
 export function getPostUrl(slug: string): string {
-  return `/speakers/${encodeURIComponent(slug)}`;
+  return `/presentation/${encodeURIComponent(slug)}`;
 }
 
 // Generate tag URL
