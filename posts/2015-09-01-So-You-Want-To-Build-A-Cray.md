@@ -8,6 +8,7 @@ speakers:
   - name: "Jeff Nichols"
     title: "Cyber Security Research Scientist"
     company: "Oak Ridge National Lab"
+    image: "/images/speakers/jeff_nichols.jpeg"
     bio: "Currently a Cyber Security Research Scientist for the Cyber Warfare Research Team at Oak Ridge National Laboratory, Jeff Nichols has a Ph.D. in Mathematics (Math Ecology) from the University of Tennessee. He was IT Director at Jewelry Television, and has been messing with computers since the age of 12. His research areas are high-performance computation, parallel computing, and data flow. This talk was originally given at PhreakNIC 17."
     linkedIn: "https://www.linkedin.com/in/jeff-nichols-889a933/"
 presentationSlides: "j._nichols-so_you_want_to_build_a_cray.pdf"

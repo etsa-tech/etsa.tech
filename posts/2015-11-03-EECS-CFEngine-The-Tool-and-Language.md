@@ -19,6 +19,7 @@ speakers:
   - name: "Bryan Burke"
     title: "IT Administrator"
     company: "University of Tennessee, Knoxville"
+    image: "/images/speakers/bryan_burke.jpeg"
     bio: "I am an IT administrator for the Electrical Engineering and Computer Science Department (EECS) at the University of Tennessee, Knoxville. I also keep a home infrastructure, which I give out to people for free, and which I use to test software. In my spare time, I enjoy board and video games, moonlighting as a sysadmin and software developer, and making life difficult for my awesome girlfriend and cats."
     linkedIn: "https://www.linkedin.com/in/bryan-t-burke/"
 eventDate: "2015-11-03"
