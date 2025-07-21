@@ -8,6 +8,7 @@ speakers:
   - name: "John Wynkoop"
     title: "Lead Architect"
     company: "Peak Hosting"
+    image: "/images/speakers/john_wynkoop.jpeg"
     bio: "Currently the Lead Architect for Peak Hosting, a managed service provider for some of the fastest growing companies on the web, John provides technical oversight for the research, development, and improvement of all of Peak's products and services. Over the past 15 years, John has designed systems and networks for government, academia, and private industry, including real-time submarine tracking systems, supercomputers, e-commerce sites, and mobile games.  Having worked with agile methods for almost 10 years, John is passionate about combining development and operations teams to deliver a more responsive IT organization."
     linkedIn: "https://www.linkedin.com/in/jlwynkoop/"
 presentationSlides: "kanban_for_it_ops.pdf"
