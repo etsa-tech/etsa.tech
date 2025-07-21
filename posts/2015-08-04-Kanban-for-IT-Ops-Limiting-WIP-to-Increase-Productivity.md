@@ -16,8 +16,6 @@ eventLocation: "Cafe 4"
 published: true
 ---
 
-# Kanban for IT Ops: Limiting WIP to Increase Productivity
-
 Originally adopted by Toyota in the late 1940's, Kanban is a system for scheduling Just In Time (or Lean) production. Originally applied to manufacturing, technical organizations have begun adopting this methodology to reduce task switching, schedule work more efficiently, and promote continuous improvement. In this talk, we'll discuss how teams can apply the Kanban principles to IT Operations to increase agility, improve productivity, and reduce burn-out. You can get started using Kanban with nothing more than a wall, some tape, and a stack of Post-it Notes.
 
 [Presentation Notes]("/presentations/2025-08-04-kanban-for-it-ops/kanban_notes.pdf")

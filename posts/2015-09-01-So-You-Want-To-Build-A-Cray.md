@@ -16,6 +16,4 @@ eventLocation: "Cafe 4"
 published: true
 ---
 
-# So You Want to Build a Cray
-
 Oak Ridge National Laboratory, is home to Cray's Titan, the world's fastest, open science supercomputer. Not far from ORNL is the local hacker space, KnoxMakers. At KnoxMakers, a cabinet left over from a previous generation Cray captured their imagination. "Could we restore the machine?", they wondered. And with this musing, a wild adventure began.

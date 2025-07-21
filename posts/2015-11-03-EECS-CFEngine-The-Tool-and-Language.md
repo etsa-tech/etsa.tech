@@ -26,8 +26,6 @@ eventLocation: "Cafe 4"
 published: true
 ---
 
-# CFEngine - The Tool and Language
-
 CFEngine is a system configuration and management tool with a rich history and a small footprint. It's also a language with a potentially steep learning curve at its core. In this talk, I'll introduce the two parts of the product, and I'll attempt to elucidate some of its advantages and disadvantages, as well as impart some of the wisdom acquired from actually deploying it.
 
 Resources:
