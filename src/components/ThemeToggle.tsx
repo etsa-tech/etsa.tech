@@ -6,9 +6,22 @@ import { useTheme } from "./ThemeProvider";
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     setMounted(true);
+
+    // Detect system theme preference
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    setSystemTheme(mediaQuery.matches ? "dark" : "light");
+
+    // Listen for system theme changes
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemTheme(e.matches ? "dark" : "light");
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   if (!mounted) {
@@ -18,12 +31,12 @@ export function ThemeToggle() {
   }
 
   const toggleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("system");
-    } else {
+    if (theme === "system") {
       setTheme("light");
+    } else if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("system");
     }
   };
 
@@ -33,7 +46,8 @@ export function ThemeToggle() {
       className="relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text hover:bg-light-border dark:hover:bg-dark-border transition-colors"
       aria-label="Toggle theme"
     >
-      {theme === "light" && (
+      {(theme === "light" ||
+        (theme === "system" && systemTheme === "light")) && (
         <svg
           className="h-5 w-5"
           fill="none"
@@ -49,7 +63,7 @@ export function ThemeToggle() {
           />
         </svg>
       )}
-      {theme === "dark" && (
+      {(theme === "dark" || (theme === "system" && systemTheme === "dark")) && (
         <svg
           className="h-5 w-5"
           fill="none"
@@ -62,22 +76,6 @@ export function ThemeToggle() {
             strokeLinejoin="round"
             strokeWidth={2}
             d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-          />
-        </svg>
-      )}
-      {theme === "system" && (
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
           />
         </svg>
       )}
