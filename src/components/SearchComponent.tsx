@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { PostSummary } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
+import { getPostSpeakers } from "@/lib/utils";
 
 interface SearchComponentProps {
   posts: PostSummary[];
@@ -26,14 +27,24 @@ export default function SearchComponent({
     const searchTerm = searchQuery.toLowerCase();
     return posts.filter((post) => {
       const { title, excerpt, tags } = post.frontmatter;
-      const speakerName = post.frontmatter.speakerName || "";
+      const speakers = getPostSpeakers(post.frontmatter);
 
-      return (
+      // Check if search term matches title, excerpt, or tags
+      const matchesContent =
         title.toLowerCase().includes(searchTerm) ||
         excerpt.toLowerCase().includes(searchTerm) ||
-        speakerName.toLowerCase().includes(searchTerm) ||
-        tags.some((tag) => tag.toLowerCase().includes(searchTerm))
+        tags.some((tag) => tag.toLowerCase().includes(searchTerm));
+
+      // Check if search term matches any speaker name, title, or company
+      const matchesSpeakers = speakers.some(
+        (speaker) =>
+          speaker.name.toLowerCase().includes(searchTerm) ||
+          (speaker.title && speaker.title.toLowerCase().includes(searchTerm)) ||
+          (speaker.company &&
+            speaker.company.toLowerCase().includes(searchTerm)),
       );
+
+      return matchesContent || matchesSpeakers;
     });
   }, [searchQuery, posts]);
 
