@@ -1,0 +1,94 @@
+# vim:syntax=cf3
+
+body common control
+{
+    bundlesequence => { gvars, authkeys };
+}
+
+bundle common gvars
+{
+    vars:
+        any::
+            "keys1"
+                meta  => { "mykeys" },
+                slist => {
+                            "$(this.promise_dirname)/id_ed25519.elincia.pub",
+                            "$(this.promise_dirname)/id_ed25519.eecs.pub",
+                         };
+
+            "keys2"
+                meta  => { "mykeys" },
+                slist => {
+                            "$(this.promise_dirname)/id_ecdsa.bburke.pub",
+                         };
+}
+
+bundle agent authkeys
+{
+    files:
+        any::
+            "/tmp/presentation/."
+                create => "true";
+
+    methods:
+        any::
+            "Set authorized_keys"
+                usebundle => merge_into("mykeys", "/tmp/presentation/authorized_keys");
+}
+
+# Merges a set of files, listed in slist's and tagged, into a destination file
+bundle agent merge_into(tag, dest)
+{
+  vars:
+    any::
+      "list_vars[$(tag)]" slist => variablesmatching(".*", "$(tag)");
+
+      "all_lists"
+          data => parsejson('[]'),
+        policy => "free";
+
+      "all_lists"
+          data => mergedata("all_lists", "$(list_vars[$(tag)])"),
+        policy => "free";
+
+  files:
+    any::
+      "$(dest)"
+        comment       => "Ensure $(dest) is populated",
+        handle        => "eecs_merge_into_files_$(tag)",
+        create        => "true",
+        edit_defaults => empty,
+        edit_line     => insert_file(@(all_lists)),
+        classes       => scoped_classes_generic("bundle", "merge_into_$(tag)");
+
+  reports:
+    inform_mode::
+      "File $(dest) was populated with files tagged with $(tag)"
+        ifvarclass => "merge_into_$(tag)_ok)";
+}
+
+body edit_defaults empty
+{
+      empty_file_before_editing => "true";
+      edit_backup => "false";
+      #max_file_size => "300000";
+}
+
+bundle edit_line insert_file(templatefile)
+{
+  insert_lines:
+
+      "$(templatefile)"
+      comment => "Insert the template file into the file being edited",
+      insert_type => "file";
+}
+
+body classes scoped_classes_generic(scope, x)
+{
+      scope => "$(scope)";
+      promise_repaired => { "promise_repaired_$(x)", "$(x)_repaired", "$(x)_ok", "$(x)_reached" };
+      repair_failed => { "repair_failed_$(x)", "$(x)_failed", "$(x)_not_ok", "$(x)_error", "$(x)_not_kept", "$(x)_reached" };
+      repair_denied => { "repair_denied_$(x)", "$(x)_denied", "$(x)_not_ok", "$(x)_error", "$(x)_not_kept", "$(x)_reached" };
+      repair_timeout => { "repair_timeout_$(x)", "$(x)_timeout", "$(x)_not_ok", "$(x)_error", "$(x)_not_kept", "$(x)_reached" };
+      promise_kept => { "promise_kept_$(x)", "$(x)_kept", "$(x)_ok", "$(x)_reached" };
+}

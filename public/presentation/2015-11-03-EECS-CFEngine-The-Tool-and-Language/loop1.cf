@@ -1,0 +1,42 @@
+# vim:syntax=cf3
+
+body common control
+{
+    bundlesequence => { loop };
+}
+
+bundle agent loop
+{
+    vars:
+        any::
+            "list1" slist => { "one", "two", "three" };
+            "list2" slist => { "four", "five", "six" };
+
+    files:
+        any::
+            "/tmp/presentation/."
+                create     => "true";
+
+            "/tmp/presentation/$(list1)"
+                comment    => "make some files",
+                edit_line  => demo_insert(@(list2)),
+                create     => "true",
+                ifvarclass => not(fileexists("/tmp/presenation/$(list1)")),
+                classes    => demo_repaired("$(list1)_created");
+
+    reports:
+        any::
+            "/tmp/presentation/$(list1) was created"
+                ifvarclass => "$(list1)_created";
+}
+
+bundle edit_line demo_insert(list)
+{
+    insert_lines:
+        "$(list)";
+}
+
+body classes demo_repaired(c)
+{
+    promise_repaired => { "$(c)" };
+}

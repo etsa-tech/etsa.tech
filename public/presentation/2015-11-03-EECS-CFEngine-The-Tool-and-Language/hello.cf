@@ -1,0 +1,27 @@
+# vim:syntax=cf3
+
+body common control
+{
+    !secondary::
+        bundlesequence => { hello };
+
+    secondary::
+        bundlesequence => { cli_class };
+}
+
+bundle agent hello
+{
+    reports:
+        any::
+            "Hello, LOPSA!";
+
+        inform_mode::
+            "Specifically the East-Tennessee group.";
+}
+
+bundle agent cli_class
+{
+    reports:
+        any::
+            "This only gets printed if the 'secondary' class is set.";
+}

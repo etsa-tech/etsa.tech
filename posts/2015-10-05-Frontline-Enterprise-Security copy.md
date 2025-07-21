@@ -7,7 +7,7 @@ tags:
     "Cybersecurity",
     "Compliance",
     "PCI",
-    " HIPPA",
+    "HIPPA",
     "ISO",
     "Security Audits",
     "Enterprise Security",

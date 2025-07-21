@@ -1,0 +1,24 @@
+# vim:syntax=cf3
+
+body common control
+{
+    bundlesequence => { loop };
+}
+
+bundle agent loop
+{
+    vars:
+        any::
+            "list1" slist => { "one", "two", "three" };
+            "list2" slist => { "four", "five", "six" };
+
+    reports:
+        !double.!thrice::
+            "Items in list1: $(list1)";
+
+        double.!thrice::
+            "list1: $(list1), list2: $(list2)";
+
+        thrice::
+            "list1: $(list1), list2: $(list2), list1 (again) $(list1)";
+}
