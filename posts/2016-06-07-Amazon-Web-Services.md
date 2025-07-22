@@ -1,6 +1,6 @@
 ---
 title: "The Cloud, DevOps, and the Changing Face of Modern Operations"
-date: "2016-01-05"
+date: "2016-06-07"
 excerpt: "Dive into the evolving world of DevOps, cloud computing, and the shifting role of system administrators in an industry moving from pets to cattle."
 tags:
   [
@@ -24,7 +24,7 @@ speakers:
     \"wizard\" with the UTK Computer Science department. When not wrangling systems, he solders microcontrollers, paints toy soldiers, drinks bourbon, smokes pipes, and rolls 20s."
     linkedIn: "https://www.linkedin.com/in/andy-cowell/"
 presentationSlides: "lopsa_amazon_web_services.pdf"
-eventDate: "2016-01-05"
+eventDate: "2016-06-07"
 eventLocation: "Cafe 4"
 published: true
 ---
