@@ -118,11 +118,17 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="text-4xl font-bold text-etsa-primary mb-2">
+                {/* Our first meeting was June 2012, we're taking a rough estimate from our founding and taking in account any missed meetings since we only tracked starting in August 2015 */}
                 {Math.ceil(
-                  (new Date().getFullYear() -
-                    parseInt(
-                      process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || "2012",
-                    )) *
+                  ((new Date().getTime() -
+                    new Date(
+                      parseInt(
+                        process.env.NEXT_PUBLIC_ORG_FOUNDED_YEAR || "2012",
+                      ),
+                      5,
+                      1,
+                    ).getTime()) /
+                    (1000 * 60 * 60 * 24 * 365.25)) *
                     11.6,
                 )}
                 +
