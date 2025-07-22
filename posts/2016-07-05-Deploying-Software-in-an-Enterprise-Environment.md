@@ -1,5 +1,5 @@
 ---
-title: "Deploying Software in an Enterprise Environment "
+title: "Deploying Software in an Enterprise Environment"
 date: "2016-07-05"
 excerpt: "See how ORNL leverages Microsoft SCCM to streamline software deployment and updates in today’s complex enterprise environments."
 tags:
