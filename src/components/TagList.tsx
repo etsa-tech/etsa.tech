@@ -82,14 +82,14 @@ export function TagCloud({
           const normalizedCount = range > 0 ? (count - minCount) / range : 0;
 
           // Map to text size classes
-          const sizeClass =
-            normalizedCount > 0.8
-              ? "text-lg"
-              : normalizedCount > 0.6
-                ? "text-base"
-                : normalizedCount > 0.4
-                  ? "text-sm"
-                  : "text-xs";
+          const getSizeClass = (normalizedCount: number): string => {
+            if (normalizedCount > 0.8) return "text-lg";
+            if (normalizedCount > 0.6) return "text-base";
+            if (normalizedCount > 0.4) return "text-sm";
+            return "text-xs";
+          };
+
+          const sizeClass = getSizeClass(normalizedCount);
 
           return (
             <Link
