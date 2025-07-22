@@ -19,7 +19,6 @@ speakers:
   - name: "Chad DeGuira"
     title: "Systems Management and Engineering Team Leader"
     company: "Oak Ridge National Lab"
-    image: "/images/speakers/michael_campfield.jpeg"
     bio: "Chad DeGuira is an Architecture & Integration Engineer at Oak Ridge National Laboratory. He has worked in Information Technology for the past 20 years in support, administrative, and management roles. He has been at Oak Ridge DOE facilities for the past 12 years with primary interests in substantial cost reductions based on efficient and effective use of computing resources through new technology, automated processes, and improved workflow."
     linkedIn: "https://www.linkedin.com/in/chad-deguira-a1237674/"
 presentationSlides: "microsoft_deployment-chad_deguira.pptx"
