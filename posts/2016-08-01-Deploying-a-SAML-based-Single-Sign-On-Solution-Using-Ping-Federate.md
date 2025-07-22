@@ -24,7 +24,7 @@ speakers:
     linkedIn: "https://www.linkedin.com/in/dewayne-holiway-a304aab/"
 presentationSlides: "LOPSA-ET 2016-08-02 BEWilson SAML.pptx"
 eventDate: "2016-08-01"
-eventLocation: "Cafe 4"
+eventLocation: "Pellissippi State Community College"
 published: true
 ---
 
