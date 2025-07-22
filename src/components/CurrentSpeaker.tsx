@@ -6,7 +6,7 @@ interface CurrentSpeakerProps {
   latestPost: PostSummary | null;
 }
 
-export function CurrentSpeaker({ latestPost }: CurrentSpeakerProps) {
+export function CurrentSpeaker({ latestPost }: Readonly<CurrentSpeakerProps>) {
   if (!latestPost) {
     return (
       <div className="card">

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -27,7 +27,7 @@ export function ThemeProvider({
   defaultTheme = "system",
   storageKey = "etsa-ui-theme",
   ...props
-}: ThemeProviderProps) {
+}: Readonly<ThemeProviderProps>) {
   const [theme, setTheme] = useState<Theme>(defaultTheme);
   const [mounted, setMounted] = useState(false);
 
@@ -57,13 +57,13 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme, mounted]);
 
-  const value = {
+  const value = useMemo(() => ({
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem(storageKey, newTheme);
+      setTheme(newTheme);
     },
-  };
+  }), [theme, storageKey]);
 
   if (!mounted) {
     return <>{children}</>;
