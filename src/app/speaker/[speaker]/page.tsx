@@ -92,7 +92,6 @@ export default async function SpeakerPage({ params }: Readonly<PageProps>) {
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
             {posts.length} presentation{posts.length !== 1 ? "s" : ""} at ETSA
-            meetups
           </p>
         </div>
       </div>
