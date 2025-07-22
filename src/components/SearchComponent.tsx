@@ -39,9 +39,8 @@ export default function SearchComponent({
       const matchesSpeakers = speakers.some(
         (speaker) =>
           speaker.name.toLowerCase().includes(searchTerm) ||
-          (speaker.title && speaker.title.toLowerCase().includes(searchTerm)) ||
-          (speaker.company &&
-            speaker.company.toLowerCase().includes(searchTerm)),
+          speaker.title?.toLowerCase().includes(searchTerm) ||
+          speaker.company?.toLowerCase().includes(searchTerm),
       );
 
       return matchesContent || matchesSpeakers;
