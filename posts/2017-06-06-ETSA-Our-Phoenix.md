@@ -14,7 +14,7 @@ tags:
   ]
 author: "ETSA"
 speakers:
- - name: "Jesse Trucks"
+  - name: "Jesse Trucks"
     title: "Minister of Magic"
     company: "Splunk"
     image: "/images/speakers/jesse_trucks.jpeg"
