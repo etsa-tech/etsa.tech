@@ -23,7 +23,7 @@ speakers:
     bio: "Over the years, Wesley Kirkland has worked extensively with VMWare and Hyper-V Clusters, System Center Configuration/Operations/VM Manager, particularly using PowerShell to increasingly automate and integrate Active Directory environments. He is currently a Cloud Engineer for TeamHealth, where he implements and maintains SaaS applications, including AWS, Okta, various Web APIs, and other backend programs for scalable automation."
     linkedIn: "https://www.linkedin.com/in/wesleykirkland/"
 eventDate: "2017-01-03"
-eventLocation: "Pellissippi State Community College"
+eventLocation: "TekSystems"
 published: true
 ---
 

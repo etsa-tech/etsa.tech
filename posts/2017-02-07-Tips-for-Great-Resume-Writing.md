@@ -22,7 +22,7 @@ speakers:
     bio: "Michael Campfield is a systems administrator with the National Center for Computational Sciences at Oak Ridge National Lab.  He received his Bachelor and Master of Science in Computer Science from the University of Tennessee.  Over the last decade in his professional career, he has worked with various state agencies and higher education institutions, along with National Science Foundation projects such as XSEDE.  He has recently transferred from the National Institute for Computational Sciences, part of UT's Joint Institute for Computational Sciences at ORNL. As a result of Michael's upbringing in Upstate New York, he only eats sweet cornbread but never drinks sweet tea."
     linkedIn: "https://www.linkedin.com/in/michael-campfield-2969382/"
 eventDate: "2017-02-07"
-eventLocation: "Pellissippi State Community College"
+eventLocation: "TekSystems"
 presentationSlides: "resume_presentation_lopsa_201702.odp"
 published: true
 ---

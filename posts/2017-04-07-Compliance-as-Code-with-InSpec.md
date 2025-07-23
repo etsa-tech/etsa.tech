@@ -24,7 +24,7 @@ speakers:
     bio: "Nolan Davidson is a systems engineer with over 15 years of experience.  Currently an engineer for Chef Software, Nolan focuses on infrastructure design, automation, and application delivery.  He also spends time on tool development, both internal and contributing to open source automation related projects. When not automating all the things, he enjoys video games, reading, and failing miserably at keeping up with his wife and two daughters."
     linkedIn: "https://www.linkedin.com/in/rob-barker-14018392/"
 eventDate: "2017-04-07"
-eventLocation: "Pellissippi State Community College"
+eventLocation: "TekSystems"
 published: true
 ---
 
