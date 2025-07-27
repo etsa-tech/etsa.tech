@@ -11,7 +11,7 @@ tags:
     "Recruiting",
     "Resume Tips",
     "Job Applications",
-    "Personal Branding"
+    "Personal Branding",
   ]
 author: "ETSA"
 speakers:
@@ -27,7 +27,7 @@ presentationSlides: "resume_presentation_lopsa_201702.odp"
 published: true
 ---
 
-You're résumé is prefect, You have red it many times. When it hits my desk. I dont even reed your name, I just start Nit-picking. Buy inch one, I begin to dislike you, but inch 4 I'm sure your triing to make me angry, by in eight, I've taken out the dramamine since you have made me so angry I'm nauseous.  This talk is about those simple and not-so simple issues that you insert in to your résumé, the formatting, and from your personal life that make me want to see which of my co-workers recycled it 1st.
+You're résumé is prefect, You have red it many times. When it hits my desk. I dont even reed your name, I just start Nit-picking. Buy inch one, I begin to dislike you, but inch 4 I'm sure your triing to make me angry, by in eight, I've taken out the dramamine since you have made me so angry I'm nauseous. This talk is about those simple and not-so simple issues that you insert in to your résumé, the formatting, and from your personal life that make me want to see which of my co-workers recycled it 1st.
 
 Think your resume is perfect? please bring yours four part of this educational and interactive talk where you will be judge, jury and executioner of your own future and move from first on the discard stack to the point where I'm Itching to give you an on-sight interview.
 

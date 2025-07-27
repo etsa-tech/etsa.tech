@@ -26,6 +26,6 @@ eventLocation: "TekSystems"
 published: true
 ---
 
-Ansible is automation for everyone. For a long time we have been told a good sysadmin should always be automating. This has led to a proliferation of tools and platforms that seem to add as much complexity as they aim to remove. If you are like me, you embarked on a career in system administration because you didn't want to be a programmer -- what happened? 
+Ansible is automation for everyone. For a long time we have been told a good sysadmin should always be automating. This has led to a proliferation of tools and platforms that seem to add as much complexity as they aim to remove. If you are like me, you embarked on a career in system administration because you didn't want to be a programmer -- what happened?
 
 ​Ansible is a simple, powerful, agent-less automation language that works across platforms designed to lower the barrier to automation and focus on the more interesting parts of our job. In this presentation we will talk about the features of Ansible and how you can use it to love your job again.

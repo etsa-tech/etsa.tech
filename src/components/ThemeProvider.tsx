@@ -57,13 +57,16 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme, mounted]);
 
-  const value = useMemo(() => ({
-    theme,
-    setTheme: (newTheme: Theme) => {
-      localStorage.setItem(storageKey, newTheme);
-      setTheme(newTheme);
-    },
-  }), [theme, storageKey]);
+  const value = useMemo(
+    () => ({
+      theme,
+      setTheme: (newTheme: Theme) => {
+        localStorage.setItem(storageKey, newTheme);
+        setTheme(newTheme);
+      },
+    }),
+    [theme, storageKey],
+  );
 
   if (!mounted) {
     return <>{children}</>;

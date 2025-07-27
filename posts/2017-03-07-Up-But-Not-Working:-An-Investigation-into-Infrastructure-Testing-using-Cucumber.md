@@ -12,7 +12,7 @@ tags:
     "Infrastructure Testing",
     "System Reliability",
     "Credentialed Tests",
-    "Application Monitoring"
+    "Application Monitoring",
   ]
 author: "ETSA"
 speakers:
@@ -27,6 +27,6 @@ eventLocation: "TekSystems"
 published: true
 ---
 
-The monitoring system says the server is up and ping works.  But that doesn’t always mean the application or the infrastructure is working.  That often requires several systems are working together and meaningful tests have to have credentials.
+The monitoring system says the server is up and ping works. But that doesn’t always mean the application or the infrastructure is working. That often requires several systems are working together and meaningful tests have to have credentials.
 
 This talk will show some work using Cucumber (a domain specific language for testing), along with the Watir web driver, as a tool to do functional tests of systems.

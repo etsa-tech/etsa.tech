@@ -12,7 +12,7 @@ tags:
     "IT Operations",
     "System Administration",
     "Programming Languages",
-    "Infrastructure Automation"
+    "Infrastructure Automation",
   ]
 author: "ETSA"
 speakers:
@@ -27,4 +27,4 @@ eventLocation: "TekSystems"
 published: true
 ---
 
-PowerShell is a modern 4th generation object oriented scripting & programming language. It is an absolute must for any Windows admin to learn. This talk offers both an introduction to PowerShell, and highlights some of its relevant features and advantages for scalable automation. 
+PowerShell is a modern 4th generation object oriented scripting & programming language. It is an absolute must for any Windows admin to learn. This talk offers both an introduction to PowerShell, and highlights some of its relevant features and advantages for scalable automation.

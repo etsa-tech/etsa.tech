@@ -30,6 +30,6 @@ published: true
 
 What does it mean to have built your career around maintaining servers when they take your servers away?
 
-The technology world is changing in interesting ways.  The rise of the cloud has hyped new trends to the spotlight, and among them is "Serverless" computing.  You can today build a substantial technology company without ever seeing a shell prompt.  What does serverless computing mean to a career built around the care and feeding of...servers?  Could another trend, NoOps-- automating away your operations staff (hint: that's us) become reality?  Is your career path a dead end?  Is our future doomed to be in front end javascript development?
+The technology world is changing in interesting ways. The rise of the cloud has hyped new trends to the spotlight, and among them is "Serverless" computing. You can today build a substantial technology company without ever seeing a shell prompt. What does serverless computing mean to a career built around the care and feeding of...servers? Could another trend, NoOps-- automating away your operations staff (hint: that's us) become reality? Is your career path a dead end? Is our future doomed to be in front end javascript development?
 
 We will examine the reality of Serverless computing, and what impact that has on the roles traditionally filled by server administrators.

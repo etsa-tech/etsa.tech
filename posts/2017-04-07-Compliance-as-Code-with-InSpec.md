@@ -13,7 +13,7 @@ tags:
     "Collaboration",
     "Security Compliance",
     "CI/CD",
-    "DevSecOps"
+    "DevSecOps",
   ]
 author: "ETSA"
 speakers:
@@ -28,6 +28,6 @@ eventLocation: "TekSystems"
 published: true
 ---
 
-We're living the DevOps life.  Devs are on call, ops personnel are putting infrastructure changes in though pipelines, and everybody's going out for beers on Friday afternoon, right?  
+We're living the DevOps life. Devs are on call, ops personnel are putting infrastructure changes in though pipelines, and everybody's going out for beers on Friday afternoon, right?
 
-What about our friends in Security? (yes, they ARE our friends, I promise).  Are they staying behind at the office to make sure their compliance spreadsheets are all filled out for the new systems you just built?  Let's talk about bringing them along for our DevOps adventure with InSpec, a framework for expressing compliance as code. *Unicorns and rainbows sold separately
+What about our friends in Security? (yes, they ARE our friends, I promise). Are they staying behind at the office to make sure their compliance spreadsheets are all filled out for the new systems you just built? Let's talk about bringing them along for our DevOps adventure with InSpec, a framework for expressing compliance as code. \*Unicorns and rainbows sold separately
