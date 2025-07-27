@@ -12,12 +12,13 @@ interface PageProps {
 
 export async function generateStaticParams() {
   const slugs = getPostSlugs();
-  return slugs.map((slug) => ({ slug }));
+  return slugs.map((slug) => ({ slug: encodeURIComponent(slug) }));
 }
 
 export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await getPostBySlug(decodedSlug);
 
   if (!post) {
     return {
@@ -44,7 +45,8 @@ export default async function PresentationPage({
   params,
 }: Readonly<PageProps>) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await getPostBySlug(decodedSlug);
 
   if (!post) {
     notFound();
@@ -63,7 +65,7 @@ export default async function PresentationPage({
 
   const speakers = getPostSpeakers(frontmatter);
 
-  const recentPosts = getRecentPosts(3).filter((p) => p.slug !== slug);
+  const recentPosts = getRecentPosts(3).filter((p) => p.slug !== decodedSlug);
 
   return (
     <div className="container py-12">
