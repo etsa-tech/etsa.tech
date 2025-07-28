@@ -103,10 +103,10 @@ export default async function SpeakerPage({ params }: Readonly<PageProps>) {
         ))}
       </div>
 
-      {/* Back to Speakers */}
+      {/* Back to Presentations */}
       <div className="mt-12 text-center">
         <Link
-          href="/speakers"
+          href="/presentations"
           className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
         >
           <svg
@@ -122,7 +122,7 @@ export default async function SpeakerPage({ params }: Readonly<PageProps>) {
               d="M10 19l-7-7m0 0l7-7m-7 7h18"
             />
           </svg>
-          Back to All Speakers
+          Back to All Presentations
         </Link>
       </div>
     </div>
