@@ -11,6 +11,7 @@ export interface Speaker {
 }
 
 export interface PostFrontmatter {
+  description?: string;
   title: string;
   date: string;
   excerpt: string;

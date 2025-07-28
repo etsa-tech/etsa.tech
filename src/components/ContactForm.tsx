@@ -157,7 +157,7 @@ export default function ContactForm({
       // For static export, we'll show a success message and provide alternative contact methods
       setSubmitStatus("success");
       setSubmitMessage(
-        "Thank you for your message! Since this is a static site, please send your message directly to our email or contact us via Meetup.",
+        "Thank you for your message, and we hope to see you at a Meetup! We will get back to you as soon as we can..",
       );
       setFormData({ name: "", email: "", subject: "", message: "" });
       setErrors({});

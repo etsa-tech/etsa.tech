@@ -167,6 +167,14 @@ NEXT_PUBLIC_GITHUB_URL="https://github.com/etsa"
 NEXT_PUBLIC_LINKEDIN_URL="https://linkedin.com/company/etsa"
 NEXT_PUBLIC_MEETUP_URL="https://meetup.com/etsa"
 NEXT_PUBLIC_EMAIL="contact@etsa.tech"
+
+# Google Sheets Integration (for RSVP form)
+GOOGLE_SHEETS_WEBHOOK_URL="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+
+# Mailchimp Integration (for mailing list subscription)
+MAILCHIMP_API_KEY="your_mailchimp_api_key_here"
+MAILCHIMP_LIST_ID="your_mailchimp_list_id_here"
+MAILCHIMP_SERVER_PREFIX="us1"  # or us2, us3, etc. based on your account
 ```
 
 ### Security Best Practices
