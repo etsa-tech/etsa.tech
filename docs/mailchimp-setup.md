@@ -41,19 +41,6 @@ MAILCHIMP_SERVER_PREFIX=us1  # or us2, us3, etc.
 
 ## Testing the Integration
 
-### Test the Mailchimp Function Directly
-
-You can test the Mailchimp function by making a POST request to your deployed function:
-
-```bash
-curl -X POST "https://your-site.netlify.app/.netlify/functions/mailchimp-subscribe" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "name": "Test User"
-  }'
-```
-
 ### Test the Full RSVP Flow
 
 1. Go to `/rsvp` on your website
