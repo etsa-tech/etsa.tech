@@ -32,6 +32,7 @@ The Google Apps Script acts as a webhook endpoint that:
    - Column F: `Comments and/or questions`
    - Column G: `Subscribe to our newsletter (We won't sell your email or spam you)`
    - Column H: `What is your last name?`
+   - Column I: `Event`
 
 ### Step 2: Access Google Apps Script
 
@@ -96,6 +97,7 @@ function doPost(e) {
       data.comments || "", // Column F: Comments and/or questions
       data.subscribeToNewsletter ? "Yes" : "No", // Column G: Subscribe to our newsletter
       data.lastName, // Column H: What is your last name?
+      data.event || "ETSA Meetup", // Column I: Event
     ];
 
     // Append the data to the sheet
@@ -156,6 +158,7 @@ function testRSVPSubmission() {
         howDidYouHear: "Testing",
         comments: "This is a test submission",
         subscribeToNewsletter: true,
+        event: "Test Event",
         timestamp: new Date().toISOString(),
       }),
     },
@@ -198,6 +201,7 @@ function testRSVPSubmission() {
 1. After successful deployment, you'll see a **Web app URL**
 2. It will look like: `https://script.google.com/macros/s/AKfycbx...../exec`
 3. **Copy this entire URL** - you'll need it for Netlify configuration
+4. When you change the app code you will need to update the webhook url
 
 ### Step 8: Test the Deployment
 

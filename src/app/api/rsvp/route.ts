@@ -16,6 +16,7 @@ async function submitToGoogleSheets(data: {
   howDidYouHear: string;
   comments: string;
   subscribeToNewsletter: boolean;
+  event: string;
   timestamp: string;
 }): Promise<GoogleSheetsResponse> {
   try {
@@ -27,6 +28,7 @@ async function submitToGoogleSheets(data: {
       howDidYouHear,
       comments,
       subscribeToNewsletter,
+      event,
       timestamp,
     } = data;
 
@@ -53,6 +55,7 @@ async function submitToGoogleSheets(data: {
         comments,
         subscribeToNewsletter,
         lastName,
+        event,
       }),
     });
 
@@ -128,6 +131,7 @@ export async function POST(request: NextRequest) {
       howDidYouHear: validatedData.howDidYouHear,
       comments: validatedData.comments || "",
       subscribeToNewsletter: validatedData.subscribeToNewsletter,
+      event: formData.meetingTitle || "ETSA Meetup",
       timestamp: new Date().toISOString(),
     });
 

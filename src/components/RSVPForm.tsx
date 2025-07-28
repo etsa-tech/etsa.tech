@@ -200,6 +200,37 @@ export default function RSVPForm({
     }
 
     setErrors(newErrors);
+
+    // Scroll to first error field if validation fails
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorField = Object.keys(newErrors)[0];
+      let element = document.getElementById(firstErrorField);
+
+      // Special handling for radio button groups
+      if (firstErrorField === "canAttend") {
+        // Scroll to the container
+        element = document.getElementById("canAttend");
+        if (element) {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          // Focus the first radio button in the group
+          const firstRadio = document.getElementById("canAttend-first");
+          if (firstRadio) {
+            firstRadio.focus();
+          }
+        }
+      } else if (element) {
+        // Standard text input handling
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        element.focus();
+      }
+    }
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -256,7 +287,7 @@ export default function RSVPForm({
       setSubmitMessage(
         `Thank you for your RSVP! We've confirmed your response for "${meetingTitle}".${
           formData.subscribeToNewsletter
-            ? " You've also been subscribed to our newsletter for future updates."
+            ? "\n\nYou've also been subscribed to our newsletter for future updates."
             : ""
         }`,
       );
@@ -405,15 +436,16 @@ export default function RSVPForm({
         </div>
 
         {/* Can You Attend Field */}
-        <div>
+        <div id="canAttend">
           <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
             Can you attend? *
           </label>
           <div className="space-y-2">
-            {["Yes", "No", "Maybe"].map((option) => (
+            {["Yes", "No", "Maybe"].map((option, index) => (
               <label key={option} className="flex items-center">
                 <input
                   type="radio"
+                  id={index === 0 ? "canAttend-first" : undefined}
                   name="canAttend"
                   value={option}
                   checked={formData.canAttend === option}
@@ -568,7 +600,7 @@ export default function RSVPForm({
         {/* Submit Status Messages */}
         {submitMessage && (
           <div
-            className={`p-4 rounded-lg ${
+            className={`p-4 rounded-lg whitespace-pre-line ${
               submitStatus === "success"
                 ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
                 : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
