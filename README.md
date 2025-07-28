@@ -253,7 +253,7 @@ speakers:
 presentationSlides: "https://slides.google.com/docker-networking"
 recordingUrl: "https://youtube.com/watch?v=docker-recording-2024"
 eventDate: "2024-03-15"
-eventLocation: "Knoxville Tech Hub"
+eventLocation: "Knoxville Entrepreneur Center"
 featured: true
 published: true
 ---
