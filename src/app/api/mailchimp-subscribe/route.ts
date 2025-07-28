@@ -24,7 +24,7 @@ async function subscribeToMailchimp(data: {
 
     // Mailchimp configuration
     const apiKey = process.env.MAILCHIMP_API_KEY;
-    const listId = process.env.MAILCHIMP_LIST_ID || "47a321dfbf"; // Your audience ID
+    const listId = process.env.MAILCHIMP_LIST_ID; // Your audience ID
     const serverPrefix = process.env.MAILCHIMP_SERVER_PREFIX; // e.g., "us1", "us2"
 
     if (!apiKey || !serverPrefix) {
