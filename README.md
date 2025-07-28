@@ -395,7 +395,7 @@ Use consistent, descriptive tags for better categorization and discoverability:
 
 The site uses a custom color scheme defined in `tailwind.config.ts`:
 
-- **Primary**: Blue tones for ETSA branding
+- **Primary**: Blue tones for ETSA branding pulled from our logo
 - **Secondary**: Professional grays
 - **Accent**: Orange highlights
 
