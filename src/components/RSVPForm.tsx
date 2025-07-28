@@ -216,7 +216,7 @@ export default function RSVPForm({
 
     try {
       // Submit RSVP data
-      const rsvpResponse = await fetch("/.netlify/functions/rsvp", {
+      const rsvpResponse = await fetch("/api/rsvp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -234,19 +234,16 @@ export default function RSVPForm({
 
       // If user opted for mailing list, subscribe them
       if (formData.subscribeToNewsletter) {
-        const mailchimpResponse = await fetch(
-          "/.netlify/functions/mailchimp-subscribe",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: formData.email,
-              name: `${formData.firstName} ${formData.lastName}`,
-            }),
+        const mailchimpResponse = await fetch("/api/mailchimp-subscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify({
+            email: formData.email,
+            name: `${formData.firstName} ${formData.lastName}`,
+          }),
+        });
 
         if (!mailchimpResponse.ok) {
           console.warn(
@@ -257,7 +254,7 @@ export default function RSVPForm({
 
       setSubmitStatus("success");
       setSubmitMessage(
-        `Thank you for your RSVP! We've confirmed your response for ${meetingTitle} on ${meetingDate}.${
+        `Thank you for your RSVP! We've confirmed your response for "${meetingTitle}".${
           formData.subscribeToNewsletter
             ? " You've also been subscribed to our newsletter for future updates."
             : ""
