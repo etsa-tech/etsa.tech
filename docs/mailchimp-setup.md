@@ -58,6 +58,7 @@ The integration:
 - Sets first and last name from the provided name
 - Adds tags: "ETSA Website" and "RSVP Signup"
 - Handles duplicate email addresses gracefully
+- If the email already exists Mailchimp returns a 200, we will **NOT** error out on this as that would provide user enumeration.
 
 ### Error Handling
 
