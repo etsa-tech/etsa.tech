@@ -154,10 +154,26 @@ export default function ContactForm({
         return;
       }
 
-      // For static export, we'll show a success message and provide alternative contact methods
+      // Submit contact form data to API
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          "h-captcha-response": captchaToken,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send message");
+      }
+
       setSubmitStatus("success");
       setSubmitMessage(
-        "Thank you for your message, and we hope to see you at a Meetup! We will get back to you as soon as we can..",
+        "Thank you for your message! We have received it and will get back to you as soon as we can.",
       );
       setFormData({ name: "", email: "", subject: "", message: "" });
       setErrors({});
