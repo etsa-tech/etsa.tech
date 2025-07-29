@@ -1,14 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { validateRSVPForm } from "@/lib/validation";
-import { verifyHCaptcha } from "@/lib/email-config";
+import {
+  createApiHandler,
+  parseRequestBody,
+  validateCaptcha,
+  createErrorResponse,
+  createSuccessResponse,
+  logRequestData,
+} from "@/lib/api-utils";
 
 interface GoogleSheetsResponse {
   success: boolean;
   error?: string;
 }
 
-// Function to submit data to Google Sheets
-async function submitToGoogleSheets(data: {
+interface RSVPData {
   firstName: string;
   lastName: string;
   email: string;
@@ -18,7 +24,12 @@ async function submitToGoogleSheets(data: {
   subscribeToNewsletter: boolean;
   event: string;
   timestamp: string;
-}): Promise<GoogleSheetsResponse> {
+}
+
+// Function to submit data to Google Sheets
+async function submitToGoogleSheets(
+  data: RSVPData,
+): Promise<GoogleSheetsResponse> {
   try {
     const {
       firstName,
@@ -79,94 +90,48 @@ async function submitToGoogleSheets(data: {
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    // Parse request body
-    const requestData = await request.json();
-    const { captchaToken, ...formData } = requestData;
+async function handleRSVPSubmission(request: NextRequest) {
+  // Parse and log request
+  const requestData = await parseRequestBody(request);
+  const { captchaToken, ...formData } = requestData;
+  logRequestData(requestData, "RSVP form");
 
-    console.log("RSVP form data received:", {
-      ...formData,
-      captchaToken: captchaToken ? "[PRESENT]" : "[MISSING]",
-    });
+  // Verify hCaptcha
+  await validateCaptcha(captchaToken);
 
-    // Verify hCaptcha
-    if (!captchaToken) {
-      return NextResponse.json(
-        { error: "Captcha token is required" },
-        { status: 400 },
-      );
-    }
-
-    const captchaResult = await verifyHCaptcha(captchaToken);
-    if (!captchaResult.success) {
-      console.error("hCaptcha verification failed:", captchaResult.error);
-      return NextResponse.json(
-        { error: captchaResult.error || "Captcha verification failed" },
-        { status: 400 },
-      );
-    }
-
-    // Validate form data
-    const validation = validateRSVPForm(formData);
-    if (!validation.success) {
-      console.error("RSVP form validation failed:", validation.errors);
-      return NextResponse.json(
-        {
-          error: "Validation failed",
-          details: validation.errors,
-        },
-        { status: 400 },
-      );
-    }
-
-    const validatedData = validation.data;
-
-    // Submit to Google Sheets
-    const sheetsResult = await submitToGoogleSheets({
-      firstName: validatedData.firstName,
-      lastName: validatedData.lastName,
-      email: validatedData.email,
-      canAttend: validatedData.canAttend,
-      howDidYouHear: validatedData.howDidYouHear,
-      comments: validatedData.comments || "",
-      subscribeToNewsletter: validatedData.subscribeToNewsletter,
-      event: formData.meetingTitle || "ETSA Meetup",
-      timestamp: new Date().toISOString(),
-    });
-
-    if (!sheetsResult.success) {
-      console.error("Failed to submit to Google Sheets:", sheetsResult.error);
-      return NextResponse.json(
-        { error: "Failed to save RSVP. Please try again later." },
-        { status: 500 },
-      );
-    }
-
-    console.log("RSVP submitted successfully");
-
-    // Success response
-    return NextResponse.json({
-      success: true,
-      message: "RSVP submitted successfully",
-    });
-  } catch (error) {
-    console.error("RSVP API error:", error);
-
-    return NextResponse.json(
-      { error: "Internal server error. Please try again later." },
-      { status: 500 },
-    );
+  // Validate form data
+  const validation = validateRSVPForm(formData);
+  if (!validation.success) {
+    console.error("RSVP form validation failed:", validation.errors);
+    return createErrorResponse("Validation failed");
   }
-}
 
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
+  const validatedData = validation.data;
+
+  // Submit to Google Sheets
+  const sheetsResult = await submitToGoogleSheets({
+    firstName: validatedData.firstName,
+    lastName: validatedData.lastName,
+    email: validatedData.email,
+    canAttend: validatedData.canAttend,
+    howDidYouHear: validatedData.howDidYouHear,
+    comments: validatedData.comments || "",
+    subscribeToNewsletter: validatedData.subscribeToNewsletter,
+    event: formData.meetingTitle || "ETSA Meetup",
+    timestamp: new Date().toISOString(),
+  });
+
+  if (!sheetsResult.success) {
+    console.error("Failed to submit to Google Sheets:", sheetsResult.error);
+    throw new Error("Failed to save RSVP. Please try again later.");
+  }
+
+  console.log("RSVP submitted successfully");
+  return createSuccessResponse({
+    success: true,
+    message: "RSVP submitted successfully",
   });
 }
+
+export const POST = createApiHandler(handleRSVPSubmission);
+export { handleOptions as OPTIONS } from "@/lib/api-utils";

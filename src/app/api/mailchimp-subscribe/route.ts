@@ -1,4 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import {
+  createApiHandler,
+  parseRequestBody,
+  createErrorResponse,
+  createSuccessResponse,
+  logRequestData,
+} from "@/lib/api-utils";
 
 interface MailchimpMember {
   id: string;
@@ -88,69 +95,43 @@ async function subscribeToMailchimp(data: {
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    // Parse request body
-    const { email, name } = await request.json();
+// Email validation regex
+const EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-    console.log("Mailchimp subscription request:", { email, name });
+async function handleMailchimpSubscription(request: NextRequest) {
+  // Parse and log request
+  const requestData = await parseRequestBody(request);
+  const { email, name } = requestData;
+  logRequestData({ email, name }, "Mailchimp subscription");
 
-    // Basic validation
-    if (!email || !name) {
-      return NextResponse.json(
-        { error: "Email and name are required" },
-        { status: 400 },
-      );
-    }
+  // Basic validation
+  if (!email || !name) {
+    return createErrorResponse("Email and name are required");
+  }
 
-    // Validate email format
-    const emailRegex =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 },
-      );
-    }
+  // Validate email format
+  if (!EMAIL_REGEX.test(email)) {
+    return createErrorResponse("Invalid email format");
+  }
 
-    // Subscribe to Mailchimp
-    const result = await subscribeToMailchimp({ email, name });
+  // Subscribe to Mailchimp
+  const result = await subscribeToMailchimp({ email, name });
 
-    if (!result.success) {
-      console.error("Failed to subscribe to Mailchimp:", result.error);
-      return NextResponse.json(
-        {
-          error: "Failed to subscribe to mailing list. Please try again later.",
-        },
-        { status: 500 },
-      );
-    }
-
-    console.log("Mailchimp subscription successful");
-
-    // Success response
-    return NextResponse.json({
-      success: true,
-      message: "Successfully subscribed to mailing list",
-      member: result.member,
-    });
-  } catch (error) {
-    console.error("Mailchimp subscription API error:", error);
-
-    return NextResponse.json(
-      { error: "Internal server error. Please try again later." },
-      { status: 500 },
+  if (!result.success) {
+    console.error("Failed to subscribe to Mailchimp:", result.error);
+    throw new Error(
+      "Failed to subscribe to mailing list. Please try again later.",
     );
   }
-}
 
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
+  console.log("Mailchimp subscription successful");
+  return createSuccessResponse({
+    success: true,
+    message: "Successfully subscribed to mailing list",
+    member: result.member,
   });
 }
+
+export const POST = createApiHandler(handleMailchimpSubscription);
+export { handleOptions as OPTIONS } from "@/lib/api-utils";
