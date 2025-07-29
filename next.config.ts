@@ -4,14 +4,6 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        port: "",
-        pathname: "/**",
-      },
-    ],
   },
   // Note: Security headers should be implemented at the web server level for static exports
   // Recommended CSP: "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.hcaptcha.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://hcaptcha.com; frame-src https://hcaptcha.com"
