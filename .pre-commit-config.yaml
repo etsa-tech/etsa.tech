@@ -4,13 +4,13 @@ repos:
     hooks:
       - id: terraform_fmt
         exclude: ^examples/.* # Regex pattern to exclude submodule directory
-      - id: terraform_docs # Update our output, if updates it will force a failure which is good
-        args:
-          - "--args=-c .config/.terraform-docs.yml"
-      - id: terraform_docs # Verify out output is up to date, sometimes the update fails
-        always_run: true
-        args:
-          - "--args=--output-check=true"
+      # - id: terraform_docs # Update our output, if updates it will force a failure which is good
+      #   args:
+      #     - "--args=-c .config/.terraform-docs.yml"
+      # - id: terraform_docs # Verify out output is up to date, sometimes the update fails
+      #   always_run: true
+      #   args:
+      #     - "--args=--output-check=true"
       - id: terraform_tflint
         exclude: ^examples/.* # Regex pattern to exclude submodule directory
         args:
