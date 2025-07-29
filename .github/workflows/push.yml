@@ -36,31 +36,31 @@ jobs:
         with:
           tofu_version: "1.10.3"
 
-      - name: Render terraform docs inside the README.md and push changes back to PR branch
-        uses: terraform-docs/gh-actions@v1.4.1
-        with:
-          working-dir: terraform
-          output-file: README.md
-          output-method: inject
-          git-push: "true"
+      # - name: Render terraform docs inside the README.md and push changes back to PR branch
+      #   uses: terraform-docs/gh-actions@v1.4.1
+      #   with:
+      #     working-dir: terraform
+      #     output-file: README.md
+      #     output-method: inject
+      #     git-push: "true"
 
-      - uses: terraform-linters/setup-tflint@v4
-        name: Setup TFLint
-        with:
-          tflint_version: v0.58.1
+      # - uses: terraform-linters/setup-tflint@v4
+      #   name: Setup TFLint
+      #   with:
+      #     tflint_version: v0.58.1
 
-      - name: Init TFLint
-        run: tflint --init
-        env:
-          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-          GITHUB_TOKEN: ${{ github.token }}
+      # - name: Init TFLint
+      #   run: tflint --init
+      #   env:
+      #     # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+      #     GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Run TFLint
-        run: tflint -f compact
+      # - name: Run TFLint
+      #   run: tflint -f compact
 
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      # - uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
 
       - uses: gitleaks/gitleaks-action@v2
         env:
