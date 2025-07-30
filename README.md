@@ -84,6 +84,50 @@ npm run dev
 └── package.json           # Dependencies and scripts
 ```
 
+## Admin Interface
+
+The ETSA website includes a secure admin interface for content management accessible at `/admin`.
+
+### Features
+
+- **Google OAuth Authentication**: Restricted to @etsa.tech Google Workspace accounts
+- **Blog Post Management**: Create, edit, and manage blog posts with markdown editor
+- **GitHub Integration**: Automatic pull request creation for content changes
+- **Asset Management**: Upload and manage images and files (coming soon)
+- **Social Media Integration**: LinkedIn and Mailchimp integration (coming soon)
+
+### Required Environment Variables
+
+```bash
+# Google OAuth (for admin authentication)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000  # or your production URL
+
+# GitHub Integration (for content management)
+GITHUB_TOKEN=your_github_personal_access_token
+```
+
+### Setup Instructions
+
+1. **Google OAuth Setup**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials
+   - Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
+
+2. **GitHub Token Setup**:
+   - Go to GitHub Settings > Developer settings > Personal access tokens
+   - Create a new token with `repo` permissions
+   - Add the token to your environment variables
+
+3. **Access the Admin Interface**:
+   - Navigate to `/admin`
+   - Sign in with your @etsa.tech Google account
+   - Start managing content!
+
 ## Content Management
 
 ### Adding New Speaker Posts
