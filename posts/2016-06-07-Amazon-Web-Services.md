@@ -1,5 +1,5 @@
 ---
-title: "The Cloud, DevOps, and the Changing Face of Modern Operations"
+title: "Amazon Web Services"
 date: "2016-06-07"
 excerpt: "Dive into the evolving world of DevOps, cloud computing, and the shifting role of system administrators in an industry moving from pets to cattle."
 tags:

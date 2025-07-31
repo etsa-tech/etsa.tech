@@ -19,7 +19,7 @@ export function PhotoCarousel({
   photos,
   autoPlay = true,
   interval = 5000,
-}: PhotoCarouselProps) {
+}: Readonly<PhotoCarouselProps>) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -130,9 +130,9 @@ export function PhotoCarousel({
       {/* Dots Indicator */}
       {photos.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-          {photos.map((_, index) => (
+          {photos.map((photo, index) => (
             <button
-              key={index}
+              key={`${photo.src}-${index}`}
               onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-colors ${
                 index === currentIndex

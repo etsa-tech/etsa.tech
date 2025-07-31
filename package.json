@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.0",
+    "@netlify/functions": "^4.1.15",
     "@types/nodemailer": "^6.4.17",
     "gray-matter": "^4.0.3",
     "next": "15.3.5",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@netlify/plugin-nextjs": "^5.11.6",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^20",
     "@types/react": "^19",

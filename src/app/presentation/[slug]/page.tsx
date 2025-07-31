@@ -2,6 +2,7 @@ import React from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import sanitizeHtml from "sanitize-html";
 import { getPostBySlug, getPostSlugs, getRecentPosts } from "@/lib/blog";
 import { formatDate, getTagUrl, getPostSpeakers } from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
@@ -12,12 +13,13 @@ interface PageProps {
 
 export async function generateStaticParams() {
   const slugs = getPostSlugs();
-  return slugs.map((slug) => ({ slug }));
+  return slugs.map((slug) => ({ slug: encodeURIComponent(slug) }));
 }
 
 export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await getPostBySlug(decodedSlug);
 
   if (!post) {
     return {
@@ -44,7 +46,8 @@ export default async function PresentationPage({
   params,
 }: Readonly<PageProps>) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await getPostBySlug(decodedSlug);
 
   if (!post) {
     notFound();
@@ -63,7 +66,7 @@ export default async function PresentationPage({
 
   const speakers = getPostSpeakers(frontmatter);
 
-  const recentPosts = getRecentPosts(3).filter((p) => p.slug !== slug);
+  const recentPosts = getRecentPosts(3).filter((p) => p.slug !== decodedSlug);
 
   return (
     <div className="container py-12">
@@ -318,7 +321,81 @@ export default async function PresentationPage({
             )}
 
             {/* Content */}
-            <div dangerouslySetInnerHTML={{ __html: content }} />
+            <div
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(content, {
+                  allowedTags: [
+                    "h1",
+                    "h2",
+                    "h3",
+                    "h4",
+                    "h5",
+                    "h6",
+                    "p",
+                    "br",
+                    "strong",
+                    "em",
+                    "u",
+                    "s",
+                    "del",
+                    "ins",
+                    "ul",
+                    "ol",
+                    "li",
+                    "dl",
+                    "dt",
+                    "dd",
+                    "blockquote",
+                    "pre",
+                    "code",
+                    "a",
+                    "img",
+                    "table",
+                    "thead",
+                    "tbody",
+                    "tr",
+                    "th",
+                    "td",
+                    "div",
+                    "span",
+                    "hr",
+                  ],
+                  allowedAttributes: {
+                    a: ["href", "title", "target", "rel"],
+                    img: ["src", "alt", "title", "width", "height"],
+                    blockquote: ["cite"],
+                    div: ["class"],
+                    span: ["class"],
+                    code: ["class"],
+                    pre: ["class"],
+                  },
+                  allowedSchemes: ["http", "https", "mailto"],
+                  allowedSchemesByTag: {
+                    img: ["http", "https", "data"],
+                  },
+                  transformTags: {
+                    a: (tagName, attribs) => {
+                      // Ensure external links open in new tab and have security attributes
+                      if (
+                        attribs.href &&
+                        (attribs.href.startsWith("http://") ||
+                          attribs.href.startsWith("https://"))
+                      ) {
+                        return {
+                          tagName: "a",
+                          attribs: {
+                            ...attribs,
+                            target: "_blank",
+                            rel: "noopener noreferrer",
+                          },
+                        };
+                      }
+                      return { tagName, attribs };
+                    },
+                  },
+                }),
+              }}
+            />
           </article>
         </div>
 

@@ -4,7 +4,7 @@ date: "2016-09-06"
 excerpt: "Join co-founder Jesse Trucks for an open discussion on the past, present, and future of LOPSA-ETENN as the organization faces pivotal decisions."
 tags:
   [
-    “LOPSA-ETENN",
+    "LOPSA-ETENN",
     "Community",
     "Leadership",
     "Tech Organizations",

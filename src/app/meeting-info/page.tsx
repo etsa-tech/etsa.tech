@@ -126,21 +126,42 @@ export default function MeetingInfoPage() {
                 </div>
               )}
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <a
-                  href={process.env.NEXT_PUBLIC_MEETUP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-etsa-primary hover:text-etsa-secondary transition-colors"
-                >
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href="/rsvp"
+                    className="inline-flex items-center justify-center text-white bg-etsa-primary hover:bg-etsa-secondary transition-colors px-4 py-2 rounded-lg font-medium"
                   >
-                    <path d="M6.98 8.125c0 .995-.681 1.801-1.52 1.801s-1.52-.806-1.52-1.801.681-1.801 1.52-1.801 1.52.806 1.52 1.801zm12.24 0c0 .995-.681 1.801-1.52 1.801s-1.52-.806-1.52-1.801.681-1.801 1.52-1.801 1.52.806 1.52 1.801zm2.78 0c0 .995-.681 1.801-1.52 1.801s-1.52-.806-1.52-1.801.681-1.801 1.52-1.801 1.52.806 1.52 1.801zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z" />
-                  </svg>
-                  RSVP on Meetup
-                </a>
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                      />
+                    </svg>
+                    RSVP Here
+                  </a>
+                  <a
+                    href={process.env.NEXT_PUBLIC_MEETUP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center text-etsa-primary hover:text-etsa-secondary transition-colors border border-etsa-primary hover:bg-etsa-primary hover:text-white px-4 py-2 rounded-lg font-medium"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M6.98 8.125c0 .995-.681 1.801-1.52 1.801s-1.52-.806-1.52-1.801.681-1.801 1.52-1.801 1.52.806 1.52 1.801zm12.24 0c0 .995-.681 1.801-1.52 1.801s-1.52-.806-1.52-1.801.681-1.801 1.52-1.801 1.52.806 1.52 1.801zm2.78 0c0 .995-.681 1.801-1.52 1.801s-1.52-.806-1.52-1.801.681-1.801 1.52-1.801 1.52.806 1.52 1.801zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z" />
+                    </svg>
+                    RSVP on Meetup
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -385,10 +406,16 @@ export default function MeetingInfoPage() {
             </div>
             <div className="card-content space-y-3">
               <a
+                href="/rsvp"
+                className="block w-full bg-etsa-primary hover:bg-etsa-secondary text-white text-center py-3 px-4 rounded-lg font-medium transition-colors"
+              >
+                RSVP for Next Meeting
+              </a>
+              <a
                 href={process.env.NEXT_PUBLIC_MEETUP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full bg-etsa-primary hover:bg-etsa-secondary text-white text-center py-3 px-4 rounded-lg font-medium transition-colors"
+                className="block w-full border border-etsa-primary text-etsa-primary hover:bg-etsa-primary hover:text-white text-center py-3 px-4 rounded-lg font-medium transition-colors"
               >
                 Join Our Meetup Group
               </a>

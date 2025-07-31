@@ -62,9 +62,6 @@ export default function ContactPage() {
                       Use the contact form to reach out for general inquiries,
                       speaking proposals, or partnership opportunities.
                     </p>
-                    <p className="text-etsa-primary font-medium">
-                      Secure contact form →
-                    </p>
                   </div>
                 </div>
               </div>

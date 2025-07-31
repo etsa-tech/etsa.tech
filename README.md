@@ -253,7 +253,7 @@ speakers:
 presentationSlides: "https://slides.google.com/docker-networking"
 recordingUrl: "https://youtube.com/watch?v=docker-recording-2024"
 eventDate: "2024-03-15"
-eventLocation: "Knoxville Tech Hub"
+eventLocation: "Knoxville Entrepreneur Center"
 featured: true
 published: true
 ---
@@ -395,7 +395,7 @@ Use consistent, descriptive tags for better categorization and discoverability:
 
 The site uses a custom color scheme defined in `tailwind.config.ts`:
 
-- **Primary**: Blue tones for ETSA branding
+- **Primary**: Blue tones for ETSA branding pulled from our logo
 - **Secondary**: Professional grays
 - **Accent**: Orange highlights
 
