@@ -158,7 +158,7 @@ NEXT_PUBLIC_HCAPTCHA_SITE_KEY=your_site_key_here
 HCAPTCHA_SECRET_KEY=your_secret_key_here
 
 # Organization Details
-NEXT_PUBLIC_ORG_NAME="East Tennessee Systems Administration"
+NEXT_PUBLIC_ORG_NAME="ETSA"
 NEXT_PUBLIC_ORG_LOCATION="Knoxville, TN"
 NEXT_PUBLIC_ORG_FOUNDED_YEAR="2019"
 
