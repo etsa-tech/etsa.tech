@@ -90,48 +90,72 @@ export default function RSVPForm({
     }
   }, []);
 
+  // Helper function to get the correct value from form input
+  const getInputValue = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    const value = e.target.value;
+    return type === "checkbox" ? checked : value;
+  };
+
+  // Helper function to clear field error
+  const clearFieldError = (fieldName: string) => {
+    if (errors[fieldName as keyof FormErrors]) {
+      setErrors((prev) => ({ ...prev, [fieldName]: undefined }));
+    }
+  };
+
+  // Helper function to set field error
+  const setFieldError = (fieldName: string, error: string) => {
+    setErrors((prev) => ({ ...prev, [fieldName]: error }));
+  };
+
+  // Helper function for real-time field validation
+  const validateFieldRealTime = (fieldName: string, value: string) => {
+    if (!value.trim()) return;
+
+    let error: string | null = null;
+
+    switch (fieldName) {
+      case "firstName":
+        error = validateFirstName(value);
+        break;
+      case "lastName":
+        error = validateLastName(value);
+        break;
+      case "email":
+        error = validateEmail(value);
+        break;
+      case "howDidYouHear":
+        error = validateHowDidYouHear(value);
+        break;
+      case "comments":
+        error = validateComments(value);
+        break;
+    }
+
+    if (error) {
+      setFieldError(fieldName, error);
+    }
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
+    const { name } = e.target;
+    const value = getInputValue(e);
 
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
 
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
+    clearFieldError(name);
 
-    // Real-time validation
-    if (name === "firstName" && value.trim()) {
-      const error = validateFirstName(value);
-      if (error) {
-        setErrors((prev) => ({ ...prev, firstName: error }));
-      }
-    } else if (name === "lastName" && value.trim()) {
-      const error = validateLastName(value);
-      if (error) {
-        setErrors((prev) => ({ ...prev, lastName: error }));
-      }
-    } else if (name === "email" && value.trim()) {
-      const error = validateEmail(value);
-      if (error) {
-        setErrors((prev) => ({ ...prev, email: error }));
-      }
-    } else if (name === "howDidYouHear" && value.trim()) {
-      const error = validateHowDidYouHear(value);
-      if (error) {
-        setErrors((prev) => ({ ...prev, howDidYouHear: error }));
-      }
-    } else if (name === "comments" && value.trim()) {
-      const error = validateComments(value);
-      if (error) {
-        setErrors((prev) => ({ ...prev, comments: error }));
-      }
+    if (typeof value === "string") {
+      validateFieldRealTime(name, value);
     }
   };
 
@@ -152,86 +176,121 @@ export default function RSVPForm({
     }));
   };
 
-  const validateForm = (): boolean => {
+  // Helper function to validate a required field
+  const validateRequiredField = (
+    value: string,
+    requiredMessage: string,
+    validator: (val: string) => string | null,
+  ): string | null => {
+    if (!value.trim()) {
+      return requiredMessage;
+    }
+    return validator(value);
+  };
+
+  // Helper function to validate optional field
+  const validateOptionalField = (
+    value: string,
+    validator: (val: string) => string | null,
+  ): string | null => {
+    return value.trim() ? validator(value) : null;
+  };
+
+  // Helper function to collect all validation errors
+  const collectValidationErrors = (): FormErrors => {
     const newErrors: FormErrors = {};
 
-    // Validate required fields
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    } else {
-      const firstNameError = validateFirstName(formData.firstName);
-      if (firstNameError) newErrors.firstName = firstNameError;
-    }
+    // Required field validations
+    const firstNameError = validateRequiredField(
+      formData.firstName,
+      "First name is required",
+      validateFirstName,
+    );
+    if (firstNameError) newErrors.firstName = firstNameError;
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    } else {
-      const lastNameError = validateLastName(formData.lastName);
-      if (lastNameError) newErrors.lastName = lastNameError;
-    }
+    const lastNameError = validateRequiredField(
+      formData.lastName,
+      "Last name is required",
+      validateLastName,
+    );
+    if (lastNameError) newErrors.lastName = lastNameError;
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else {
-      const emailError = validateEmail(formData.email);
-      if (emailError) newErrors.email = emailError;
-    }
+    const emailError = validateRequiredField(
+      formData.email,
+      "Email is required",
+      validateEmail,
+    );
+    if (emailError) newErrors.email = emailError;
 
+    const howDidYouHearError = validateRequiredField(
+      formData.howDidYouHear,
+      "Please tell us how you heard about this event",
+      validateHowDidYouHear,
+    );
+    if (howDidYouHearError) newErrors.howDidYouHear = howDidYouHearError;
+
+    // Special validations
     if (!formData.canAttend) {
       newErrors.canAttend = "Please indicate if you can attend";
     }
 
-    if (!formData.howDidYouHear.trim()) {
-      newErrors.howDidYouHear = "Please tell us how you heard about this event";
-    } else {
-      const howDidYouHearError = validateHowDidYouHear(formData.howDidYouHear);
-      if (howDidYouHearError) newErrors.howDidYouHear = howDidYouHearError;
-    }
-
-    // Validate optional fields
-    if (formData.comments.trim()) {
-      const commentsError = validateComments(formData.comments);
-      if (commentsError) newErrors.comments = commentsError;
-    }
-
-    // Validate captcha
     if (!captchaToken) {
       newErrors.captcha = "Please complete the captcha verification";
     }
 
-    setErrors(newErrors);
+    // Optional field validation
+    const commentsError = validateOptionalField(
+      formData.comments,
+      validateComments,
+    );
+    if (commentsError) newErrors.comments = commentsError;
 
-    // Scroll to first error field if validation fails
-    if (Object.keys(newErrors).length > 0) {
-      const firstErrorField = Object.keys(newErrors)[0];
-      let element = document.getElementById(firstErrorField);
+    return newErrors;
+  };
 
-      // Special handling for radio button groups
-      if (firstErrorField === "canAttend") {
-        // Scroll to the container
-        element = document.getElementById("canAttend");
-        if (element) {
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-          // Focus the first radio button in the group
-          const firstRadio = document.getElementById("canAttend-first");
-          if (firstRadio) {
-            firstRadio.focus();
-          }
-        }
-      } else if (element) {
-        // Standard text input handling
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-        element.focus();
+  // Helper function to scroll to first error
+  const scrollToFirstError = (errorFields: string[]) => {
+    const firstErrorField = errorFields[0];
+
+    if (firstErrorField === "canAttend") {
+      scrollToRadioGroup();
+    } else {
+      scrollToTextInput(firstErrorField);
+    }
+  };
+
+  // Helper function to scroll to radio group
+  const scrollToRadioGroup = () => {
+    const element = document.getElementById("canAttend");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      const firstRadio = document.getElementById("canAttend-first");
+      if (firstRadio) {
+        firstRadio.focus();
       }
     }
+  };
 
-    return Object.keys(newErrors).length === 0;
+  // Helper function to scroll to text input
+  const scrollToTextInput = (fieldName: string) => {
+    const element = document.getElementById(fieldName);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.focus();
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors = collectValidationErrors();
+    setErrors(newErrors);
+
+    const errorFields = Object.keys(newErrors);
+    if (errorFields.length > 0) {
+      scrollToFirstError(errorFields);
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -436,10 +495,10 @@ export default function RSVPForm({
         </div>
 
         {/* Can You Attend Field */}
-        <div id="canAttend">
-          <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+        <fieldset id="canAttend">
+          <legend className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
             Can you attend? *
-          </label>
+          </legend>
           <div className="space-y-2">
             {["Yes", "No", "Maybe"].map((option, index) => (
               <label key={option} className="flex items-center">
@@ -464,7 +523,7 @@ export default function RSVPForm({
               {errors.canAttend}
             </p>
           )}
-        </div>
+        </fieldset>
 
         {/* How Did You Hear Field */}
         <div>
