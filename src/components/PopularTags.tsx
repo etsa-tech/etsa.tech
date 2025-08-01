@@ -8,7 +8,7 @@ interface PopularTagsProps {
   showViewAll?: boolean;
 }
 
-export default function PopularTags({
+export default function PopularTags<Readonly>({
   className = "",
   limit = 25,
   showViewAll = true,
