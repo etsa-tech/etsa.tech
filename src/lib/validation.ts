@@ -52,7 +52,7 @@ export function validateContactForm(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors: Record<string, string[]> = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const path = err.path.join(".");
         if (!errors[path]) {
           errors[path] = [];
@@ -109,7 +109,7 @@ export function validateName(name: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid name";
+      return error.issues[0]?.message || "Invalid name";
     }
     return "Invalid name";
   }
@@ -121,7 +121,7 @@ export function validateEmail(email: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid email";
+      return error.issues[0]?.message || "Invalid email";
     }
     return "Invalid email";
   }
@@ -133,7 +133,7 @@ export function validateSubject(subject: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid subject";
+      return error.issues[0]?.message || "Invalid subject";
     }
     return "Invalid subject";
   }
@@ -145,7 +145,7 @@ export function validateMessage(message: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid message";
+      return error.issues[0]?.message || "Invalid message";
     }
     return "Invalid message";
   }
@@ -181,7 +181,7 @@ export const rsvpFormSchema = z.object({
     .toLowerCase(),
 
   canAttend: z.enum(["Yes", "No", "Maybe"], {
-    required_error: "Please indicate if you can attend",
+    message: "Please indicate if you can attend",
   }),
 
   howDidYouHear: z
@@ -216,7 +216,7 @@ export function validateRSVPForm(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors: Record<string, string[]> = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const path = err.path.join(".");
         if (!errors[path]) {
           errors[path] = [];
@@ -241,7 +241,7 @@ export function validateFirstName(firstName: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid first name";
+      return error.issues[0]?.message || "Invalid first name";
     }
     return "Invalid first name";
   }
@@ -253,7 +253,7 @@ export function validateLastName(lastName: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid last name";
+      return error.issues[0]?.message || "Invalid last name";
     }
     return "Invalid last name";
   }
@@ -265,7 +265,7 @@ export function validateHowDidYouHear(response: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid response";
+      return error.issues[0]?.message || "Invalid response";
     }
     return "Invalid response";
   }
@@ -277,7 +277,7 @@ export function validateComments(comments: string): string | null {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return error.errors[0]?.message || "Invalid comments";
+      return error.issues[0]?.message || "Invalid comments";
     }
     return "Invalid comments";
   }
