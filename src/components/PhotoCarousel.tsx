@@ -60,7 +60,7 @@ export function PhotoCarousel({
   }
 
   return (
-    <div className="relative w-full h-96 max-w-2xl rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+    <div className="relative w-full h-96 max-w-2xl mx-auto rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
       {/* Main Image */}
       <div className="relative w-full h-full">
         <Image

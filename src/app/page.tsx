@@ -1,4 +1,8 @@
+import { getCarouselImages } from "@/lib/utils";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
+
 export default function Home() {
+  const carouselImages = getCarouselImages();
   return (
     <div>
       {/* Hero Section */}
@@ -105,6 +109,29 @@ export default function Home() {
                 Advance your career through knowledge sharing and mentorship.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Photo Carousel Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Our Community in Action
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              See highlights from our meetups, presentations, and networking
+              events. Join us to be part of East Tennessee&apos;s growing tech
+              community!
+            </p>
+          </div>
+          <div className="max-w-5xl mx-auto">
+            <PhotoCarousel
+              photos={carouselImages}
+              autoPlay={true}
+              interval={6000}
+            />
           </div>
         </div>
       </section>
