@@ -8,11 +8,11 @@ interface PopularTagsProps {
   showViewAll?: boolean;
 }
 
-export default function PopularTags<Readonly>({
+export default function PopularTags({
   className = "",
   limit = 25,
   showViewAll = true,
-}: PopularTagsProps) {
+}: Readonly<PopularTagsProps>) {
   const tagsWithCount = getTagsWithCount().slice(0, limit);
 
   if (tagsWithCount.length === 0) {

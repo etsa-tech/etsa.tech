@@ -20,7 +20,7 @@ export default function GoogleMapEmbed({
   zoom = 15,
   className = "w-full h-96",
   title = "Location Map",
-}: GoogleMapEmbedProps) {
+}: Readonly<GoogleMapEmbedProps>) {
   const [embedUrl, setEmbedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
