@@ -271,7 +271,9 @@ export default async function PresentationPage({
                   <div className="flex flex-wrap gap-4">
                     {presentationSlides && (
                       <a
-                        href={`/presentation/${slug}/${presentationSlides}`}
+                        href={`/presentation/${encodeURIComponent(
+                          slug,
+                        )}/${encodeURIComponent(presentationSlides)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-outline btn-sm"

@@ -187,7 +187,7 @@ export function formatDate(dateString: string): string {
 
 // Generate post URL
 export function getPostUrl(slug: string): string {
-  return `/presentation/${slug}`;
+  return `/presentation/${encodeURIComponent(slug)}`;
 }
 
 // Generate tag URL
