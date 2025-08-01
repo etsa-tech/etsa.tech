@@ -171,6 +171,9 @@ NEXT_PUBLIC_EMAIL="contact@etsa.tech"
 # Google Sheets Integration (for RSVP form)
 GOOGLE_SHEETS_WEBHOOK_URL="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
 
+# Google Maps Integration (for location maps)
+GOOGLE_MAPS_API_KEY="your_google_maps_api_key_here"
+
 # Mailchimp Integration (for mailing list subscription)
 MAILCHIMP_API_KEY="your_mailchimp_api_key_here"
 MAILCHIMP_LIST_ID="your_mailchimp_list_id_here"
