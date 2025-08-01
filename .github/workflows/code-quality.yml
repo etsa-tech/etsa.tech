@@ -1,4 +1,6 @@
 name: Code Quality & Performance
+permissions:
+  contents: read
 
 on:
   workflow_run:
