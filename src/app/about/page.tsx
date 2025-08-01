@@ -310,7 +310,7 @@ export default function AboutPage() {
                 href="https://www.meetup.com/etsa-tech"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
+                className="btn btn-outline"
               >
                 Join Our Meetup
               </a>
