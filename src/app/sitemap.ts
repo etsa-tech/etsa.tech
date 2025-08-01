@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
-import { getAllPosts, getPostUrl } from "@/lib/blog";
+import { getAllPosts } from "@/lib/blog";
+import { getPostUrl } from "@/lib/utils";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://etsa.tech";
@@ -26,6 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${siteUrl}/tags`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
+    {
       url: `${siteUrl}/about`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
@@ -48,6 +55,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/robots.txt`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.1,
+    },
+    {
+      url: `${siteUrl}/humans.txt`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.1,
+    },
+    {
+      url: `${siteUrl}/.well-known/security.txt`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.1,
     },
   ];
 
