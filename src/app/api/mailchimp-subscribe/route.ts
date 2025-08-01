@@ -46,12 +46,14 @@ async function subscribeToMailchimp(data: {
     // Mailchimp API endpoint
     const url = `https://${serverPrefix}.api.mailchimp.com/3.0/lists/${listId}/members`;
 
+    // Create authorization header without nested template literals
+    const authString = `anystring:${apiKey}`;
+    const authHeader = `Basic ${Buffer.from(authString).toString("base64")}`;
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(`anystring:${apiKey}`).toString(
-          "base64",
-        )}`,
+        Authorization: authHeader,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

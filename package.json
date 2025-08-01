@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.0",
-    "@netlify/functions": "^4.1.15",
+    "@types/js-yaml": "^4.0.9",
     "@types/nodemailer": "^6.4.17",
     "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
     "next": "15.4.5",
     "nodemailer": "^7.0.5",
     "react": "^19.0.0",
@@ -20,6 +21,7 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "sanitize-html": "^2.17.0",
+    "server-only": "^0.0.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {

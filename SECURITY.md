@@ -158,7 +158,7 @@ NEXT_PUBLIC_HCAPTCHA_SITE_KEY=your_site_key_here
 HCAPTCHA_SECRET_KEY=your_secret_key_here
 
 # Organization Details
-NEXT_PUBLIC_ORG_NAME="East Tennessee Systems Administration"
+NEXT_PUBLIC_ORG_NAME="ETSA"
 NEXT_PUBLIC_ORG_LOCATION="Knoxville, TN"
 NEXT_PUBLIC_ORG_FOUNDED_YEAR="2019"
 
@@ -170,6 +170,9 @@ NEXT_PUBLIC_EMAIL="contact@etsa.tech"
 
 # Google Sheets Integration (for RSVP form)
 GOOGLE_SHEETS_WEBHOOK_URL="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+
+# Google Maps Integration (for location maps)
+GOOGLE_MAPS_API_KEY="your_google_maps_api_key_here"
 
 # Mailchimp Integration (for mailing list subscription)
 MAILCHIMP_API_KEY="your_mailchimp_api_key_here"

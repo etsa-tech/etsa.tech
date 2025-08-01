@@ -1,0 +1,52 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Organizers: ETSA Community
+    Contact: info [at] etsa.tech
+    Location: Knoxville, Tennessee, USA
+
+# THANKS
+
+    All ETSA speakers and presenters
+    Community members and attendees
+    Local sponsors and supporters
+
+# TECHNOLOGY COLOPHON
+
+    ## Frontend
+    Framework: Next.js 14
+    Language: TypeScript
+    Styling: Tailwind CSS
+    Components: React 18
+
+    ## Backend
+    Runtime: Node.js
+    Database: File-based (Markdown)
+    Email: SMTP
+    Forms: hCaptcha
+
+    ## Hosting & Deployment
+    Platform: Vercel
+    Domain: etsa.tech
+    CDN: Vercel Edge Network
+
+    ## Development
+    Version Control: Git
+    Repository: GitHub
+    Package Manager: npm
+    Build Tool: Next.js
+
+    ## Standards
+    Accessibility: WCAG 2.1 AA
+    SEO: Structured Data, Open Graph
+    Performance: Core Web Vitals
+    Security: HTTPS, CSP Headers
+
+# SITE
+
+    Last update: 2024/12/19
+    Standards: HTML5, CSS3, ES2022
+    Components: Responsive Design
+    Software: VS Code, GitHub

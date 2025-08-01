@@ -271,7 +271,9 @@ export default async function PresentationPage({
                   <div className="flex flex-wrap gap-4">
                     {presentationSlides && (
                       <a
-                        href={`/presentation/${slug}/${presentationSlides}`}
+                        href={`/presentation/${encodeURIComponent(
+                          slug,
+                        )}/${encodeURIComponent(presentationSlides)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-outline btn-sm"
@@ -415,7 +417,7 @@ export default async function PresentationPage({
                       className="border-b border-light-border dark:border-dark-border last:border-b-0 pb-4 last:pb-0"
                     >
                       <Link
-                        href={`/presentation/${post.slug}`}
+                        href={`/presentation/${encodeURIComponent(post.slug)}`}
                         className="block group"
                       >
                         <h4 className="font-medium text-light-text dark:text-dark-text group-hover:text-primary-500 transition-colors mb-1">

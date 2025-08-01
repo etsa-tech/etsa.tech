@@ -116,6 +116,29 @@ export function getAllTags(): string[] {
   return Array.from(tags).sort((a, b) => a.localeCompare(b));
 }
 
+// Get tags with their usage count, sorted by popularity
+export function getTagsWithCount(): Array<{ tag: string; count: number }> {
+  const allPosts = getAllPosts();
+  const tagCounts = new Map<string, number>();
+
+  allPosts.forEach((post) => {
+    post.frontmatter.tags.forEach((tag) => {
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+    });
+  });
+
+  return Array.from(tagCounts.entries())
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count); // Sort by count descending
+}
+
+// Get the most popular tags (limited number)
+export function getPopularTags(limit: number = 25): string[] {
+  return getTagsWithCount()
+    .slice(0, limit)
+    .map(({ tag }) => tag);
+}
+
 // Get featured posts
 export function getFeaturedPosts(): PostSummary[] {
   const allPosts = getAllPosts();
@@ -164,7 +187,7 @@ export function formatDate(dateString: string): string {
 
 // Generate post URL
 export function getPostUrl(slug: string): string {
-  return `/presentation/${slug}`;
+  return `/presentation/${encodeURIComponent(slug)}`;
 }
 
 // Generate tag URL

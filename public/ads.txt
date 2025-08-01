@@ -1,0 +1,9 @@
+# ads.txt file for etsa.tech
+# This file indicates that ETSA does not currently run advertisements
+# and helps prevent unauthorized ad inventory sales
+
+# No authorized digital sellers
+# ETSA is a non-profit community organization
+# We do not monetize through advertising
+
+# Contact for inquiries: info@etsa.tech

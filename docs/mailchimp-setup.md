@@ -76,7 +76,6 @@ The function handles common scenarios:
 If you have custom merge fields in Mailchimp, you can modify the function:
 
 ```javascript
-// In netlify/functions/mailchimp-subscribe.ts
 merge_fields: {
   FNAME: firstName,
   LNAME: lastName,

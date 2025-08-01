@@ -1,0 +1,53 @@
+# Robots.txt for ETSA (East Tennessee Systems Administration)
+# https://etsa.tech
+
+User-agent: *
+Allow: /
+
+# Allow all search engines to crawl the site
+Allow: /presentations
+Allow: /speakers
+Allow: /about
+Allow: /contact
+Allow: /rsvp
+Allow: /meeting-info
+Allow: /tag/
+Allow: /presentation/
+
+# Disallow admin areas and sensitive paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /private/
+
+# Allow RSS feed
+Allow: /rss.xml
+
+# Sitemap location
+Sitemap: https://etsa.tech/sitemap.xml
+
+# Crawl delay (optional - be respectful to smaller sites)
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Block known bad bots (optional)
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /

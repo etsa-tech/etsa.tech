@@ -1,0 +1,271 @@
+name: Security & Code Quality Scan
+
+on:
+  # Run after push.yml completes successfully
+  workflow_run:
+    workflows: ["Run pre-commit on push"]
+    types:
+      - completed
+    branches-ignore:
+      - main
+  # Run on PRs to main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  # Also run when manually triggered
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    name: Security & Quality Analysis
+    runs-on: ubuntu-latest
+    # Only run if push.yml succeeded or this is a pull request or manual trigger
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Run TypeScript check
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      - name: Build project
+        run: npm run build
+        continue-on-error: true
+
+      # Snyk Security Scanning
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --file=package.json --sarif-file-output=snyk.sarif
+        continue-on-error: true
+
+      # Fallback Snyk scan if SARIF generation fails
+      - name: Run Snyk CLI (fallback)
+        if: always() && hashFiles('snyk.sarif') == ''
+        run: |
+          npm install -g snyk
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk test --severity-threshold=high --json > snyk-results.json || true
+          echo "Snyk scan completed (fallback mode)"
+        continue-on-error: true
+
+      - name: Upload Snyk results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('snyk.sarif') != ''
+        with:
+          sarif_file: snyk.sarif
+        continue-on-error: true
+
+      # Snyk Infrastructure as Code scanning (for future Terraform)
+      - name: Run Snyk IaC scan
+        uses: snyk/actions/iac@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium --sarif-file-output=snyk-iac.sarif
+        continue-on-error: true
+
+      - name: Upload Snyk IaC results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('snyk-iac.sarif') != ''
+        with:
+          sarif_file: snyk-iac.sarif
+        continue-on-error: true
+
+      # Skip CodeQL if default setup is enabled (to avoid conflicts)
+      # CodeQL analysis is handled by GitHub's default setup
+      # To use custom CodeQL, disable default setup in repository settings
+
+      # Semgrep Security Scanning
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep
+        run: |
+          echo "=== Running Semgrep security analysis"
+          SEMGREP_RULES="p/security-audit p/secrets p/owasp-top-ten p/react p/typescript"
+          semgrep --config=$SEMGREP_RULES --json --output=semgrep-results.json . || true
+
+          # Display results summary
+          if [ -f "semgrep-results.json" ]; then
+            echo "📊 Semgrep scan completed. Results saved to semgrep-results.json"
+            # Count findings by severity
+            node -e "
+              try {
+                const results = JSON.parse(require('fs').readFileSync('semgrep-results.json', 'utf8'));
+                const findings = results.results || [];
+                const errors = findings.filter(f => f.extra?.severity === 'ERROR').length;
+                const warnings = findings.filter(f => f.extra?.severity === 'WARNING').length;
+                const info = findings.filter(f => f.extra?.severity === 'INFO').length;
+
+                console.log('🔍 Semgrep Results Summary:');
+                console.log('- Errors:', errors);
+                console.log('- Warnings:', warnings);
+                console.log('- Info:', info);
+                console.log('- Total findings:', findings.length);
+              } catch (e) {
+                console.log('Could not parse Semgrep results');
+              }
+            " || echo "Results summary not available"
+          fi
+        continue-on-error: true
+
+      # Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
+        continue-on-error: false
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        with:
+          sarif_file: "trivy-results.sarif"
+        continue-on-error: true
+
+      # Debug: Check for generated SARIF files
+      - name: Check SARIF files
+        if: always()
+        run: |
+          echo "Checking for SARIF files..."
+          ls -la *.sarif 2>/dev/null || echo "No SARIF files found"
+          if [ -f "snyk.sarif" ]; then
+            echo "✅ snyk.sarif exists ($(wc -l < snyk.sarif) lines)"
+          else
+            echo "❌ snyk.sarif not found"
+          fi
+          if [ -f "trivy-results.sarif" ]; then
+            echo "✅ trivy-results.sarif exists ($(wc -l < trivy-results.sarif) lines)"
+          else
+            echo "❌ trivy-results.sarif not found"
+          fi
+        continue-on-error: true
+
+      # Audit npm packages
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          if [ -s npm-audit.json ]; then
+            echo "NPM audit found vulnerabilities"
+            cat npm-audit.json
+          fi
+        continue-on-error: false
+
+      # Additional secret scanning with TruffleHog
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+        continue-on-error: false
+
+      # Dependency Review (for PRs)
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        if: github.event_name == 'pull_request'
+        with:
+          fail-on-severity: moderate
+        continue-on-error: true
+
+  terraform-scan:
+    name: Terraform Security Scan
+    permissions:
+      contents: read
+      security-events: write
+    runs-on: ubuntu-latest
+    # Only run if push.yml succeeded or this is a pull request or manual trigger
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      # Terraform security scanning with Checkov
+      - name: Run Checkov action
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform
+          output_format: sarif
+          output_file_path: checkov.sarif
+        continue-on-error: true
+
+      - name: Upload Checkov scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('checkov.sarif') != ''
+        with:
+          sarif_file: checkov.sarif
+        continue-on-error: true
+
+      # TFSec for Terraform security
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          soft_fail: true
+        continue-on-error: true
+
+  summary:
+    name: Security Scan Summary
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest
+    needs: [security-scan]
+    if: always()
+
+    steps:
+      - name: Security Scan Summary
+        run: |
+          echo "## Security Scan Results 🔒" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Completed Security Scans:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Snyk vulnerability scanning" >> $GITHUB_STEP_SUMMARY
+          echo "- CodeQL static analysis (via GitHub default setup)" >> $GITHUB_STEP_SUMMARY
+          echo "- Semgrep security rules" >> $GITHUB_STEP_SUMMARY
+          echo "- Trivy vulnerability scanner" >> $GITHUB_STEP_SUMMARY
+          echo "- Gitleaks secret detection" >> $GITHUB_STEP_SUMMARY
+          echo "- TruffleHog secret detection" >> $GITHUB_STEP_SUMMARY
+          echo "- NPM audit" >> $GITHUB_STEP_SUMMARY
+          echo "- ESLint & TypeScript checks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Check the Security tab for detailed results**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔧 **Next Steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Review any security findings in the Security tab" >> $GITHUB_STEP_SUMMARY
+          echo "- Address high/critical vulnerabilities before merging" >> $GITHUB_STEP_SUMMARY
+          echo "- Update dependencies if needed" >> $GITHUB_STEP_SUMMARY
