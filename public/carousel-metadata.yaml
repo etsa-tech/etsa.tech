@@ -1,0 +1,41 @@
+# Carousel Image Metadata
+# This file contains metadata for carousel images
+# Format: filename -> { alt, caption }
+
+images:
+  "meetup_1.jpg":
+    alt: "ETSA meetup group photo"
+    caption: "ETSA community members at a monthly meetup"
+
+  "meetup_2.jpg":
+    alt: "ETSA presentation in progress"
+    caption: "Learning from industry experts"
+
+  "meetup_3.jpg":
+    alt: "ETSA networking session"
+    caption: "Networking and knowledge sharing"
+
+  "meetup_4.jpg":
+    alt: "ETSA technical discussion"
+    caption: "Deep technical discussions and collaboration"
+
+  "meetup_6.jpg":
+    alt: "ETSA workshop session"
+    caption: "Hands-on learning and skill development"
+
+  "meetup_7.jpg":
+    alt: "ETSA group discussion"
+    caption: "Collaborative problem solving"
+
+  "2022_11-09_1.png":
+    alt: "ETSA November 2022 Outreach"
+    caption: "November 2022 Outreach at Pellissippi State Community College"
+
+  "2022_11_09_2.png":
+    alt: "ETSA November 2022 Outreach"
+    caption: "November 2022 Outreach at Pellissippi State Community College"
+
+# Default metadata for images without specific entries
+default:
+  alt: "ETSA community event"
+  caption: "Building connections in the tech community"

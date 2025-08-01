@@ -19,7 +19,7 @@ speakers:
     title: "Senior Specialist Solution Architect"
     company: "Red Hat"
     image: "/images/speakers/matt_hermanson.jpeg"
-    bio: "Over the last several years, Wesley Kirkland has gained Systems Engineering experience consisting of On Premise, Cloud, and scalable automation, primarily using PowerShell to integrate Active Directory environments and Office 365. He currently works at Ministry Brands as a Sr. Systems Engineer working with AWS & Azure."
+    bio: "Matt Hermanson is Cloud Solutions Architect for Red Hat. He received his Bachelors in Computer Science from Tennessee Tech University, and spent the last decade of his career in financial services and government research. When he's not working, he enjoys Golf, Softball, and anything that keeps him active."
     linkedIn: "https://www.linkedin.com/in/mjhermanson/"
 eventDate: "2017-09-05"
 eventLocation: "TekSystems"

@@ -1,6 +1,7 @@
 import { getAllPosts } from "@/lib/blog";
 import { getPostSpeakers } from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
+import GoogleMapEmbed from "@/components/GoogleMapEmbed";
 
 export const metadata = {
   title: "Meeting Information - ETSA",
@@ -382,20 +383,12 @@ export default function MeetingInfoPage() {
               <h2 className="card-title">Location Map</h2>
             </div>
             <div className="card-content p-0">
-              <div className="w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=${
-                    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-                  }&q=${encodeURIComponent(meetingLocation.address)}&zoom=15`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Meeting Location Map"
-                />
-              </div>
+              <GoogleMapEmbed
+                address={meetingLocation.address}
+                zoom={15}
+                className="w-full h-96"
+                title="Meeting Location Map"
+              />
             </div>
           </div>
 

@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   description: `A professional meetup organization based in ${process.env.NEXT_PUBLIC_ORG_LOCATION}, bringing together systems administrators, DevOps engineers, and technology professionals.`,
   keywords: [
     process.env.NEXT_PUBLIC_ORG_NAME || "ETSA",
-    process.env.NEXT_PUBLIC_ORG_NAME || "East Tennessee Systems Administration",
     "Systems Administration",
     "DevOps",
     process.env.NEXT_PUBLIC_ORG_LOCATION || "Knoxville",
@@ -49,6 +48,16 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
+    },
+  },
+  alternates: {
+    types: {
+      "application/rss+xml": [
+        {
+          url: "/rss.xml",
+          title: `${process.env.NEXT_PUBLIC_ORG_NAME || "ETSA"} RSS Feed`,
+        },
+      ],
     },
   },
 };
