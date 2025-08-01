@@ -363,7 +363,7 @@ Use consistent, descriptive tags for better categorization and discoverability:
 ### Managing Photos
 
 1. Add photos to `public/images/meetup-photos/`
-2. Update the photo carousel data in `src/app/page.tsx`
+2. Update the photo carousel data in `public/carousel-metadata.yaml`, if not generic metadata will be used
 3. Use high-quality images (recommended: 800x400px minimum)
 
 ### Content Guidelines
@@ -374,13 +374,6 @@ Use consistent, descriptive tags for better categorization and discoverability:
 - Include practical examples and code snippets
 - Structure content with proper headings (H2, H3, etc.)
 - Add links to relevant resources and documentation
-
-#### Technical Content
-
-- Test all code examples before publishing
-- Include prerequisites and setup instructions
-- Provide troubleshooting tips for common issues
-- Link to presentation slides and video recordings when available
 
 #### SEO Optimization
 
@@ -393,7 +386,7 @@ Use consistent, descriptive tags for better categorization and discoverability:
 
 ### Branding
 
-The site uses a custom color scheme defined in `tailwind.config.ts`:
+The site uses a custom color scheme defined in `tailwind.config.ts` according to our branding specifications:
 
 - **Primary**: Blue tones for ETSA branding pulled from our logo
 - **Secondary**: Professional grays
@@ -424,26 +417,6 @@ The `netlify.toml` file includes:
 - Performance optimizations
 - Caching rules
 
-### Manual Deployment
-
-```bash
-# Build the project
-npm run build
-
-# Export static files (if needed)
-npm run export
-```
-
-## Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript checks
-
 ### Code Style
 
 - TypeScript for type safety
@@ -473,13 +446,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Contact
 
 - **Website**: [https://etsa.tech](https://etsa.tech)
-- **Email**: info@etsa.tech
+- **Email**: Utilize the contact form on our website
 - **Meetup**: [https://www.meetup.com/etsa-tech](https://www.meetup.com/etsa-tech)
 - **LinkedIn**: [https://www.linkedin.com/company/etsa-tech](https://www.linkedin.com/company/etsa-tech)
 - **GitHub**: [https://github.com/etsa-tech](https://github.com/etsa-tech)
 
 ## Acknowledgments
 
-- Built with inspiration from [wesleyk.me](https://wesleykme.netlify.app)
 - Thanks to all ETSA speakers and community members
-- Powered by the amazing Next.js and Tailwind CSS communities
+- Powered by the amazing Next.js, Tailwind CSS communities, Next.JS, and Netlify

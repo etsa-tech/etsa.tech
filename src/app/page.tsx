@@ -1,4 +1,4 @@
-import { getCarouselImages } from "@/lib/utils";
+import { getCarouselImages } from "@/lib/server-only-carousel";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 
 export default function Home() {
