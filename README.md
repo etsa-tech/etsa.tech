@@ -112,6 +112,7 @@ GITHUB_TOKEN=your_github_personal_access_token
 ### Setup Instructions
 
 1. **Google OAuth Setup**:
+
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
    - Create a new project or select existing
    - Enable Google+ API
@@ -119,6 +120,7 @@ GITHUB_TOKEN=your_github_personal_access_token
    - Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
 
 2. **GitHub Token Setup**:
+
    - Go to GitHub Settings > Developer settings > Personal access tokens
    - Create a new token with `repo` permissions
    - Add the token to your environment variables
