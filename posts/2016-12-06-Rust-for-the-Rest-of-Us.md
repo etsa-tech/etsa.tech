@@ -29,4 +29,4 @@ published: true
 Mozilla's Rust is on the rise. This relatively young language is making inroads to the systems programming world, typically dominated by C and C++. For those of us in the DevOps world, as well as for those of us who increasingly find ourselves wearing developer hats, and for any others who might be yearning for a language that offers innovations in fundamental design, safety, and concurrency, then this is a presentation you won't want to miss.
 
 
-Test
+Test 2
