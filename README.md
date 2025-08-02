@@ -16,10 +16,11 @@ The official website for ETSA, a professional meetup organization based in Knoxv
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS with custom design system
+- **Styling**: Tailwind CSS v4 with custom design system
 - **Content**: Markdown with gray-matter for frontmatter
 - **Deployment**: Netlify with automatic builds
 - **Icons**: Heroicons and custom SVGs
+- **Code Quality**: SonarCloud integration with Tailwind v4 support
 
 ## Getting Started
 
@@ -455,6 +456,45 @@ The `netlify.toml` file includes:
 - ESLint for code quality
 - Prettier for code formatting
 - Tailwind CSS for styling
+
+## SonarCloud Configuration
+
+This project uses SonarCloud for code quality analysis. The configuration includes special handling for Tailwind CSS v4 directives:
+
+### Tailwind v4 At-Rules
+
+Tailwind CSS v4 introduces new CSS at-rules that are not part of standard CSS:
+
+- `@variant` - Defines custom variants (e.g., dark mode)
+- `@theme` - Defines theme configuration
+
+These are configured to be ignored by SonarCloud in `.sonarcloud.properties`:
+
+```properties
+# Disable unknown at-rules check for CSS files
+sonar.css.rules.unknown-at-rules=false
+
+# Ignore specific CSS rules for Tailwind v4 directives
+sonar.issue.ignore.multicriteria=e1,e2
+sonar.issue.ignore.multicriteria.e1.ruleKey=css:unknown-at-rules
+sonar.issue.ignore.multicriteria.e1.resourceKey=**/*.css
+sonar.issue.ignore.multicriteria.e2.ruleKey=Web:UnknownAtRuleCheck
+sonar.issue.ignore.multicriteria.e2.resourceKey=**/*.css
+```
+
+### CSS Comments
+
+The CSS file also includes SonarCloud suppression comments for these directives:
+
+```css
+/* sonar-disable-next-line css:unknown-at-rules */
+@variant dark (&:where(.dark, .dark *));
+
+/* sonar-disable-next-line css:unknown-at-rules */
+@theme {
+  /* Theme configuration */
+}
+```
 
 ## Contributing
 
