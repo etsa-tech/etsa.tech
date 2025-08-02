@@ -27,12 +27,16 @@ async function handleContactSubmission(request: NextRequest) {
   // Verify hCaptcha
   await validateCaptcha(validatedData["h-captcha-response"]);
 
+  // Extract hostname from request
+  const hostname = request.headers.get("host") || "Unknown";
+
   // Send contact email
   const emailResult = await sendContactEmail({
     name: validatedData.name,
     email: validatedData.email,
     subject: validatedData.subject,
     message: validatedData.message,
+    hostname: hostname,
   });
 
   if (!emailResult.success) {

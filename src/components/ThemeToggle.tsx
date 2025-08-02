@@ -6,48 +6,29 @@ import { useTheme } from "./ThemeProvider";
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
-
   useEffect(() => {
     setMounted(true);
-
-    // Detect system theme preference
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    setSystemTheme(mediaQuery.matches ? "dark" : "light");
-
-    // Listen for system theme changes
-    const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? "dark" : "light");
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   if (!mounted) {
     return (
-      <div className="h-10 w-10 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800" />
+      <div className="h-10 w-10 rounded-md border border-gray-200 bg-gray-50" />
     );
   }
 
   const toggleTheme = () => {
-    if (theme === "system") {
-      setTheme("light");
-    } else if (theme === "light") {
-      setTheme("dark");
-    } else {
-      setTheme("system");
-    }
+    // Always toggle to the opposite theme
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
   };
 
   return (
     <button
       onClick={toggleTheme}
-      className="relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text hover:bg-light-border dark:hover:bg-dark-border transition-colors"
+      className="relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
       aria-label="Toggle theme"
     >
-      {(theme === "light" ||
-        (theme === "system" && systemTheme === "light")) && (
+      {theme === "light" && (
         <svg
           className="h-5 w-5"
           fill="none"
@@ -63,7 +44,7 @@ export function ThemeToggle() {
           />
         </svg>
       )}
-      {(theme === "dark" || (theme === "system" && systemTheme === "dark")) && (
+      {theme === "dark" && (
         <svg
           className="h-5 w-5"
           fill="none"

@@ -50,44 +50,59 @@ async function subscribeToMailchimp(data: {
     const authString = `anystring:${apiKey}`;
     const authHeader = `Basic ${Buffer.from(authString).toString("base64")}`;
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: authHeader,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email_address: email,
-        status: "subscribed",
-        merge_fields: {
-          FNAME: firstName,
-          LNAME: lastName,
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: authHeader,
+          "Content-Type": "application/json",
         },
-        tags: ["ETSA Website", "RSVP Signup"],
-      }),
-    });
+        body: JSON.stringify({
+          email_address: email,
+          status: "subscribed",
+          merge_fields: {
+            FNAME: firstName,
+            LNAME: lastName,
+          },
+          tags: ["ETSA Website", "RSVP Signup"],
+        }),
+        signal: controller.signal,
+      });
 
-    const result = await response.json();
+      clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      // Handle specific Mailchimp errors
-      if (result.title === "Member Exists") {
-        // User is already subscribed - this is not really an error
-        return {
-          success: true,
-          member: result,
-        };
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Handle specific Mailchimp errors
+        if (result.title === "Member Exists") {
+          // User is already subscribed - this is not really an error
+          return {
+            success: true,
+            member: result,
+          };
+        }
+
+        throw new Error(
+          result.detail || `Mailchimp API error: ${response.status}`,
+        );
       }
 
-      throw new Error(
-        result.detail || `Mailchimp API error: ${response.status}`,
-      );
+      return {
+        success: true,
+        member: result,
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Mailchimp API request timed out");
+      }
+      throw error;
     }
-
-    return {
-      success: true,
-      member: result,
-    };
   } catch (error) {
     console.error("Mailchimp subscription error:", error);
     return {
