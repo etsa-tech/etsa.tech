@@ -30,6 +30,38 @@ The official website for ETSA, a professional meetup organization based in Knoxv
 
 ### Installation
 
+#### Netlify local development (This saves you creating a `.env.local` file)
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/etsa-tech/etsa.tech.git
+cd etsa.tech
+```
+
+2. Install Netlify CLI
+
+Mac `brew install netlify-cli`
+Windows `npm install netlify-cli -g`
+
+3. Install dependencies:
+
+```bash
+npm install
+```
+
+4. Login to Netlify
+
+`netlify login`
+
+5. Run the development server:
+
+`netlify dev`
+
+5. Open [http://localhost:8888](http://localhost:8888) in your browser.
+
+#### True local development
+
 1. Clone the repository:
 
 ```bash
