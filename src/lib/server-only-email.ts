@@ -6,6 +6,7 @@ export async function sendContactEmail(formData: {
   email: string;
   subject: string;
   message: string;
+  hostname?: string;
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const transporter = createTransporter();
@@ -21,7 +22,7 @@ export async function sendContactEmail(formData: {
       };
     }
 
-    const { name, email, subject, message } = formData;
+    const { name, email, subject, message, hostname } = formData;
 
     // Email content
     const htmlContent = `
@@ -70,6 +71,7 @@ export async function sendContactEmail(formData: {
             </div>
             <div class="footer">
               <p>This email was sent from the ETSA website contact form.</p>
+              <p>Hostname: ${hostname || "Unknown"}</p>
               <p>Timestamp: ${new Date().toISOString()}</p>
             </div>
           </div>
@@ -89,6 +91,7 @@ ${message}
 
 ---
 This email was sent from the ETSA website contact form.
+Hostname: ${hostname || "Unknown"}
 Timestamp: ${new Date().toISOString()}
     `;
 
