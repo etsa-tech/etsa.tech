@@ -33,3 +33,5 @@ Ansible is automation for everyone. For a long time we have been told a good sys
 ​Ansible is a simple, powerful, agent-less automation language that works across platforms designed to lower the barrier to automation and focus on the more interesting parts of our job. In this presentation we will talk about the features of Ansible and how you can use it to love your job again.
 
 Testing
+
+Testing 2
