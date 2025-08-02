@@ -52,35 +52,50 @@ async function submitToGoogleSheets(
       throw new Error("Google Sheets webhook URL not configured");
     }
 
-    const response = await fetch(googleScriptUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        timestamp,
-        email,
-        canAttend,
-        firstName,
-        howDidYouHear,
-        comments,
-        subscribeToNewsletter,
-        lastName,
-        event,
-      }),
-    });
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for Google Sheets
 
-    if (!response.ok) {
-      throw new Error(`Google Sheets API error: ${response.status}`);
+    try {
+      const response = await fetch(googleScriptUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          timestamp,
+          email,
+          canAttend,
+          firstName,
+          howDidYouHear,
+          comments,
+          subscribeToNewsletter,
+          lastName,
+          event,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Google Sheets API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      return { success: true };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Google Sheets API request timed out");
+      }
+      throw error;
     }
-
-    const result = await response.json();
-
-    if (result.error) {
-      throw new Error(result.error);
-    }
-
-    return { success: true };
   } catch (error) {
     console.error("Google Sheets submission error:", error);
     return {
