@@ -8,9 +8,14 @@ interface BranchSelectorProps {
 }
 
 export default function BranchSelector({
-  className = ""
+  className = "",
 }: BranchSelectorProps) {
-  const { selectedBranch, setSelectedBranch, availableBranches, setAvailableBranches } = useAdmin();
+  const {
+    selectedBranch,
+    setSelectedBranch,
+    availableBranches,
+    setAvailableBranches,
+  } = useAdmin();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,12 +38,14 @@ export default function BranchSelector({
     };
 
     fetchBranches();
-  }, []);
+  }, [setAvailableBranches]);
 
   if (isLoading) {
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
-        <span className="text-sm text-gray-600 dark:text-gray-400">Branch:</span>
+        <span className="text-sm text-gray-600 dark:text-gray-400">
+          Branch:
+        </span>
         <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-8 w-24 rounded"></div>
       </div>
     );
@@ -46,7 +53,10 @@ export default function BranchSelector({
 
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
-      <label htmlFor="branch-select" className="text-sm text-gray-600 dark:text-gray-400">
+      <label
+        htmlFor="branch-select"
+        className="text-sm text-gray-600 dark:text-gray-400"
+      >
         Branch:
       </label>
       <div className="relative">
@@ -63,18 +73,28 @@ export default function BranchSelector({
           ))}
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <svg
+            className="h-4 w-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
       </div>
-      
+
       {error && (
         <span className="text-xs text-red-600 dark:text-red-400" title={error}>
           ⚠️
         </span>
       )}
-      
+
       {selectedBranch !== "main" && (
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200">
           {selectedBranch}

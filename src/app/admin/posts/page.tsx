@@ -6,8 +6,25 @@ import BlogPostsTable from "@/components/admin/BlogPostsTable";
 import BranchSelector from "@/components/admin/BranchSelector";
 import { useAdmin } from "@/contexts/AdminContext";
 
+// BlogPost interface that matches BlogPostsTable expectations
+interface BlogPost {
+  name: string;
+  path: string;
+  size: number;
+  frontmatter?: {
+    title: string;
+    date: string;
+    speakerName?: string;
+    speakerImage?: string;
+    speakers?: Array<{
+      name: string;
+      image?: string;
+    }>;
+  };
+}
+
 export default function BlogPostsPage() {
-  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { selectedBranch } = useAdmin();
@@ -17,14 +34,18 @@ export default function BlogPostsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/admin/posts?branch=${encodeURIComponent(selectedBranch)}`);
+        const response = await fetch(
+          `/api/admin/posts?branch=${encodeURIComponent(selectedBranch)}`,
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch posts");
         }
         const data = await response.json();
         setBlogPosts(data.posts || []);
       } catch (err) {
-        setError("Failed to load blog posts. Please check GitHub configuration.");
+        setError(
+          "Failed to load blog posts. Please check GitHub configuration.",
+        );
         console.error("Error loading blog posts:", err);
       } finally {
         setIsLoading(false);

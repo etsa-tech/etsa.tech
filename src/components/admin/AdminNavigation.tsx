@@ -5,11 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 interface AdminNavigationProps {
-  user: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  } | undefined;
+  user:
+    | {
+        name?: string | null;
+        email?: string | null;
+        image?: string | null;
+      }
+    | undefined;
 }
 
 const navigation = [
@@ -32,7 +34,9 @@ export default function AdminNavigation({ user }: AdminNavigationProps) {
                 <div className="h-8 w-8 rounded bg-etsa-primary flex items-center justify-center">
                   <span className="text-white font-bold text-sm">E</span>
                 </div>
-                <span className="text-xl font-bold text-etsa-primary">ETSA Admin</span>
+                <span className="text-xl font-bold text-etsa-primary">
+                  ETSA Admin
+                </span>
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -83,7 +87,10 @@ export default function AdminNavigation({ user }: AdminNavigationProps) {
                 <button
                   onClick={() => {
                     // Clear admin session data
-                    localStorage.setItem("etsa-admin-logout", Date.now().toString());
+                    localStorage.setItem(
+                      "etsa-admin-logout",
+                      Date.now().toString(),
+                    );
                     localStorage.removeItem("etsa-admin-branch");
                     signOut({ callbackUrl: "/" });
                   }}

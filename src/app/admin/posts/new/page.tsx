@@ -7,9 +7,17 @@ import BlogPostEditor from "@/components/admin/BlogPostEditor";
 export default function NewPostPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
-  const handleSave = async (data: { slug: string; frontmatter: any; content: string; createPR: boolean }) => {
+  const handleSave = async (data: {
+    slug: string;
+    frontmatter: Record<string, unknown>;
+    content: string;
+    createPR: boolean;
+  }) => {
     setIsLoading(true);
     setMessage(null);
 
@@ -32,18 +40,17 @@ export default function NewPostPage() {
         type: "success",
         text: data.createPR
           ? `Pull request #${result.prNumber} created successfully!`
-          : "Post created successfully!"
+          : "Post created successfully!",
       });
 
       setTimeout(() => {
         router.push("/admin/posts");
       }, 2000);
-
     } catch (error) {
       console.error("Error creating post:", error);
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Failed to create post"
+        text: error instanceof Error ? error.message : "Failed to create post",
       });
     } finally {
       setIsLoading(false);
@@ -62,18 +69,22 @@ export default function NewPostPage() {
       </div>
 
       {message && (
-        <div className={`rounded-md p-4 ${
-          message.type === "success"
-            ? "bg-green-50 dark:bg-green-900/20"
-            : "bg-red-50 dark:bg-red-900/20"
-        }`}>
+        <div
+          className={`rounded-md p-4 ${
+            message.type === "success"
+              ? "bg-green-50 dark:bg-green-900/20"
+              : "bg-red-50 dark:bg-red-900/20"
+          }`}
+        >
           <div className="flex">
             <div className="ml-3">
-              <p className={`text-sm font-medium ${
-                message.type === "success"
-                  ? "text-green-800 dark:text-green-200"
-                  : "text-red-800 dark:text-red-200"
-              }`}>
+              <p
+                className={`text-sm font-medium ${
+                  message.type === "success"
+                    ? "text-green-800 dark:text-green-200"
+                    : "text-red-800 dark:text-red-200"
+                }`}
+              >
                 {message.text}
               </p>
             </div>

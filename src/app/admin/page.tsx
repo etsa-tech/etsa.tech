@@ -4,9 +4,21 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+interface AdminBlogPost {
+  slug: string;
+  title: string;
+  date: string;
+  status: string;
+  author?: string;
+  frontmatter?: {
+    published?: boolean;
+    [key: string]: unknown;
+  };
+}
+
 export default function AdminDashboard() {
   const { data: session } = useSession();
-  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [blogPosts, setBlogPosts] = useState<AdminBlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +32,9 @@ export default function AdminDashboard() {
         const data = await response.json();
         setBlogPosts(data.posts || []);
       } catch (err) {
-        setError("Failed to load blog posts. Please check GitHub configuration.");
+        setError(
+          "Failed to load blog posts. Please check GitHub configuration.",
+        );
         console.error("Error loading blog posts:", err);
       } finally {
         setIsLoading(false);
@@ -39,7 +53,10 @@ export default function AdminDashboard() {
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 shadow rounded-lg p-5">
+            <div
+              key={i}
+              className="bg-white dark:bg-gray-800 shadow rounded-lg p-5"
+            >
               <div className="animate-pulse space-y-3">
                 <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                 <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
@@ -109,7 +126,11 @@ export default function AdminDashboard() {
                     Published
                   </dt>
                   <dd className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {error ? "—" : blogPosts.filter(post => post.frontmatter?.published !== false).length}
+                    {error
+                      ? "—"
+                      : blogPosts.filter(
+                          (post) => post.frontmatter?.published !== false,
+                        ).length}
                   </dd>
                 </dl>
               </div>
@@ -134,7 +155,11 @@ export default function AdminDashboard() {
                     Drafts
                   </dt>
                   <dd className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {error ? "—" : blogPosts.filter(post => post.frontmatter?.published === false).length}
+                    {error
+                      ? "—"
+                      : blogPosts.filter(
+                          (post) => post.frontmatter?.published === false,
+                        ).length}
                   </dd>
                 </dl>
               </div>

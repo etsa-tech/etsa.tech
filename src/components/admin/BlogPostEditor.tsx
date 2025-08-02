@@ -11,7 +11,9 @@ import html from "remark-html";
 // Dynamically import Monaco Editor to avoid SSR issues
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
-  loading: () => <div className="h-96 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-md" />,
+  loading: () => (
+    <div className="h-96 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-md" />
+  ),
 });
 
 const blogPostSchema = z.object({
@@ -36,17 +38,46 @@ const blogPostSchema = z.object({
 
 type BlogPostFormData = z.infer<typeof blogPostSchema>;
 
+interface BlogPostFrontmatter {
+  title?: string;
+  date?: string;
+  excerpt?: string;
+  tags?: string[];
+  speakers?: Array<{
+    name: string;
+    title?: string;
+    company?: string;
+    bio?: string;
+  }>;
+  speakerName?: string;
+  speakerTitle?: string;
+  speakerCompany?: string;
+  speakerBio?: string;
+  presentationSlides?: string;
+  recordingUrl?: string;
+  [key: string]: unknown;
+}
+
 interface BlogPostEditorProps {
   initialData?: {
     slug: string;
-    frontmatter: any;
+    frontmatter: BlogPostFrontmatter;
     content: string;
   };
-  onSave: (data: { slug: string; frontmatter: any; content: string; createPR: boolean }) => Promise<void>;
+  onSave: (data: {
+    slug: string;
+    frontmatter: BlogPostFrontmatter;
+    content: string;
+    createPR: boolean;
+  }) => Promise<void>;
   isLoading?: boolean;
 }
 
-export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogPostEditorProps) {
+export default function BlogPostEditor({
+  initialData,
+  onSave,
+  isLoading,
+}: BlogPostEditorProps) {
   const [content, setContent] = useState(initialData?.content || "");
   const [preview, setPreview] = useState("");
   const [showPreview, setShowPreview] = useState(false);
@@ -56,27 +87,64 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
     defaultValues: {
-      title: initialData?.frontmatter?.title || "",
-      date: initialData?.frontmatter?.date || new Date().toISOString().split('T')[0],
-      excerpt: initialData?.frontmatter?.excerpt || "",
-      tags: initialData?.frontmatter?.tags?.join(", ") || "",
-      author: initialData?.frontmatter?.author || "",
-      speakerName: initialData?.frontmatter?.speakerName || "",
-      speakerTitle: initialData?.frontmatter?.speakerTitle || "",
-      speakerCompany: initialData?.frontmatter?.speakerCompany || "",
-      speakerBio: initialData?.frontmatter?.speakerBio || "",
-      presentationTitle: initialData?.frontmatter?.presentationTitle || "",
-      presentationDescription: initialData?.frontmatter?.presentationDescription || "",
-      presentationSlides: initialData?.frontmatter?.presentationSlides || "",
-      recordingUrl: initialData?.frontmatter?.recordingUrl || "",
-      eventDate: initialData?.frontmatter?.eventDate || "",
-      eventLocation: initialData?.frontmatter?.eventLocation || "",
-      featured: initialData?.frontmatter?.featured || false,
+      title: String(initialData?.frontmatter?.title || ""),
+      date: String(
+        initialData?.frontmatter?.date ||
+          new Date().toISOString().split("T")[0],
+      ),
+      excerpt: String(initialData?.frontmatter?.excerpt || ""),
+      tags: Array.isArray(initialData?.frontmatter?.tags)
+        ? initialData.frontmatter.tags.join(", ")
+        : "",
+      author:
+        typeof initialData?.frontmatter?.author === "string"
+          ? initialData.frontmatter.author
+          : "",
+      speakerName:
+        typeof initialData?.frontmatter?.speakerName === "string"
+          ? initialData.frontmatter.speakerName
+          : "",
+      speakerTitle:
+        typeof initialData?.frontmatter?.speakerTitle === "string"
+          ? initialData.frontmatter.speakerTitle
+          : "",
+      speakerCompany:
+        typeof initialData?.frontmatter?.speakerCompany === "string"
+          ? initialData.frontmatter.speakerCompany
+          : "",
+      speakerBio:
+        typeof initialData?.frontmatter?.speakerBio === "string"
+          ? initialData.frontmatter.speakerBio
+          : "",
+      presentationTitle:
+        typeof initialData?.frontmatter?.presentationTitle === "string"
+          ? initialData.frontmatter.presentationTitle
+          : "",
+      presentationDescription:
+        typeof initialData?.frontmatter?.presentationDescription === "string"
+          ? initialData.frontmatter.presentationDescription
+          : "",
+      presentationSlides:
+        typeof initialData?.frontmatter?.presentationSlides === "string"
+          ? initialData.frontmatter.presentationSlides
+          : "",
+      recordingUrl:
+        typeof initialData?.frontmatter?.recordingUrl === "string"
+          ? initialData.frontmatter.recordingUrl
+          : "",
+      eventDate:
+        typeof initialData?.frontmatter?.eventDate === "string"
+          ? initialData.frontmatter.eventDate
+          : "",
+      eventLocation:
+        typeof initialData?.frontmatter?.eventLocation === "string"
+          ? initialData.frontmatter.eventLocation
+          : "",
+      featured: Boolean(initialData?.frontmatter?.featured),
       published: initialData?.frontmatter?.published !== false,
     },
   });
@@ -118,7 +186,10 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
     const frontmatter = {
       ...data,
-      tags: data.tags.split(",").map(tag => tag.trim()).filter(Boolean),
+      tags: data.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
     };
 
     await onSave({
@@ -148,7 +219,9 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
               />
               {errors.title && (
-                <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.title.message}
+                </p>
               )}
             </div>
 
@@ -174,7 +247,9 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
               />
               {errors.date && (
-                <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.date.message}
+                </p>
               )}
             </div>
 
@@ -188,7 +263,9 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
               />
               {errors.author && (
-                <p className="mt-1 text-sm text-red-600">{errors.author.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.author.message}
+                </p>
               )}
             </div>
           </div>
@@ -203,7 +280,9 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
             />
             {errors.excerpt && (
-              <p className="mt-1 text-sm text-red-600">{errors.excerpt.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.excerpt.message}
+              </p>
             )}
           </div>
 
@@ -230,7 +309,10 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
                 {...register("featured")}
                 className="h-4 w-4 text-etsa-primary focus:ring-etsa-primary border-gray-300 rounded"
               />
-              <label htmlFor="featured" className="ml-2 block text-sm text-gray-900 dark:text-white">
+              <label
+                htmlFor="featured"
+                className="ml-2 block text-sm text-gray-900 dark:text-white"
+              >
                 Featured post
               </label>
             </div>
@@ -242,7 +324,10 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
                 {...register("published")}
                 className="h-4 w-4 text-etsa-primary focus:ring-etsa-primary border-gray-300 rounded"
               />
-              <label htmlFor="published" className="ml-2 block text-sm text-gray-900 dark:text-white">
+              <label
+                htmlFor="published"
+                className="ml-2 block text-sm text-gray-900 dark:text-white"
+              >
                 Published
               </label>
             </div>
@@ -264,7 +349,11 @@ export default function BlogPostEditor({ initialData, onSave, isLoading }: BlogP
             </button>
           </div>
 
-          <div className={`grid gap-6 ${showPreview ? "grid-cols-2" : "grid-cols-1"}`}>
+          <div
+            className={`grid gap-6 ${
+              showPreview ? "grid-cols-2" : "grid-cols-1"
+            }`}
+          >
             <div>
               <MonacoEditor
                 height="500px"

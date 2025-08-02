@@ -19,11 +19,14 @@ export interface GitHubFile {
 export interface BlogPost {
   slug: string;
   content: string;
-  frontmatter: Record<string, any>;
+  frontmatter: Record<string, unknown>;
 }
 
 // Get repository contents
-export async function getRepoContents(path: string = "", branch: string = "main"): Promise<GitHubFile[]> {
+export async function getRepoContents(
+  path: string = "",
+  branch: string = "main",
+): Promise<GitHubFile[]> {
   try {
     const response = await octokit.rest.repos.getContent({
       owner: REPO_OWNER,
@@ -50,7 +53,10 @@ export async function getRepoContents(path: string = "", branch: string = "main"
 }
 
 // Get file content
-export async function getFileContent(path: string, branch: string = "main"): Promise<string> {
+export async function getFileContent(
+  path: string,
+  branch: string = "main",
+): Promise<string> {
   try {
     const response = await octokit.rest.repos.getContent({
       owner: REPO_OWNER,
@@ -71,7 +77,10 @@ export async function getFileContent(path: string, branch: string = "main"): Pro
 }
 
 // Get file content with SHA (for updates)
-export async function getFileContentWithSha(path: string, branch: string = "main"): Promise<{ content: string; sha: string }> {
+export async function getFileContentWithSha(
+  path: string,
+  branch: string = "main",
+): Promise<{ content: string; sha: string }> {
   try {
     const response = await octokit.rest.repos.getContent({
       owner: REPO_OWNER,
@@ -95,12 +104,17 @@ export async function getFileContentWithSha(path: string, branch: string = "main
 }
 
 // Get all blog posts
-export async function getBlogPosts(branch: string = "main"): Promise<GitHubFile[]> {
+export async function getBlogPosts(
+  branch: string = "main",
+): Promise<GitHubFile[]> {
   return getRepoContents("posts", branch);
 }
 
 // Get specific blog post
-export async function getBlogPost(slug: string, branch: string = "main"): Promise<string> {
+export async function getBlogPost(
+  slug: string,
+  branch: string = "main",
+): Promise<string> {
   return getFileContent(`posts/${slug}.md`, branch);
 }
 
@@ -112,7 +126,7 @@ export async function getBranches(): Promise<string[]> {
       repo: REPO_NAME,
     });
 
-    return response.data.map(branch => branch.name);
+    return response.data.map((branch) => branch.name);
   } catch (error) {
     console.error("Error fetching branches:", error);
     return ["main"]; // Fallback to main branch
@@ -124,7 +138,7 @@ export async function createOrUpdateFile(
   path: string,
   content: string,
   message: string,
-  sha?: string
+  sha?: string,
 ): Promise<void> {
   try {
     await octokit.rest.repos.createOrUpdateFileContents({
@@ -168,7 +182,7 @@ export async function createBranch(branchName: string): Promise<void> {
 export async function createPullRequest(
   branchName: string,
   title: string,
-  body: string
+  body: string,
 ): Promise<number> {
   try {
     const response = await octokit.rest.pulls.create({
@@ -191,7 +205,7 @@ export async function createPullRequest(
 export async function uploadAsset(
   path: string,
   content: Buffer,
-  message: string
+  message: string,
 ): Promise<void> {
   try {
     await octokit.rest.repos.createOrUpdateFileContents({

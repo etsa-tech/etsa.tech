@@ -10,17 +10,28 @@ export default function EditPostPage() {
   const params = useParams();
   const slug = params.slug as string;
   const { selectedBranch } = useAdmin();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPost, setIsLoadingPost] = useState(true);
-  const [postData, setPostData] = useState<any>(null);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [postData, setPostData] = useState<{
+    slug: string;
+    frontmatter: Record<string, unknown>;
+    content: string;
+  } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         // Use slug directly - Next.js handles URL encoding/decoding
-        const response = await fetch(`/api/admin/posts/${slug}?branch=${encodeURIComponent(selectedBranch)}`);
+        const response = await fetch(
+          `/api/admin/posts/${slug}?branch=${encodeURIComponent(
+            selectedBranch,
+          )}`,
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch post");
         }
@@ -30,7 +41,7 @@ export default function EditPostPage() {
         console.error("Error fetching post:", error);
         setMessage({
           type: "error",
-          text: "Failed to load post"
+          text: "Failed to load post",
         });
       } finally {
         setIsLoadingPost(false);
@@ -42,19 +53,27 @@ export default function EditPostPage() {
     }
   }, [slug, selectedBranch]);
 
-  const handleSave = async (data: { slug: string; frontmatter: any; content: string; createPR: boolean }) => {
+  const handleSave = async (data: {
+    slug: string;
+    frontmatter: Record<string, unknown>;
+    content: string;
+    createPR: boolean;
+  }) => {
     setIsLoading(true);
     setMessage(null);
 
     try {
       // Use slug directly - Next.js handles URL encoding/decoding
-      const response = await fetch(`/api/admin/posts/${slug}?branch=${encodeURIComponent(selectedBranch)}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `/api/admin/posts/${slug}?branch=${encodeURIComponent(selectedBranch)}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         },
-        body: JSON.stringify(data),
-      });
+      );
 
       const result = await response.json();
 
@@ -64,9 +83,9 @@ export default function EditPostPage() {
 
       setMessage({
         type: "success",
-        text: data.createPR 
+        text: data.createPR
           ? `Pull request #${result.prNumber} created successfully!`
-          : "Post updated successfully!"
+          : "Post updated successfully!",
       });
 
       if (!data.createPR) {
@@ -74,12 +93,11 @@ export default function EditPostPage() {
           router.push("/admin/posts");
         }, 2000);
       }
-
     } catch (error) {
       console.error("Error updating post:", error);
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Failed to update post"
+        text: error instanceof Error ? error.message : "Failed to update post",
       });
     } finally {
       setIsLoading(false);
@@ -121,7 +139,7 @@ export default function EditPostPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Edit Blog Post: {postData.frontmatter.title}
+          Edit Blog Post: {String(postData.frontmatter.title || "Untitled")}
         </h1>
         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Make changes to your blog post.
@@ -129,18 +147,22 @@ export default function EditPostPage() {
       </div>
 
       {message && (
-        <div className={`rounded-md p-4 ${
-          message.type === "success" 
-            ? "bg-green-50 dark:bg-green-900/20" 
-            : "bg-red-50 dark:bg-red-900/20"
-        }`}>
+        <div
+          className={`rounded-md p-4 ${
+            message.type === "success"
+              ? "bg-green-50 dark:bg-green-900/20"
+              : "bg-red-50 dark:bg-red-900/20"
+          }`}
+        >
           <div className="flex">
             <div className="ml-3">
-              <p className={`text-sm font-medium ${
-                message.type === "success"
-                  ? "text-green-800 dark:text-green-200"
-                  : "text-red-800 dark:text-red-200"
-              }`}>
+              <p
+                className={`text-sm font-medium ${
+                  message.type === "success"
+                    ? "text-green-800 dark:text-green-200"
+                    : "text-red-800 dark:text-red-200"
+                }`}
+              >
                 {message.text}
               </p>
             </div>
@@ -148,10 +170,10 @@ export default function EditPostPage() {
         </div>
       )}
 
-      <BlogPostEditor 
+      <BlogPostEditor
         initialData={postData}
-        onSave={handleSave} 
-        isLoading={isLoading} 
+        onSave={handleSave}
+        isLoading={isLoading}
       />
     </div>
   );

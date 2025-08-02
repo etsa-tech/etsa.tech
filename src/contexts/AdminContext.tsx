@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface AdminContextType {
   selectedBranch: string;
@@ -25,7 +31,9 @@ interface AdminProviderProps {
 
 export function AdminProvider({ children }: AdminProviderProps) {
   const [selectedBranch, setSelectedBranchState] = useState("main");
-  const [availableBranches, setAvailableBranches] = useState<string[]>(["main"]);
+  const [availableBranches, setAvailableBranches] = useState<string[]>([
+    "main",
+  ]);
 
   // Load branch from localStorage on mount
   useEffect(() => {
@@ -56,7 +64,10 @@ export function AdminProvider({ children }: AdminProviderProps) {
 
   // Validate branch exists when branches are loaded
   useEffect(() => {
-    if (availableBranches.length > 0 && !availableBranches.includes(selectedBranch)) {
+    if (
+      availableBranches.length > 0 &&
+      !availableBranches.includes(selectedBranch)
+    ) {
       // If selected branch doesn't exist, fall back to main
       setSelectedBranch("main");
     }
@@ -70,8 +81,6 @@ export function AdminProvider({ children }: AdminProviderProps) {
   };
 
   return (
-    <AdminContext.Provider value={value}>
-      {children}
-    </AdminContext.Provider>
+    <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
   );
 }

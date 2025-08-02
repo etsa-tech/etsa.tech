@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     console.log(`Admin API: Found ${posts.length} total posts from GitHub`);
 
     // Filter only .md files
-    const markdownPosts = posts.filter(post => post.name.endsWith('.md'));
+    const markdownPosts = posts.filter((post) => post.name.endsWith(".md"));
     console.log(`Admin API: Found ${markdownPosts.length} markdown posts`);
 
     // Fetch frontmatter for each post
@@ -40,16 +40,18 @@ export async function GET(request: NextRequest) {
             frontmatter: {},
           };
         }
-      })
+      }),
     );
 
-    console.log(`Admin API: Successfully processed ${postsWithFrontmatter.length} posts with frontmatter`);
+    console.log(
+      `Admin API: Successfully processed ${postsWithFrontmatter.length} posts with frontmatter`,
+    );
     return NextResponse.json({ posts: postsWithFrontmatter });
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(
       { error: "Failed to fetch posts" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

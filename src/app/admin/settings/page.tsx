@@ -17,7 +17,8 @@ export default function SettingsPage() {
             Settings coming soon
           </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            LinkedIn and Mailchimp integration settings will be available in the next update.
+            LinkedIn and Mailchimp integration settings will be available in the
+            next update.
           </p>
         </div>
       </div>

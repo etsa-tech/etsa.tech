@@ -17,7 +17,8 @@ export default function AssetsPage() {
             Asset management coming soon
           </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            File upload and asset management functionality will be available in the next update.
+            File upload and asset management functionality will be available in
+            the next update.
           </p>
         </div>
       </div>

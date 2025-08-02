@@ -14,7 +14,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // Additional check to ensure user is from etsa.tech domain
       if (account?.provider === "google") {
         const email = user.email;
@@ -24,11 +24,11 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async session({ session, token }) {
+    async session({ session }) {
       // Add any additional session data here
       return session;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token }) {
       // Add any additional token data here
       return token;
     },

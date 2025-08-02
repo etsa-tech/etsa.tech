@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function AdminSignIn() {
   const searchParams = useSearchParams();
@@ -26,7 +27,9 @@ export default function AdminSignIn() {
           <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-etsa-primary">
             <span className="text-white text-xl font-bold">E</span>
           </div>
-          <h1 className="mt-6 text-3xl font-bold text-etsa-primary">ETSA Admin</h1>
+          <h1 className="mt-6 text-3xl font-bold text-etsa-primary">
+            ETSA Admin
+          </h1>
         </div>
       </div>
 
@@ -36,15 +39,26 @@ export default function AdminSignIn() {
             <div className="mb-6 rounded-md bg-red-50 dark:bg-red-900/20 p-4">
               <div className="text-center">
                 <div className="text-red-400 mb-2">
-                  <svg className="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                  <svg
+                    className="mx-auto h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
                   </svg>
                 </div>
                 <p className="text-sm font-medium text-red-800 dark:text-red-200">
                   Access Denied
                 </p>
                 <p className="mt-1 text-sm text-red-700 dark:text-red-300">
-                  Only users with @etsa.tech Google Workspace accounts can access this admin interface.
+                  Only users with @etsa.tech Google Workspace accounts can
+                  access this admin interface.
                 </p>
               </div>
             </div>
@@ -89,12 +103,12 @@ export default function AdminSignIn() {
         </div>
 
         <div className="mt-8 text-center">
-          <a
+          <Link
             href="/"
             className="text-sm text-etsa-primary hover:text-etsa-primary-dark font-medium"
           >
             ← Back to ETSA Website
-          </a>
+          </Link>
         </div>
       </div>
     </div>

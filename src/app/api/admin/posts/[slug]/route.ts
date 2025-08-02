@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getBlogPost, getFileContentWithSha, createOrUpdateFile, createBranch, createPullRequest } from "@/lib/github";
+import {
+  getBlogPost,
+  getFileContentWithSha,
+  createOrUpdateFile,
+  createBranch,
+  createPullRequest,
+} from "@/lib/github";
 import matter from "gray-matter";
 
 interface RouteParams {
@@ -27,13 +33,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       slug,
       frontmatter,
-      content: markdown
+      content: markdown,
     });
   } catch (error) {
     console.error("Error fetching post:", error);
     return NextResponse.json(
       { error: "Failed to fetch post" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -65,21 +71,25 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         `posts/${slug}.md`,
         fullContent,
         `Update blog post: ${frontmatter.title || slug}`,
-        undefined
+        undefined,
       );
 
       // Create pull request
       const prNumber = await createPullRequest(
         branchName,
         `Update blog post: ${frontmatter.title || slug}`,
-        `This PR updates the blog post "${frontmatter.title || slug}".\n\nChanges made via ETSA Admin interface by ${session.user.name} (${session.user.email}).`
+        `This PR updates the blog post "${
+          frontmatter.title || slug
+        }".\n\nChanges made via ETSA Admin interface by ${session.user.name} (${
+          session.user.email
+        }).`,
       );
 
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         message: "Pull request created successfully",
         prNumber,
-        branchName
+        branchName,
       });
     } else {
       // Direct update (for drafts or immediate changes) - need SHA for existing file
@@ -89,27 +99,27 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           `posts/${slug}.md`,
           fullContent,
           `Update blog post: ${frontmatter.title || slug}`,
-          sha
+          sha,
         );
-      } catch (error) {
+      } catch {
         // If file doesn't exist, create it without SHA
         await createOrUpdateFile(
           `posts/${slug}.md`,
           fullContent,
-          `Create blog post: ${frontmatter.title || slug}`
+          `Create blog post: ${frontmatter.title || slug}`,
         );
       }
 
       return NextResponse.json({
         success: true,
-        message: "Post updated successfully"
+        message: "Post updated successfully",
       });
     }
   } catch (error) {
     console.error("Error updating post:", error);
     return NextResponse.json(
       { error: "Failed to update post" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
