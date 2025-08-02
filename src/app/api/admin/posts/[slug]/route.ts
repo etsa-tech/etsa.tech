@@ -7,7 +7,8 @@ import {
   getFileContentWithSha,
   createOrUpdateFile,
   createBranch,
-  createPullRequest,
+  createOrGetPullRequest,
+  getBranches,
 } from "@/lib/github";
 import matter from "gray-matter";
 
@@ -63,20 +64,61 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const fullContent = matter.stringify(content, frontmatter);
 
     if (createPR) {
-      // Create a new branch for the changes
-      const branchName = `update-post-${slug}-${Date.now()}`;
-      await createBranch(branchName);
+      // Check if there's already an update branch for this post
+      const allBranches = await getBranches();
+      const updateBranchPattern = `update-post-${slug}-`;
+      const existingUpdateBranch = allBranches.find((branch) =>
+        branch.startsWith(updateBranchPattern),
+      );
 
-      // Update the file in the new branch (no SHA needed for new branch)
+      let branchName: string;
+      let fileSha: string;
+
+      if (existingUpdateBranch) {
+        // Use existing update branch
+        branchName = existingUpdateBranch;
+        console.log(`Using existing update branch: ${branchName}`);
+
+        // Get the file SHA from the existing branch
+        try {
+          const fileData = await getFileContentWithSha(
+            `posts/${slug}.md`,
+            branchName,
+          );
+          fileSha = fileData.sha;
+        } catch {
+          // If file doesn't exist in the branch, get SHA from main
+          const fileData = await getFileContentWithSha(
+            `posts/${slug}.md`,
+            "main",
+          );
+          fileSha = fileData.sha;
+        }
+      } else {
+        // Create a new branch for this post
+        branchName = `update-post-${slug}-${Date.now()}`;
+        console.log(`Creating new update branch: ${branchName}`);
+        await createBranch(branchName);
+
+        // Get the current file SHA from main branch for the update
+        const fileData = await getFileContentWithSha(
+          `posts/${slug}.md`,
+          "main",
+        );
+        fileSha = fileData.sha;
+      }
+
+      // Update the file in the branch
       await createOrUpdateFile(
         `posts/${slug}.md`,
         fullContent,
         `Update blog post: ${frontmatter.title || slug}`,
-        undefined,
+        fileSha,
+        branchName,
       );
 
-      // Create pull request
-      const prNumber = await createPullRequest(
+      // Create or get existing pull request
+      const { prNumber, isNew } = await createOrGetPullRequest(
         branchName,
         `Update blog post: ${frontmatter.title || slug}`,
         `This PR updates the blog post "${
@@ -87,9 +129,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
       return NextResponse.json({
         success: true,
-        message: "Pull request created successfully",
+        message: isNew
+          ? "Pull request created successfully"
+          : "Changes saved to existing pull request",
         prNumber,
         branchName,
+        isNewPR: isNew,
       });
     } else {
       // Direct update (for drafts or immediate changes) - need SHA for existing file
@@ -100,6 +145,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           fullContent,
           `Update blog post: ${frontmatter.title || slug}`,
           sha,
+          branch,
         );
       } catch {
         // If file doesn't exist, create it without SHA
@@ -107,6 +153,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           `posts/${slug}.md`,
           fullContent,
           `Create blog post: ${frontmatter.title || slug}`,
+          undefined,
+          branch,
         );
       }
 

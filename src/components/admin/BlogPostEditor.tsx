@@ -71,12 +71,16 @@ interface BlogPostEditorProps {
     createPR: boolean;
   }) => Promise<void>;
   readonly isLoading?: boolean;
+  readonly currentBranch?: string;
+  readonly viewingBranch?: string;
 }
 
 export default function BlogPostEditor({
   initialData,
   onSave,
   isLoading,
+  currentBranch = "main",
+  viewingBranch,
 }: Readonly<BlogPostEditorProps>) {
   const [content, setContent] = useState(initialData?.content || "");
   const [preview, setPreview] = useState("");
@@ -169,7 +173,11 @@ export default function BlogPostEditor({
     const updatePreview = async () => {
       if (content) {
         try {
-          const processedContent = await remark().use(html).process(content);
+          // Pre-process content to handle line breaks better
+          const contentWithBreaks = content.replace(/\n(?!\n)/g, "  \n");
+          const processedContent = await remark()
+            .use(html)
+            .process(contentWithBreaks);
           setPreview(processedContent.toString());
         } catch (error) {
           console.error("Error processing markdown:", error);
@@ -182,6 +190,14 @@ export default function BlogPostEditor({
 
     updatePreview();
   }, [content]);
+
+  // Determine if we're on an update branch for THIS specific post
+  const isUpdateBranchForThisPost = currentBranch.startsWith(
+    `update-post-${slug}-`,
+  );
+  const isUpdateBranchForOtherPost =
+    currentBranch.startsWith("update-post-") && !isUpdateBranchForThisPost;
+  const isMainBranch = currentBranch === "main";
 
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
     const frontmatter = {
@@ -202,6 +218,113 @@ export default function BlogPostEditor({
 
   return (
     <div className="space-y-6">
+      {/* Branch Status Indicator */}
+      {viewingBranch && viewingBranch !== currentBranch && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-5 w-5 text-amber-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Viewing content from different branch
+              </h3>
+              <div className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                <p>
+                  Viewing:{" "}
+                  <code className="bg-amber-100 dark:bg-amber-800 px-1 py-0.5 rounded text-xs">
+                    {viewingBranch}
+                  </code>
+                  {" • Changes will be saved to: "}
+                  <code className="bg-amber-100 dark:bg-amber-800 px-1 py-0.5 rounded text-xs">
+                    {currentBranch}
+                  </code>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {isUpdateBranchForThisPost &&
+        (!viewingBranch || viewingBranch === currentBranch) && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-blue-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  Working on update branch for this post
+                </h3>
+                <div className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                  <p>
+                    Branch:{" "}
+                    <code className="bg-blue-100 dark:bg-blue-800 px-1 py-0.5 rounded text-xs">
+                      {currentBranch}
+                    </code>
+                    {" • Changes will be saved as draft to this branch"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      {isUpdateBranchForOtherPost && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-5 w-5 text-amber-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Wrong branch for this post
+              </h3>
+              <div className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                <p>
+                  You&apos;re on:{" "}
+                  <code className="bg-amber-100 dark:bg-amber-800 px-1 py-0.5 rounded text-xs">
+                    {currentBranch}
+                  </code>
+                  {
+                    " • This branch is for a different post. Switch to main branch to edit this post."
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <form className="space-y-6">
         {/* Basic Information */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
@@ -407,22 +530,41 @@ export default function BlogPostEditor({
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-3">
-          <button
-            type="button"
-            onClick={() => handleSubmit((data) => onSubmit(data, false))()}
-            disabled={isLoading}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary disabled:opacity-50"
-          >
-            {isLoading ? "Saving..." : "Save Draft"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSubmit((data) => onSubmit(data, true))()}
-            disabled={isLoading}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-etsa-primary hover:bg-etsa-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary disabled:opacity-50"
-          >
-            {isLoading ? "Creating PR..." : "Create Pull Request"}
-          </button>
+          {isUpdateBranchForThisPost && (
+            <button
+              type="button"
+              onClick={() => handleSubmit((data) => onSubmit(data, false))()}
+              disabled={isLoading}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-etsa-primary hover:bg-etsa-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary disabled:opacity-50"
+            >
+              {isLoading ? "Saving..." : "Save Draft"}
+            </button>
+          )}
+          {isMainBranch && (
+            <button
+              type="button"
+              onClick={() => handleSubmit((data) => onSubmit(data, true))()}
+              disabled={isLoading}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-etsa-primary hover:bg-etsa-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary disabled:opacity-50"
+            >
+              {isLoading ? "Creating PR..." : "Create Pull Request"}
+            </button>
+          )}
+          {isUpdateBranchForOtherPost && (
+            <div className="text-center">
+              <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">
+                You&apos;re on an update branch for a different post. Switch to
+                main branch to edit this post.
+              </p>
+              <button
+                type="button"
+                disabled
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-400 bg-gray-100 cursor-not-allowed"
+              >
+                Switch to Main Branch First
+              </button>
+            </div>
+          )}
         </div>
       </form>
     </div>

@@ -5,7 +5,7 @@ import { isAuthorizedUser } from "@/lib/auth-utils";
 import {
   createOrUpdateFile,
   createBranch,
-  createPullRequest,
+  createOrGetPullRequest,
 } from "@/lib/github";
 import matter from "gray-matter";
 
@@ -41,10 +41,12 @@ export async function POST(request: NextRequest) {
         `posts/${slug}.md`,
         fullContent,
         `Add new blog post: ${frontmatter.title || slug}`,
+        undefined,
+        branchName,
       );
 
-      // Create pull request
-      const prNumber = await createPullRequest(
+      // Create pull request (new posts shouldn't have existing PRs, but use consistent function)
+      const { prNumber, isNew } = await createOrGetPullRequest(
         branchName,
         `Add new blog post: ${frontmatter.title || slug}`,
         `This PR adds a new blog post "${
@@ -59,6 +61,7 @@ export async function POST(request: NextRequest) {
         prNumber,
         branchName,
         slug,
+        isNewPR: isNew,
       });
     } else {
       // Direct creation (for drafts or immediate publishing)
@@ -66,6 +69,8 @@ export async function POST(request: NextRequest) {
         `posts/${slug}.md`,
         fullContent,
         `Add new blog post: ${frontmatter.title || slug}`,
+        undefined,
+        "main",
       );
 
       return NextResponse.json({

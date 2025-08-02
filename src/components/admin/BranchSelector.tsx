@@ -96,7 +96,14 @@ export default function BranchSelector({
       )}
 
       {selectedBranch !== "main" && (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200">
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+            selectedBranch.startsWith("update-post-")
+              ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200"
+              : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200"
+          }`}
+        >
+          {selectedBranch.startsWith("update-post-") ? "📝 " : ""}
           {selectedBranch}
         </span>
       )}

@@ -139,6 +139,7 @@ export async function createOrUpdateFile(
   content: string,
   message: string,
   sha?: string,
+  branch?: string,
 ): Promise<void> {
   try {
     await octokit.rest.repos.createOrUpdateFileContents({
@@ -148,6 +149,7 @@ export async function createOrUpdateFile(
       message,
       content: Buffer.from(content).toString("base64"),
       sha,
+      branch,
     });
   } catch (error) {
     console.error("Error creating/updating file:", error);
@@ -178,13 +180,71 @@ export async function createBranch(branchName: string): Promise<void> {
   }
 }
 
-// Create pull request
-export async function createPullRequest(
+// Check if pull request exists for branch
+export async function getPullRequestForBranch(
+  branchName: string,
+): Promise<number | null> {
+  try {
+    const response = await octokit.rest.pulls.list({
+      owner: REPO_OWNER,
+      repo: REPO_NAME,
+      head: `${REPO_OWNER}:${branchName}`,
+      state: "open",
+    });
+
+    return response.data.length > 0 ? response.data[0].number : null;
+  } catch (error) {
+    console.error("Error checking for existing pull request:", error);
+    return null;
+  }
+}
+
+// Get open PR for a specific post (by slug)
+export async function getOpenPRForPost(
+  slug: string,
+): Promise<{ branchName: string; prNumber: number } | null> {
+  try {
+    const response = await octokit.rest.pulls.list({
+      owner: REPO_OWNER,
+      repo: REPO_NAME,
+      state: "open",
+    });
+
+    // Look for PRs with branches that match the post pattern
+    const updateBranchPattern = `update-post-${slug}-`;
+    const matchingPR = response.data.find((pr) =>
+      pr.head.ref.startsWith(updateBranchPattern),
+    );
+
+    if (matchingPR) {
+      return {
+        branchName: matchingPR.head.ref,
+        prNumber: matchingPR.number,
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error checking for open PR for post:", error);
+    return null;
+  }
+}
+
+// Create pull request or return existing one
+export async function createOrGetPullRequest(
   branchName: string,
   title: string,
   body: string,
-): Promise<number> {
+): Promise<{ prNumber: number; isNew: boolean }> {
   try {
+    // Check if PR already exists
+    const existingPR = await getPullRequestForBranch(branchName);
+    if (existingPR) {
+      console.log(`Found existing PR #${existingPR} for branch ${branchName}`);
+      return { prNumber: existingPR, isNew: false };
+    }
+
+    // Create new PR
     const response = await octokit.rest.pulls.create({
       owner: REPO_OWNER,
       repo: REPO_NAME,
@@ -194,11 +254,24 @@ export async function createPullRequest(
       base: "main",
     });
 
-    return response.data.number;
+    console.log(
+      `Created new PR #${response.data.number} for branch ${branchName}`,
+    );
+    return { prNumber: response.data.number, isNew: true };
   } catch (error) {
     console.error("Error creating pull request:", error);
     throw new Error("Failed to create pull request");
   }
+}
+
+// Create pull request (legacy function for backward compatibility)
+export async function createPullRequest(
+  branchName: string,
+  title: string,
+  body: string,
+): Promise<number> {
+  const result = await createOrGetPullRequest(branchName, title, body);
+  return result.prNumber;
 }
 
 // Upload asset file

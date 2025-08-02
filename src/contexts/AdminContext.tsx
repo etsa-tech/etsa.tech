@@ -31,7 +31,7 @@ interface AdminProviderProps {
 }
 
 export function AdminProvider({ children }: Readonly<AdminProviderProps>) {
-  const [selectedBranch, setSelectedBranchState] = useState("main");
+  const [selectedBranch, setSelectedBranch] = useState("main");
   const [availableBranches, setAvailableBranches] = useState<string[]>([
     "main",
   ]);
@@ -40,13 +40,13 @@ export function AdminProvider({ children }: Readonly<AdminProviderProps>) {
   useEffect(() => {
     const savedBranch = localStorage.getItem("etsa-admin-branch");
     if (savedBranch) {
-      setSelectedBranchState(savedBranch);
+      setSelectedBranch(savedBranch);
     }
   }, []);
 
   // Save branch to localStorage when it changes
-  const setSelectedBranch = (branch: string) => {
-    setSelectedBranchState(branch);
+  const setSelectedBranchWithStorage = (branch: string) => {
+    setSelectedBranch(branch);
     localStorage.setItem("etsa-admin-branch", branch);
   };
 
@@ -55,7 +55,7 @@ export function AdminProvider({ children }: Readonly<AdminProviderProps>) {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "etsa-admin-logout") {
         localStorage.removeItem("etsa-admin-branch");
-        setSelectedBranchState("main");
+        setSelectedBranch("main");
       }
     };
 
@@ -70,14 +70,14 @@ export function AdminProvider({ children }: Readonly<AdminProviderProps>) {
       !availableBranches.includes(selectedBranch)
     ) {
       // If selected branch doesn't exist, fall back to main
-      setSelectedBranch("main");
+      setSelectedBranchWithStorage("main");
     }
   }, [availableBranches, selectedBranch]);
 
   const value = useMemo(
     () => ({
       selectedBranch,
-      setSelectedBranch,
+      setSelectedBranch: setSelectedBranchWithStorage,
       availableBranches,
       setAvailableBranches,
     }),

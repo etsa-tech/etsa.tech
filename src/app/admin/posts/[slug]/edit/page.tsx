@@ -9,7 +9,7 @@ export default function EditPostPage() {
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
-  const { selectedBranch } = useAdmin();
+  const { selectedBranch, setSelectedBranch, availableBranches } = useAdmin();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPost, setIsLoadingPost] = useState(true);
@@ -22,15 +22,96 @@ export default function EditPostPage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [openPR, setOpenPR] = useState<{
+    branchName: string;
+    prNumber: number;
+  } | null>(null);
+  const [viewBranch, setViewBranch] = useState<string>(""); // One-time branch selector
+  const [prCheckComplete, setPrCheckComplete] = useState(false);
+
+  // Check for open PR for this post
+  useEffect(() => {
+    const checkOpenPR = async () => {
+      try {
+        const response = await fetch(`/api/admin/posts/${slug}/pr`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.openPR) {
+            console.log(
+              `Found open PR #${data.openPR.prNumber} for post ${slug}, using branch: ${data.openPR.branchName}`,
+            );
+            setOpenPR(data.openPR);
+            // Set the default view branch to the PR branch
+            setViewBranch(data.openPR.branchName);
+          } else {
+            console.log(
+              `No open PR found for post ${slug}, using branch: ${selectedBranch}`,
+            );
+            // No open PR, use selectedBranch
+            setViewBranch(selectedBranch);
+          }
+        } else {
+          console.log(
+            `Error checking PR for post ${slug}, using branch: ${selectedBranch}`,
+          );
+          // Error or no PR, use selectedBranch
+          setViewBranch(selectedBranch);
+        }
+      } catch (error) {
+        console.error("Error checking for open PR:", error);
+        setViewBranch(selectedBranch);
+      } finally {
+        setPrCheckComplete(true);
+      }
+    };
+
+    if (slug && selectedBranch) {
+      checkOpenPR();
+    }
+  }, [slug, selectedBranch]);
+
+  // Check for existing update branch for this post and switch to it
+  useEffect(() => {
+    if (availableBranches.length > 0) {
+      const updateBranchPattern = `update-post-${slug}-`;
+      const existingUpdateBranch = availableBranches.find((branch) =>
+        branch.startsWith(updateBranchPattern),
+      );
+
+      // Only auto-switch if:
+      // 1. There's an existing update branch for THIS specific post
+      // 2. We're currently on main branch (not on another post's branch)
+      // 3. We're not already on the correct branch
+      if (existingUpdateBranch && selectedBranch === "main") {
+        console.log(
+          `Switching from main to existing update branch: ${existingUpdateBranch}`,
+        );
+        setSelectedBranch(existingUpdateBranch);
+      }
+      // If we're on a different post's update branch, switch back to main
+      else if (
+        selectedBranch.startsWith("update-post-") &&
+        !selectedBranch.startsWith(updateBranchPattern)
+      ) {
+        console.log(
+          `Switching from different post's branch (${selectedBranch}) to main for post: ${slug}`,
+        );
+        setSelectedBranch("main");
+      }
+    }
+  }, [availableBranches, slug, selectedBranch, setSelectedBranch]);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
+        // Use viewBranch (which is set after PR check completes)
+        const branchToUse = viewBranch;
+
+        console.log(`Fetching post ${slug} from branch: ${branchToUse}`);
+
         // Use slug directly - Next.js handles URL encoding/decoding
         const response = await fetch(
-          `/api/admin/posts/${slug}?branch=${encodeURIComponent(
-            selectedBranch,
-          )}`,
+          `/api/admin/posts/${slug}?branch=${encodeURIComponent(branchToUse)}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch post");
@@ -48,10 +129,11 @@ export default function EditPostPage() {
       }
     };
 
-    if (slug) {
+    // Only fetch after PR check is complete and we have a branch to use
+    if (slug && viewBranch && prCheckComplete) {
       fetchPost();
     }
-  }, [slug, selectedBranch]);
+  }, [slug, viewBranch, prCheckComplete]);
 
   const handleSave = async (data: {
     slug: string;
@@ -81,14 +163,35 @@ export default function EditPostPage() {
         throw new Error(result.error || "Failed to update post");
       }
 
+      let successMessage: string;
+      if (data.createPR) {
+        if (result.isNewPR === false) {
+          successMessage = `Changes saved to existing pull request #${result.prNumber}!`;
+        } else {
+          successMessage = `Pull request #${result.prNumber} created successfully!`;
+        }
+      } else {
+        successMessage = "Post updated successfully!";
+      }
+
       setMessage({
         type: "success",
-        text: data.createPR
-          ? `Pull request #${result.prNumber} created successfully!`
-          : "Post updated successfully!",
+        text: successMessage,
       });
 
-      if (!data.createPR) {
+      if (data.createPR) {
+        // After creating PR, refresh the page to show the update branch UI
+        setTimeout(() => {
+          setMessage({
+            type: "success",
+            text: "Refreshing to show update branch interface...",
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }, 1500);
+      } else {
+        // For direct saves, redirect to posts list
         setTimeout(() => {
           router.push("/admin/posts");
         }, 2000);
@@ -146,6 +249,59 @@ export default function EditPostPage() {
         </p>
       </div>
 
+      {/* Branch Selector for viewing different versions */}
+      {openPR && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-blue-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  This post has an open pull request #{openPR.prNumber}
+                </h3>
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  Viewing content from:{" "}
+                  <code className="bg-blue-100 dark:bg-blue-800 px-1 py-0.5 rounded">
+                    {viewBranch}
+                  </code>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="branch-select"
+                className="text-sm font-medium text-blue-800 dark:text-blue-200"
+              >
+                View from:
+              </label>
+              <select
+                id="branch-select"
+                value={viewBranch}
+                onChange={(e) => setViewBranch(e.target.value)}
+                className="text-sm border border-blue-300 dark:border-blue-600 rounded-md px-2 py-1 bg-white dark:bg-blue-900 text-blue-900 dark:text-blue-100"
+              >
+                <option value={openPR.branchName}>
+                  PR Branch ({openPR.branchName})
+                </option>
+                <option value="main">Main Branch</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+
       {message && (
         <div
           className={`rounded-md p-4 ${
@@ -174,6 +330,8 @@ export default function EditPostPage() {
         initialData={postData}
         onSave={handleSave}
         isLoading={isLoading}
+        currentBranch={selectedBranch}
+        viewingBranch={viewBranch}
       />
     </div>
   );

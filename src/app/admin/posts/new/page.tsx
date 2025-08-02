@@ -43,9 +43,23 @@ export default function NewPostPage() {
           : "Post created successfully!",
       });
 
-      setTimeout(() => {
-        router.push("/admin/posts");
-      }, 2000);
+      if (data.createPR) {
+        // For PR creation, redirect to edit page to show the update branch UI
+        setTimeout(() => {
+          setMessage({
+            type: "success",
+            text: "Redirecting to edit page...",
+          });
+          setTimeout(() => {
+            router.push(`/admin/posts/${result.slug}/edit`);
+          }, 500);
+        }, 1500);
+      } else {
+        // For direct creation, redirect to posts list
+        setTimeout(() => {
+          router.push("/admin/posts");
+        }, 2000);
+      }
     } catch (error) {
       console.error("Error creating post:", error);
       setMessage({
@@ -92,7 +106,11 @@ export default function NewPostPage() {
         </div>
       )}
 
-      <BlogPostEditor onSave={handleSave} isLoading={isLoading} />
+      <BlogPostEditor
+        onSave={handleSave}
+        isLoading={isLoading}
+        currentBranch="main"
+      />
     </div>
   );
 }
