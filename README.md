@@ -16,10 +16,11 @@ The official website for ETSA, a professional meetup organization based in Knoxv
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS with custom design system
+- **Styling**: Tailwind CSS v4 with custom design system
 - **Content**: Markdown with gray-matter for frontmatter
 - **Deployment**: Netlify with automatic builds
 - **Icons**: Heroicons and custom SVGs
+- **Code Quality**: SonarCloud integration with Tailwind v4 support
 
 ## Getting Started
 
@@ -29,6 +30,38 @@ The official website for ETSA, a professional meetup organization based in Knoxv
 - npm or yarn
 
 ### Installation
+
+#### Netlify local development (This saves you creating a `.env.local` file)
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/etsa-tech/etsa.tech.git
+cd etsa.tech
+```
+
+2. Install Netlify CLI
+
+Mac `brew install netlify-cli`
+Windows `npm install netlify-cli -g`
+
+3. Install dependencies:
+
+```bash
+npm install
+```
+
+4. Login to Netlify
+
+`netlify login`
+
+5. Run the development server:
+
+`netlify dev`
+
+5. Open [http://localhost:8888](http://localhost:8888) in your browser.
+
+#### True local development
 
 1. Clone the repository:
 
@@ -423,6 +456,45 @@ The `netlify.toml` file includes:
 - ESLint for code quality
 - Prettier for code formatting
 - Tailwind CSS for styling
+
+## SonarCloud Configuration
+
+This project uses SonarCloud for code quality analysis. The configuration includes special handling for Tailwind CSS v4 directives:
+
+### Tailwind v4 At-Rules
+
+Tailwind CSS v4 introduces new CSS at-rules that are not part of standard CSS:
+
+- `@variant` - Defines custom variants (e.g., dark mode)
+- `@theme` - Defines theme configuration
+
+These are configured to be ignored by SonarCloud in `.sonarcloud.properties`:
+
+```properties
+# Disable unknown at-rules check for CSS files
+sonar.css.rules.unknown-at-rules=false
+
+# Ignore specific CSS rules for Tailwind v4 directives
+sonar.issue.ignore.multicriteria=e1,e2
+sonar.issue.ignore.multicriteria.e1.ruleKey=css:unknown-at-rules
+sonar.issue.ignore.multicriteria.e1.resourceKey=**/*.css
+sonar.issue.ignore.multicriteria.e2.ruleKey=Web:UnknownAtRuleCheck
+sonar.issue.ignore.multicriteria.e2.resourceKey=**/*.css
+```
+
+### CSS Comments
+
+The CSS file also includes SonarCloud suppression comments for these directives:
+
+```css
+/* sonar-disable-next-line css:unknown-at-rules */
+@variant dark (&:where(.dark, .dark *));
+
+/* sonar-disable-next-line css:unknown-at-rules */
+@theme {
+  /* Theme configuration */
+}
+```
 
 ## Contributing
 

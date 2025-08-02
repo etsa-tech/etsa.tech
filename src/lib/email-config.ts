@@ -15,6 +15,10 @@ export function createTransporter() {
     tls: {
       rejectUnauthorized: process.env.SMTP_TLS === "true",
     },
+    // Add timeout settings for Netlify compatibility
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 5000, // 5 seconds
+    socketTimeout: 10000, // 10 seconds
   };
 
   // Validate required environment variables
@@ -46,27 +50,42 @@ export async function verifyHCaptcha(
       throw new Error("HCAPTCHA_SECRET_KEY environment variable is required");
     }
 
-    const response = await fetch("https://hcaptcha.com/siteverify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        secret: process.env.HCAPTCHA_SECRET_KEY,
-        response: token,
-      }),
-    });
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-    const data = await response.json();
+    try {
+      const response = await fetch("https://hcaptcha.com/siteverify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          secret: process.env.HCAPTCHA_SECRET_KEY,
+          response: token,
+        }),
+        signal: controller.signal,
+      });
 
-    if (data.success) {
-      return { success: true };
-    } else {
-      console.error("HCaptcha verification failed:", data);
-      return {
-        success: false,
-        error: "Captcha verification failed. Please try again.",
-      };
+      clearTimeout(timeoutId);
+
+      const data = await response.json();
+
+      if (data.success) {
+        return { success: true };
+      } else {
+        console.error("HCaptcha verification failed:", data);
+        return {
+          success: false,
+          error: "Captcha verification failed. Please try again.",
+        };
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("HCaptcha verification timed out");
+      }
+      throw error;
     }
   } catch (error) {
     console.error("HCaptcha verification error:", error);
