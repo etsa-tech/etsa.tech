@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { isAuthorizedUser } from "@/lib/auth-utils";
 import { getBlogPosts, getFileContent } from "@/lib/github";
 import matter from "gray-matter";
 
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user?.email?.endsWith("@etsa.tech")) {
+    if (!isAuthorizedUser(session)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

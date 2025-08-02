@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { isAuthorizedUser } from "@/lib/auth-utils";
 import {
   getBlogPost,
   getFileContentWithSha,
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user?.email?.endsWith("@etsa.tech")) {
+    if (!isAuthorizedUser(session)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -48,7 +49,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user?.email?.endsWith("@etsa.tech")) {
+    if (!isAuthorizedUser(session)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -80,9 +81,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         `Update blog post: ${frontmatter.title || slug}`,
         `This PR updates the blog post "${
           frontmatter.title || slug
-        }".\n\nChanges made via ETSA Admin interface by ${session.user.name} (${
-          session.user.email
-        }).`,
+        }".\n\nChanges made via ETSA Admin interface by ${session!.user
+          ?.name} (${session!.user?.email}).`,
       );
 
       return NextResponse.json({

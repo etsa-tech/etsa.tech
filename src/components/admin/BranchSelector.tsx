@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
 
 interface BranchSelectorProps {
-  className?: string;
+  readonly className?: string;
 }
 
 export default function BranchSelector({
   className = "",
-}: BranchSelectorProps) {
+}: Readonly<BranchSelectorProps>) {
   const {
     selectedBranch,
     setSelectedBranch,

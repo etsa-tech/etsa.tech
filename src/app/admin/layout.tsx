@@ -1,15 +1,15 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, SessionProvider } from "next-auth/react";
 import AdminNavigation from "@/components/admin/AdminNavigation";
 import AdminSignIn from "@/components/admin/AdminSignIn";
 import { AdminProvider } from "@/contexts/AdminContext";
 
-export default function AdminLayout({
+function AdminLayoutContent({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   const { data: session, status } = useSession();
 
   // Show loading state
@@ -43,5 +43,17 @@ export default function AdminLayout({
         </main>
       </div>
     </AdminProvider>
+  );
+}
+
+export default function AdminLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <SessionProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </SessionProvider>
   );
 }

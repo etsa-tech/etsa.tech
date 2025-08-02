@@ -23,17 +23,38 @@ interface BlogPost {
 }
 
 interface BlogPostsTableProps {
-  posts: BlogPost[];
-  isLoading?: boolean;
+  readonly posts: BlogPost[];
+  readonly isLoading?: boolean;
 }
 
 type SortField = "name" | "date" | "speaker";
 type SortDirection = "asc" | "desc";
 
+interface SortIconProps {
+  readonly field: SortField;
+  readonly currentSortField: SortField;
+  readonly sortDirection: SortDirection;
+}
+
+function SortIcon({
+  field,
+  currentSortField,
+  sortDirection,
+}: Readonly<SortIconProps>) {
+  if (currentSortField !== field) {
+    return <span className="text-gray-400">↕️</span>;
+  }
+  return (
+    <span className="text-etsa-primary">
+      {sortDirection === "asc" ? "↑" : "↓"}
+    </span>
+  );
+}
+
 export default function BlogPostsTable({
   posts,
   isLoading,
-}: BlogPostsTableProps) {
+}: Readonly<BlogPostsTableProps>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -47,7 +68,8 @@ export default function BlogPostsTable({
       const slug = post.name.replace(".md", "");
 
       // Extract date from filename (format: YYYY-MM-DD-title)
-      const dateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/);
+      const dateRegex = /^(\d{4}-\d{2}-\d{2})/;
+      const dateMatch = dateRegex.exec(slug);
       const extractedDate = dateMatch ? dateMatch[1] : "";
 
       // Get title from slug (remove date prefix)
@@ -134,17 +156,6 @@ export default function BlogPostsTable({
       setSortField(field);
       setSortDirection("desc");
     }
-  };
-
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) {
-      return <span className="text-gray-400">↕️</span>;
-    }
-    return (
-      <span className="text-etsa-primary">
-        {sortDirection === "asc" ? "↑" : "↓"}
-      </span>
-    );
   };
 
   if (isLoading) {
@@ -245,7 +256,11 @@ export default function BlogPostsTable({
               >
                 <div className="flex items-center space-x-1">
                   <span>Speaker</span>
-                  <SortIcon field="speaker" />
+                  <SortIcon
+                    field="speaker"
+                    currentSortField={sortField}
+                    sortDirection={sortDirection}
+                  />
                 </div>
               </th>
               <th
@@ -254,7 +269,11 @@ export default function BlogPostsTable({
               >
                 <div className="flex items-center space-x-1">
                   <span>Post Name</span>
-                  <SortIcon field="name" />
+                  <SortIcon
+                    field="name"
+                    currentSortField={sortField}
+                    sortDirection={sortDirection}
+                  />
                 </div>
               </th>
               <th
@@ -263,7 +282,11 @@ export default function BlogPostsTable({
               >
                 <div className="flex items-center space-x-1">
                   <span>Date</span>
-                  <SortIcon field="date" />
+                  <SortIcon
+                    field="date"
+                    currentSortField={sortField}
+                    sortDirection={sortDirection}
+                  />
                 </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">

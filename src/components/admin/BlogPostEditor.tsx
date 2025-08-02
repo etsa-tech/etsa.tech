@@ -59,25 +59,25 @@ interface BlogPostFrontmatter {
 }
 
 interface BlogPostEditorProps {
-  initialData?: {
+  readonly initialData?: {
     slug: string;
     frontmatter: BlogPostFrontmatter;
     content: string;
   };
-  onSave: (data: {
+  readonly onSave: (data: {
     slug: string;
     frontmatter: BlogPostFrontmatter;
     content: string;
     createPR: boolean;
   }) => Promise<void>;
-  isLoading?: boolean;
+  readonly isLoading?: boolean;
 }
 
 export default function BlogPostEditor({
   initialData,
   onSave,
   isLoading,
-}: BlogPostEditorProps) {
+}: Readonly<BlogPostEditorProps>) {
   const [content, setContent] = useState(initialData?.content || "");
   const [preview, setPreview] = useState("");
   const [showPreview, setShowPreview] = useState(false);
@@ -210,10 +210,14 @@ export default function BlogPostEditor({
           </h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Title *
               </label>
               <input
+                id="title"
                 type="text"
                 {...register("title")}
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
@@ -226,10 +230,14 @@ export default function BlogPostEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="slug"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Slug
               </label>
               <input
+                id="slug"
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
@@ -238,10 +246,14 @@ export default function BlogPostEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="date"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Date *
               </label>
               <input
+                id="date"
                 type="date"
                 {...register("date")}
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
@@ -254,10 +266,14 @@ export default function BlogPostEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="author"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Author *
               </label>
               <input
+                id="author"
                 type="text"
                 {...register("author")}
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
@@ -271,10 +287,14 @@ export default function BlogPostEditor({
           </div>
 
           <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="excerpt"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Excerpt *
             </label>
             <textarea
+              id="excerpt"
               rows={3}
               {...register("excerpt")}
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
@@ -287,10 +307,14 @@ export default function BlogPostEditor({
           </div>
 
           <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="tags"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Tags * (comma-separated)
             </label>
             <input
+              id="tags"
               type="text"
               {...register("tags")}
               placeholder="React, JavaScript, Web Development"

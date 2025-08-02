@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useMemo,
   ReactNode,
 } from "react";
 
@@ -26,10 +27,10 @@ export function useAdmin() {
 }
 
 interface AdminProviderProps {
-  children: ReactNode;
+  readonly children: ReactNode;
 }
 
-export function AdminProvider({ children }: AdminProviderProps) {
+export function AdminProvider({ children }: Readonly<AdminProviderProps>) {
   const [selectedBranch, setSelectedBranchState] = useState("main");
   const [availableBranches, setAvailableBranches] = useState<string[]>([
     "main",
@@ -73,12 +74,15 @@ export function AdminProvider({ children }: AdminProviderProps) {
     }
   }, [availableBranches, selectedBranch]);
 
-  const value = {
-    selectedBranch,
-    setSelectedBranch,
-    availableBranches,
-    setAvailableBranches,
-  };
+  const value = useMemo(
+    () => ({
+      selectedBranch,
+      setSelectedBranch,
+      availableBranches,
+      setAvailableBranches,
+    }),
+    [selectedBranch, availableBranches, setAvailableBranches],
+  );
 
   return (
     <AdminContext.Provider value={value}>{children}</AdminContext.Provider>

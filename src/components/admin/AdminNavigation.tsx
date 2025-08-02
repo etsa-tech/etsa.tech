@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 interface AdminNavigationProps {
-  user:
+  readonly user:
     | {
         name?: string | null;
         email?: string | null;
@@ -21,7 +21,9 @@ const navigation = [
   { name: "Settings", href: "/admin/settings", icon: "⚙️" },
 ];
 
-export default function AdminNavigation({ user }: AdminNavigationProps) {
+export default function AdminNavigation({
+  user,
+}: Readonly<AdminNavigationProps>) {
   const pathname = usePathname();
 
   return (
