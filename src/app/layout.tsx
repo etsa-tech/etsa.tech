@@ -74,15 +74,13 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased bg-white dark:bg-etsa-dark text-gray-900 dark:text-gray-100`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <ThemeProvider defaultTheme="system" storageKey="etsa-ui-theme">
-            <div className="relative flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-          </ThemeProvider>
-        </AuthProvider>
+        <ThemeProvider defaultTheme="light" storageKey="etsa-ui-theme">
+          <div className="relative flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

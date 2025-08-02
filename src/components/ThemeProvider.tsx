@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
-type Theme = "dark" | "light" | "system";
+type Theme = "dark" | "light";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -16,7 +16,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "system",
+  theme: "light",
   setTheme: () => null,
 };
 
@@ -24,18 +24,28 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "light",
   storageKey = "etsa-ui-theme",
   ...props
 }: Readonly<ThemeProviderProps>) {
   const [theme, setTheme] = useState<Theme>(defaultTheme);
   const [mounted, setMounted] = useState(false);
+  const [isUsingSystemTheme, setIsUsingSystemTheme] = useState(true);
 
   useEffect(() => {
     setMounted(true);
     const stored = localStorage.getItem(storageKey) as Theme;
-    if (stored) {
+    if (stored === "light" || stored === "dark") {
       setTheme(stored);
+      setIsUsingSystemTheme(false);
+    } else {
+      // No stored preference, use system theme
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      setTheme(systemTheme);
+      setIsUsingSystemTheme(true);
     }
   }, [storageKey]);
 
@@ -44,16 +54,6 @@ export function ThemeProvider({
 
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      root.classList.add(systemTheme);
-      return;
-    }
-
     root.classList.add(theme);
   }, [theme, mounted]);
 
@@ -61,11 +61,24 @@ export function ThemeProvider({
     () => ({
       theme,
       setTheme: (newTheme: Theme) => {
-        localStorage.setItem(storageKey, newTheme);
-        setTheme(newTheme);
+        if (isUsingSystemTheme) {
+          // First click: go to opposite of current system theme
+          localStorage.setItem(storageKey, newTheme);
+          setTheme(newTheme);
+          setIsUsingSystemTheme(false);
+        } else {
+          // Second click: go back to system theme
+          localStorage.removeItem(storageKey);
+          const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+            .matches
+            ? "dark"
+            : "light";
+          setTheme(systemTheme);
+          setIsUsingSystemTheme(true);
+        }
       },
     }),
-    [theme, storageKey],
+    [theme, storageKey, isUsingSystemTheme],
   );
 
   if (!mounted) {
