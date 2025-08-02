@@ -23,9 +23,6 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install Node.js dependencies
-        run: npm ci
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -70,6 +67,9 @@ jobs:
       - name: Set Git safe directory
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Install npm dependencies (for pre-commit hooks)
+        run: npm ci
 
       - name: Run pre-commit
         run: |
