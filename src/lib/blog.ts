@@ -39,8 +39,18 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
 
+    // Clean up invisible Unicode characters and normalize line breaks
+    const cleanedContent = content
+      .replace(/\u200B/g, "") // Remove zero-width spaces
+      .replace(/\u200C/g, "") // Remove zero-width non-joiners
+      .replace(/\u200D/g, "") // Remove zero-width joiners
+      .replace(/\uFEFF/g, "") // Remove byte order marks
+      .replace(/\r\n/g, "\n") // Normalize Windows line endings
+      .replace(/\r/g, "\n") // Normalize Mac line endings
+      .trim(); // Remove leading/trailing whitespace
+
     // Process markdown content to HTML
-    const processedContent = await remark().use(html).process(content);
+    const processedContent = await remark().use(html).process(cleanedContent);
     const contentHtml = processedContent.toString();
 
     const readingTime = calculateReadingTime(content);
