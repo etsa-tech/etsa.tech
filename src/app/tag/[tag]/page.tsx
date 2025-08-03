@@ -101,27 +101,60 @@ export default async function TagPage({ params }: Readonly<PageProps>) {
       )}
 
       {/* Related Tags */}
-      {posts.length > 0 && (
-        <div className="mt-16 pt-8 border-t border-light-border dark:border-dark-border">
-          <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-6">
-            Related Tags
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {allTags
-              .filter((t) => t !== actualTag)
-              .slice(0, 10)
-              .map((relatedTag) => (
-                <Link
-                  key={relatedTag}
-                  href={`/tag/${encodeURIComponent(relatedTag.toLowerCase())}`}
-                  className="tag tag-default hover:tag-primary transition-colors"
-                >
-                  {relatedTag}
-                </Link>
-              ))}
-          </div>
-        </div>
-      )}
+      {posts.length > 0 &&
+        (() => {
+          // Find tags that frequently appear together with the current tag
+          const tagCooccurrence = new Map<string, number>();
+
+          // Count how often each tag appears with the current tag
+          posts.forEach((post) => {
+            post.frontmatter.tags.forEach((tag) => {
+              if (tag.toLowerCase() !== actualTag.toLowerCase()) {
+                const normalizedTag = tag;
+                tagCooccurrence.set(
+                  normalizedTag,
+                  (tagCooccurrence.get(normalizedTag) || 0) + 1,
+                );
+              }
+            });
+          });
+
+          // Sort by co-occurrence frequency and take top 10
+          const relatedTags = Array.from(tagCooccurrence.entries())
+            .sort((a, b) => b[1] - a[1]) // Sort by count descending
+            .slice(0, 10)
+            .map(([tag]) => tag);
+
+          return relatedTags.length > 0 ? (
+            <div className="mt-16 pt-8 border-t border-light-border dark:border-dark-border">
+              <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-6">
+                Related Tags
+              </h2>
+              <p className="text-sm text-light-muted dark:text-dark-muted mb-4">
+                Tags that frequently appear together with {actualTag}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {relatedTags.map((relatedTag) => {
+                  const count = tagCooccurrence.get(relatedTag) || 0;
+                  return (
+                    <Link
+                      key={relatedTag}
+                      href={`/tag/${encodeURIComponent(
+                        relatedTag.toLowerCase(),
+                      )}`}
+                      className="tag tag-default hover:tag-primary transition-colors"
+                      title={`Appears together in ${count} presentation${
+                        count !== 1 ? "s" : ""
+                      }`}
+                    >
+                      {relatedTag} ({count})
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null;
+        })()}
     </div>
   );
 }
