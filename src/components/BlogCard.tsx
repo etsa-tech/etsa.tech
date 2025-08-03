@@ -1,23 +1,15 @@
 import Link from "next/link";
 import { PostSummary } from "@/types/post";
-import {
-  formatDate,
-  getPostUrl,
-  getTagUrl,
-  getPostSpeakers,
-} from "@/lib/utils";
-import { SpeakerList } from "@/components/SpeakerLink";
+import { formatDate, getPostUrl, getTagUrl } from "@/lib/utils";
 
-interface PostCardProps {
+interface BlogCardProps {
   post: PostSummary;
   featured?: boolean;
 }
 
-export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
+export function BlogCard({ post, featured = false }: Readonly<BlogCardProps>) {
   const { slug, frontmatter, readingTime } = post;
   const { title, date, excerpt, tags } = frontmatter;
-
-  const speakers = getPostSpeakers(frontmatter);
 
   return (
     <article
@@ -37,15 +29,6 @@ export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
                 {title}
               </h3>
             </Link>
-
-            {speakers.length > 0 && !frontmatter.blogpost && (
-              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-medium">
-                  Speaker{speakers.length > 1 ? "s" : ""}:{" "}
-                </span>
-                <SpeakerList speakers={speakers} showTitles={false} />
-              </div>
-            )}
           </div>
 
           {featured && <span className="tag tag-primary ml-4">Featured</span>}

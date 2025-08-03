@@ -48,7 +48,7 @@ export interface PostFrontmatter {
     accessibility?: string;
     contact?: string;
   };
-  featured?: boolean;
+  blogpost?: boolean; // Whether this is a blog post (true) or presentation (false/undefined)
   published?: boolean;
 }
 

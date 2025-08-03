@@ -1,8 +1,13 @@
 import { getCarouselImages } from "@/lib/server-only-carousel";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
+import { getRecentBlogPosts } from "@/lib/blog";
+import { BlogCard } from "@/components/BlogCard";
+import Link from "next/link";
 
 export default function Home() {
   const carouselImages = getCarouselImages();
+  const recentBlogPosts = getRecentBlogPosts(3);
+
   return (
     <div>
       {/* Hero Section */}
@@ -135,6 +140,46 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Latest Blog Posts Section */}
+      {recentBlogPosts.length > 0 && (
+        <section className="py-16 bg-white dark:bg-gray-800">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                Latest Blog Posts
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Stay updated with our latest insights, tutorials, and community
+                updates.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {recentBlogPosts.map((post) => (
+                <BlogCard key={post.slug} post={post} />
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link href="/blog" className="btn btn-primary">
+                View All Blog Posts
+                <svg
+                  className="ml-2 h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Stats Section */}
       <section className="py-16 bg-gray-50 dark:bg-etsa-secondary">

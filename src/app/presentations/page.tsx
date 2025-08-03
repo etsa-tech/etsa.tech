@@ -78,10 +78,10 @@ export default function PresentationsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600 dark:text-gray-400">
-                    Featured
+                    Blog Posts
                   </span>
                   <span className="font-semibold text-etsa-primary">
-                    {posts.filter((p) => p.frontmatter.featured).length}
+                    {posts.filter((p) => p.frontmatter.blogpost).length}
                   </span>
                 </div>
               </div>
