@@ -59,12 +59,6 @@ export default function BlogPage() {
                     {blogPosts.length}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Tags</span>
-                  <span className="font-semibold text-etsa-primary">
-                    {allTags.length}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
