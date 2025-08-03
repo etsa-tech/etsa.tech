@@ -23,6 +23,66 @@ interface SpeakersTableProps {
 type SortField = "name" | "talkCount" | "latestTalk" | "company" | "totalViews";
 type SortDirection = "asc" | "desc";
 
+interface SortIconProps {
+  field: SortField;
+  currentSortField: SortField;
+  sortDirection: SortDirection;
+}
+
+function SortIcon({
+  field,
+  currentSortField,
+  sortDirection,
+}: Readonly<SortIconProps>) {
+  if (currentSortField !== field) {
+    return (
+      <svg
+        className="w-4 h-4 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+        />
+      </svg>
+    );
+  }
+
+  return sortDirection === "asc" ? (
+    <svg
+      className="w-4 h-4 text-etsa-primary"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M5 15l7-7 7 7"
+      />
+    </svg>
+  ) : (
+    <svg
+      className="w-4 h-4 text-etsa-primary"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 9l-7 7-7-7"
+      />
+    </svg>
+  );
+}
+
 export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>("talkCount");
@@ -51,6 +111,7 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
 
       switch (sortField) {
         case "name":
+        default:
           aValue = a.name;
           bValue = b.name;
           break;
@@ -70,9 +131,6 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
           aValue = a.totalViews || 0;
           bValue = b.totalViews || 0;
           break;
-        default:
-          aValue = a.name;
-          bValue = b.name;
       }
 
       if (typeof aValue === "string" && typeof bValue === "string") {
@@ -96,56 +154,6 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
       setSortField(field);
       setSortDirection("desc");
     }
-  };
-
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) {
-      return (
-        <svg
-          className="w-4 h-4 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-          />
-        </svg>
-      );
-    }
-
-    return sortDirection === "asc" ? (
-      <svg
-        className="w-4 h-4 text-etsa-primary"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M5 15l7-7 7 7"
-        />
-      </svg>
-    ) : (
-      <svg
-        className="w-4 h-4 text-etsa-primary"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 9l-7 7-7-7"
-        />
-      </svg>
-    );
   };
 
   return (
@@ -251,7 +259,11 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
                 >
                   <div className="flex items-center space-x-1">
                     <span>Speaker</span>
-                    <SortIcon field="name" />
+                    <SortIcon
+                      field="name"
+                      currentSortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </div>
                 </th>
                 <th
@@ -260,7 +272,11 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
                 >
                   <div className="flex items-center space-x-1">
                     <span>Company</span>
-                    <SortIcon field="company" />
+                    <SortIcon
+                      field="company"
+                      currentSortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </div>
                 </th>
                 <th
@@ -269,7 +285,11 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
                 >
                   <div className="flex items-center space-x-1">
                     <span>Talks</span>
-                    <SortIcon field="talkCount" />
+                    <SortIcon
+                      field="talkCount"
+                      currentSortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </div>
                 </th>
                 <th
@@ -278,7 +298,11 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
                 >
                   <div className="flex items-center space-x-1">
                     <span>Latest Talk</span>
-                    <SortIcon field="latestTalk" />
+                    <SortIcon
+                      field="latestTalk"
+                      currentSortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
