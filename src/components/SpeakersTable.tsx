@@ -3,8 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { formatDate } from "@/lib/utils";
-import { getSpeakerUrl } from "@/lib/utils";
+import { getSpeakerUrl, formatDate } from "@/lib/utils";
 import type { Speaker, PostSummary } from "@/types/post";
 
 interface SpeakerData {
