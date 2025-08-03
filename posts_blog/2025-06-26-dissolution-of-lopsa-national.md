@@ -1,8 +1,16 @@
 ---
 title: "Dissolution of LOPSA National"
 date: "2025-06-26"
-excerpt: "Come join us for our annual July social filled with friends, beer, and food!"
-tags: ["Social", "Meet and Greet"]
+excerpt: "With LOPSA National stepping down, ETSA reflects on its journey to independence and reaffirms its commitment to serving the Knoxville tech community."
+tags:
+  [
+    “ETSA”,
+    “LOPSA”,
+    “Community Announcement”,
+    “Tech Community”,
+    “Organizational Growth”,
+    “Professional Development”,
+  ]
 author: "ETSA"
 blogpost: true
 published: true

@@ -160,7 +160,7 @@ export default function Home() {
               ))}
             </div>
             <div className="text-center mt-8">
-              <Link href="/blog" className="btn btn-primary">
+              <Link href="/blog" className="btn btn-outline btn-lg">
                 View All Blog Posts
                 <svg
                   className="ml-2 h-4 w-4"
