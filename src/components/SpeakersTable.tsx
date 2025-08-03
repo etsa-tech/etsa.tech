@@ -173,7 +173,7 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
             </div>
             <input
               type="text"
-              placeholder="Search speakers, or companies..."
+              placeholder="Search speakers or companies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-etsa-primary focus:border-etsa-primary"
