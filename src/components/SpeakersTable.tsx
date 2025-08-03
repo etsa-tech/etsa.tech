@@ -110,11 +110,6 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
       let bValue: string | number;
 
       switch (sortField) {
-        case "name":
-        default:
-          aValue = a.name;
-          bValue = b.name;
-          break;
         case "talkCount":
           aValue = a.talkCount;
           bValue = b.talkCount;
@@ -130,6 +125,10 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
         case "totalViews":
           aValue = a.totalViews || 0;
           bValue = b.totalViews || 0;
+          break;
+        default:
+          aValue = a.name;
+          bValue = b.name;
           break;
       }
 
