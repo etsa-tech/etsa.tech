@@ -20,7 +20,7 @@ interface SpeakersTableProps {
   speakers: SpeakerData[];
 }
 
-type SortField = "name" | "talkCount" | "latestTalk" | "company" | "totalViews";
+type SortField = "name" | "talkCount" | "latestTalk" | "totalViews";
 type SortDirection = "asc" | "desc";
 
 interface SortIconProps {
@@ -96,7 +96,6 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
       return (
         speakerData.name.toLowerCase().includes(searchLower) ||
         speakerData.speaker.title?.toLowerCase().includes(searchLower) ||
-        speakerData.speaker.company?.toLowerCase().includes(searchLower) ||
         speakerData.speaker.bio?.toLowerCase().includes(searchLower) ||
         speakerData.latestTalk?.frontmatter.title
           .toLowerCase()
@@ -117,10 +116,6 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
         case "latestTalk":
           aValue = a.latestTalk?.frontmatter.date || "1900-01-01";
           bValue = b.latestTalk?.frontmatter.date || "1900-01-01";
-          break;
-        case "company":
-          aValue = a.speaker.company || "";
-          bValue = b.speaker.company || "";
           break;
         case "totalViews":
           aValue = a.totalViews || 0;
@@ -179,7 +174,7 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
             </div>
             <input
               type="text"
-              placeholder="Search speakers or companies..."
+              placeholder="Search speakers, titles, or topics..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-etsa-primary focus:border-etsa-primary"
@@ -265,19 +260,7 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
                     />
                   </div>
                 </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  onClick={() => handleSort("company")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Company</span>
-                    <SortIcon
-                      field="company"
-                      currentSortField={sortField}
-                      sortDirection={sortDirection}
-                    />
-                  </div>
-                </th>
+
                 <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => handleSort("talkCount")}
@@ -388,11 +371,7 @@ function SpeakerTableRow({
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900 dark:text-white">
-          {speaker.company || "—"}
-        </div>
-      </td>
+
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-etsa-primary text-white">
@@ -469,11 +448,6 @@ function SpeakerCard({ speakerData }: Readonly<{ speakerData: SpeakerData }>) {
               {speaker.title && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                   {speaker.title}
-                </p>
-              )}
-              {speaker.company && (
-                <p className="text-sm text-gray-500 dark:text-gray-500 truncate">
-                  {speaker.company}
                 </p>
               )}
             </div>
