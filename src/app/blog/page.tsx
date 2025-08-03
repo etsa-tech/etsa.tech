@@ -10,7 +10,6 @@ export const metadata = {
 
 export default function BlogPage() {
   const blogPosts = getBlogPosts();
-  const allTags = getAllTags();
 
   return (
     <div className="container py-12">
