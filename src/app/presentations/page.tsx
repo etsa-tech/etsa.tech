@@ -1,5 +1,5 @@
 import { getAllPosts, getAllTags, getAllSpeakers } from "@/lib/blog";
-import { TagCloud } from "@/components/TagList";
+import PopularTags from "@/components/PopularTags";
 import SearchComponent from "@/components/SearchComponent";
 
 export const metadata = {
@@ -12,19 +12,6 @@ export default function PresentationsPage() {
   const posts = getAllPosts();
   const allTags = getAllTags();
   const allSpeakers = getAllSpeakers();
-
-  // Calculate tag counts
-  const tagCounts = allTags.reduce(
-    (acc, tag) => {
-      acc[tag] = posts.filter((post) =>
-        post.frontmatter.tags.some(
-          (postTag) => postTag.toLowerCase() === tag.toLowerCase(),
-        ),
-      ).length;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
 
   return (
     <div className="container py-12">
@@ -49,13 +36,13 @@ export default function PresentationsPage() {
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-8">
-            {/* Tag Cloud */}
+            {/* Popular Tags */}
             <div className="card">
               <div className="card-header">
                 <h3 className="card-title text-lg">Browse by Topic</h3>
               </div>
               <div className="card-content">
-                <TagCloud tags={allTags} tagCounts={tagCounts} />
+                <PopularTags limit={25} showViewAll={true} />
               </div>
             </div>
 

@@ -14,6 +14,7 @@ export function Header() {
     { name: "Contact", href: "/contact" },
     { name: "Meeting Info", href: "/meeting-info" },
     { name: "Past Presentation", href: "/presentations" },
+    { name: "Speakers", href: "/speakers" },
   ];
 
   return (
