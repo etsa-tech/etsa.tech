@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getSpeakerUrl, formatDate } from "@/lib/utils";
+import { EmptyState } from "@/components/EmptyState";
 import type { Speaker, PostSummary } from "@/types/post";
 
 interface SpeakerData {
@@ -362,16 +363,11 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
       )}
 
       {filteredAndSortedSpeakers.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-4xl mb-4">🔍</div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No speakers found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Try adjusting your search terms or clearing the search to see all
-            speakers.
-          </p>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title="No speakers found"
+          description="Try adjusting your search terms or clearing the search to see all speakers."
+        />
       )}
     </div>
   );

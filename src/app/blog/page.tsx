@@ -2,6 +2,7 @@ import { getBlogPosts } from "@/lib/blog";
 import { ContentPageLayout } from "@/components/ContentPageLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { TagsCard } from "@/components/TagsCard";
+import { EmptyState } from "@/components/EmptyState";
 import BlogSearchComponent from "@/components/BlogSearchComponent";
 
 export const metadata = {
@@ -24,16 +25,11 @@ export default function BlogPage() {
   );
 
   const emptyState = (
-    <div className="text-center py-12">
-      <div className="text-6xl mb-4">📝</div>
-      <h2 className="text-2xl font-semibold text-light-text dark:text-dark-text mb-2">
-        No blog posts yet
-      </h2>
-      <p className="text-light-muted dark:text-dark-muted mb-6">
-        We haven&apos;t published any blog posts yet. Check back soon for
-        updates!
-      </p>
-    </div>
+    <EmptyState
+      icon="📝"
+      title="No blog posts yet"
+      description="We haven't published any blog posts yet. Check back soon for updates!"
+    />
   );
 
   return (

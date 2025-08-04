@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { PostSummary } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
+import { EmptyState } from "@/components/EmptyState";
 
 interface BlogSearchComponentProps {
   posts: PostSummary[];
@@ -117,19 +118,16 @@ export default function BlogSearchComponent({
           ))}
         </div>
       ) : isSearching ? (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No blog posts found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            We couldn&apos;t find any blog posts matching &quot;{searchQuery}
-            &quot;.
-          </p>
-          <button onClick={clearSearch} className="btn btn-primary">
-            Clear Search
-          </button>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title="No blog posts found"
+          description={`We couldn't find any blog posts matching "${searchQuery}".`}
+          action={
+            <button onClick={clearSearch} className="btn btn-primary">
+              Clear Search
+            </button>
+          }
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {posts.map((post) => (
