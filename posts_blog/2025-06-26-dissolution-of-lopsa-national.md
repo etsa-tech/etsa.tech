@@ -4,12 +4,12 @@ date: "2025-06-26"
 excerpt: "With LOPSA National stepping down, ETSA reflects on its journey to independence and reaffirms its commitment to serving the Knoxville tech community."
 tags:
   [
-    “ETSA”,
-    “LOPSA”,
-    “Community Announcement”,
-    “Tech Community”,
-    “Organizational Growth”,
-    “Professional Development”,
+    "ETSA",
+    "LOPSA",
+    "Community Announcement",
+    "Tech Community",
+    "Organizational Growth",
+    "Professional Development",
   ]
 author: "ETSA"
 blogpost: true

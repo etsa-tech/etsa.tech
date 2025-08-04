@@ -16,6 +16,49 @@ function calculateReadingTime(content: string): number {
   return readingTime;
 }
 
+// Helper function to sort posts by date (newest first)
+function sortPostsByDate(posts: PostSummary[]): PostSummary[] {
+  return posts.sort((a, b) => {
+    return (
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime()
+    );
+  });
+}
+
+// Helper function to read posts from a directory
+function readPostsFromDirectory(
+  directory: string,
+  slugs: string[],
+  isBlogPost: boolean = false,
+): PostSummary[] {
+  return slugs
+    .map((slug) => {
+      try {
+        const fullPath = path.join(directory, `${slug}.md`);
+        const fileContents = fs.readFileSync(fullPath, "utf8");
+        const { data, content } = matter(fileContents);
+
+        const readingTime = calculateReadingTime(content);
+
+        return {
+          slug,
+          frontmatter: isBlogPost
+            ? ({ ...data, blogpost: true } as PostFrontmatter)
+            : (data as PostFrontmatter),
+          readingTime,
+        };
+      } catch (error) {
+        console.error(
+          `Error reading ${isBlogPost ? "blog" : "presentation"} post ${slug}:`,
+          error,
+        );
+        return null;
+      }
+    })
+    .filter((post): post is PostSummary => post !== null);
+}
+
 // Get all post slugs from both directories
 export function getPostSlugs(): string[] {
   const slugs: string[] = [];
@@ -117,63 +160,23 @@ export function getAllPosts(): PostSummary[] {
 
   // Get presentation posts from /posts
   const presentationSlugs = getPresentationPostSlugs();
-  const presentationPosts = presentationSlugs
-    .map((slug) => {
-      try {
-        const fullPath = path.join(postsDirectory, `${slug}.md`);
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data, content } = matter(fileContents);
-
-        const readingTime = calculateReadingTime(content);
-
-        return {
-          slug,
-          frontmatter: data as PostFrontmatter,
-          readingTime,
-        };
-      } catch (error) {
-        console.error(`Error reading presentation post ${slug}:`, error);
-        return null;
-      }
-    })
-    .filter((post): post is PostSummary => post !== null);
+  const presentationPosts = readPostsFromDirectory(
+    postsDirectory,
+    presentationSlugs,
+    false,
+  );
 
   // Get blog posts from /posts_blog
   const blogSlugs = getBlogPostSlugs();
-  const blogPosts = blogSlugs
-    .map((slug) => {
-      try {
-        const fullPath = path.join(blogPostsDirectory, `${slug}.md`);
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data, content } = matter(fileContents);
-
-        const readingTime = calculateReadingTime(content);
-
-        return {
-          slug,
-          frontmatter: { ...data, blogpost: true } as PostFrontmatter, // Ensure blogpost is true
-          readingTime,
-        };
-      } catch (error) {
-        console.error(`Error reading blog post ${slug}:`, error);
-        return null;
-      }
-    })
-    .filter((post): post is PostSummary => post !== null);
+  const blogPosts = readPostsFromDirectory(blogPostsDirectory, blogSlugs, true);
 
   // Combine all posts
   posts.push(...presentationPosts, ...blogPosts);
 
   // Filter and sort
-  return posts
-    .filter((post) => post.frontmatter.published !== false)
-    .sort((a, b) => {
-      // Sort by date, newest first
-      return (
-        new Date(b.frontmatter.date).getTime() -
-        new Date(a.frontmatter.date).getTime()
-      );
-    });
+  return sortPostsByDate(
+    posts.filter((post) => post.frontmatter.published !== false),
+  );
 }
 
 // Get posts by tag
@@ -226,71 +229,25 @@ export function getPopularTags(limit: number = 25): string[] {
 // Get blog posts only (from /posts_blog directory)
 export function getBlogPosts(): PostSummary[] {
   const blogSlugs = getBlogPostSlugs();
-  const posts = blogSlugs
-    .map((slug) => {
-      try {
-        const fullPath = path.join(blogPostsDirectory, `${slug}.md`);
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data, content } = matter(fileContents);
+  const posts = readPostsFromDirectory(blogPostsDirectory, blogSlugs, true);
 
-        const readingTime = calculateReadingTime(content);
-
-        return {
-          slug,
-          frontmatter: { ...data, blogpost: true } as PostFrontmatter, // Ensure blogpost is true
-          readingTime,
-        };
-      } catch (error) {
-        console.error(`Error reading blog post ${slug}:`, error);
-        return null;
-      }
-    })
-    .filter((post): post is PostSummary => post !== null)
-    .filter((post) => post.frontmatter.published !== false)
-    .sort((a, b) => {
-      // Sort by date, newest first
-      return (
-        new Date(b.frontmatter.date).getTime() -
-        new Date(a.frontmatter.date).getTime()
-      );
-    });
-
-  return posts;
+  return sortPostsByDate(
+    posts.filter((post) => post.frontmatter.published !== false),
+  );
 }
 
 // Get presentation posts only (from /posts directory)
 export function getPresentationPosts(): PostSummary[] {
   const presentationSlugs = getPresentationPostSlugs();
-  const posts = presentationSlugs
-    .map((slug) => {
-      try {
-        const fullPath = path.join(postsDirectory, `${slug}.md`);
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data, content } = matter(fileContents);
+  const posts = readPostsFromDirectory(
+    postsDirectory,
+    presentationSlugs,
+    false,
+  );
 
-        const readingTime = calculateReadingTime(content);
-
-        return {
-          slug,
-          frontmatter: data as PostFrontmatter,
-          readingTime,
-        };
-      } catch (error) {
-        console.error(`Error reading presentation post ${slug}:`, error);
-        return null;
-      }
-    })
-    .filter((post): post is PostSummary => post !== null)
-    .filter((post) => post.frontmatter.published !== false)
-    .sort((a, b) => {
-      // Sort by date, newest first
-      return (
-        new Date(b.frontmatter.date).getTime() -
-        new Date(a.frontmatter.date).getTime()
-      );
-    });
-
-  return posts;
+  return sortPostsByDate(
+    posts.filter((post) => post.frontmatter.published !== false),
+  );
 }
 
 // Get recent blog posts
@@ -362,9 +319,9 @@ export function getSpeakerUrl(speakerName: string): string {
   )}`;
 }
 
-// Get all speakers from posts (both legacy and new format)
+// Get all speakers from presentation posts (both legacy and new format)
 export function getAllSpeakers(): string[] {
-  const allPosts = getAllPosts();
+  const allPosts = getPresentationPosts();
   const speakers = new Set<string>();
 
   allPosts.forEach((post) => {
@@ -386,9 +343,9 @@ export function getAllSpeakers(): string[] {
   return Array.from(speakers).sort((a, b) => a.localeCompare(b));
 }
 
-// Get posts by speaker name
+// Get presentation posts by speaker name
 export function getPostsBySpeaker(speakerName: string): PostSummary[] {
-  const allPosts = getAllPosts();
+  const allPosts = getPresentationPosts();
   const normalizedSpeakerName = speakerName.toLowerCase();
 
   return allPosts.filter((post) => {

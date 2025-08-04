@@ -1,4 +1,8 @@
-import { getAllSpeakers, getPostsBySpeaker, getAllPosts } from "@/lib/blog";
+import {
+  getAllSpeakers,
+  getPostsBySpeaker,
+  getPresentationPosts,
+} from "@/lib/blog";
 import { getPostSpeakers } from "@/lib/utils";
 import { SpeakersTable } from "@/components/SpeakersTable";
 import type { Speaker, PostSummary } from "@/types/post";
@@ -26,7 +30,7 @@ interface SpeakerData {
 }
 
 export default function SpeakersPage() {
-  const allPosts = getAllPosts();
+  const allPosts = getPresentationPosts();
   const speakerNames = getAllSpeakers();
 
   // Build comprehensive speaker data

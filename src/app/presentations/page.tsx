@@ -1,4 +1,4 @@
-import { getAllPosts, getAllTags, getAllSpeakers } from "@/lib/blog";
+import { getPresentationPosts, getAllTags, getAllSpeakers } from "@/lib/blog";
 import PopularTags from "@/components/PopularTags";
 import SearchComponent from "@/components/SearchComponent";
 
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default function PresentationsPage() {
-  const posts = getAllPosts();
+  const posts = getPresentationPosts();
   const allTags = getAllTags();
   const allSpeakers = getAllSpeakers();
 

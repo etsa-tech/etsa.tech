@@ -1,4 +1,4 @@
-import { getBlogPosts, getAllTags } from "@/lib/blog";
+import { getBlogPosts } from "@/lib/blog";
 import PopularTags from "@/components/PopularTags";
 import BlogSearchComponent from "@/components/BlogSearchComponent";
 

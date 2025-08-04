@@ -1,7 +1,7 @@
 import { getCarouselImages } from "@/lib/server-only-carousel";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { getRecentBlogPosts } from "@/lib/blog";
-import { BlogCard } from "@/components/BlogCard";
+import { PostCard } from "@/components/PostCard";
 import Link from "next/link";
 
 export default function Home() {
@@ -156,7 +156,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {recentBlogPosts.map((post) => (
-                <BlogCard key={post.slug} post={post} />
+                <PostCard key={post.slug} post={post} showSpeakers={false} />
               ))}
             </div>
             <div className="text-center mt-8">

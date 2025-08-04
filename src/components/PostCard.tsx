@@ -11,9 +11,14 @@ import { SpeakerList } from "@/components/SpeakerLink";
 interface PostCardProps {
   post: PostSummary;
   featured?: boolean;
+  showSpeakers?: boolean; // New prop to control speaker display
 }
 
-export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
+export function PostCard({
+  post,
+  featured = false,
+  showSpeakers = true,
+}: Readonly<PostCardProps>) {
   const { slug, frontmatter, readingTime } = post;
   const { title, date, excerpt, tags } = frontmatter;
 
@@ -38,7 +43,7 @@ export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
               </h3>
             </Link>
 
-            {speakers.length > 0 && !frontmatter.blogpost && (
+            {speakers.length > 0 && showSpeakers && !frontmatter.blogpost && (
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                 <span className="font-medium">
                   Speaker{speakers.length > 1 ? "s" : ""}:{" "}

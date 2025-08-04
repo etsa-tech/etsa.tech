@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { PostSummary } from "@/types/post";
-import { BlogCard } from "@/components/BlogCard";
+import { PostCard } from "@/components/PostCard";
 
 interface BlogSearchComponentProps {
   posts: PostSummary[];
@@ -113,7 +113,7 @@ export default function BlogSearchComponent({
       {searchResults.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {searchResults.map((post) => (
-            <BlogCard key={post.slug} post={post} />
+            <PostCard key={post.slug} post={post} showSpeakers={false} />
           ))}
         </div>
       ) : isSearching ? (
@@ -133,7 +133,7 @@ export default function BlogSearchComponent({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {posts.map((post) => (
-            <BlogCard key={post.slug} post={post} />
+            <PostCard key={post.slug} post={post} showSpeakers={false} />
           ))}
         </div>
       )}
