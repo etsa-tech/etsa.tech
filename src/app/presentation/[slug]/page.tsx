@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import sanitizeHtml from "sanitize-html";
-import { getPostBySlug, getPostSlugs, getRecentPosts } from "@/lib/blog";
+import {
+  getPostBySlug,
+  getPresentationPostSlugs,
+  getRecentPosts,
+} from "@/lib/blog";
 import { formatDate, getTagUrl, getPostSpeakers } from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
 
@@ -12,7 +16,7 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const slugs = getPostSlugs();
+  const slugs = getPresentationPostSlugs();
   return slugs.map((slug) => ({ slug: encodeURIComponent(slug) }));
 }
 

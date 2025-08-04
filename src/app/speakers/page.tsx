@@ -1,6 +1,12 @@
-import { getAllSpeakers, getPostsBySpeaker, getAllPosts } from "@/lib/blog";
+import {
+  getAllSpeakers,
+  getPostsBySpeaker,
+  getPresentationPosts,
+} from "@/lib/blog";
 import { getPostSpeakers } from "@/lib/utils";
 import { SpeakersTable } from "@/components/SpeakersTable";
+import { ContentPageLayout } from "@/components/ContentPageLayout";
+import { StatsCard } from "@/components/StatsCard";
 import type { Speaker, PostSummary } from "@/types/post";
 
 export const metadata = {
@@ -26,7 +32,7 @@ interface SpeakerData {
 }
 
 export default function SpeakersPage() {
-  const allPosts = getAllPosts();
+  const allPosts = getPresentationPosts();
   const speakerNames = getAllSpeakers();
 
   // Build comprehensive speaker data
@@ -80,71 +86,37 @@ export default function SpeakersPage() {
     totalSpeakers > 0 ? (totalTalks / totalSpeakers).toFixed(1) : "0";
   const activeSpeakers = speakersData.filter((s) => s.talkCount > 1).length;
 
+  const sidebar = (
+    <>
+      <StatsCard
+        title="Speaker Statistics"
+        stats={[
+          { label: "Total Speakers", value: totalSpeakers },
+          { label: "Total Presentations", value: totalTalks },
+          { label: "Avg Talks/Speaker", value: averageTalksPerSpeaker },
+          { label: "Multi-Talk Speakers", value: activeSpeakers },
+        ]}
+      />
+    </>
+  );
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      <div className="container py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Our Speakers
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Meet the talented professionals who have shared their expertise and
-            insights with the ETSA community. From industry veterans to emerging
-            innovators, our speakers represent the best in technology and
-            leadership.
+    <ContentPageLayout
+      title="Our Speakers"
+      description="Meet the talented professionals who have shared their expertise and insights with the ETSA community. From industry veterans to emerging innovators, our speakers represent the best in technology and leadership."
+      sidebar={sidebar}
+    >
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title text-2xl">Speaker Directory</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Search and explore our community of {totalSpeakers} speakers
           </p>
         </div>
-
-        {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-          <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="text-3xl font-bold text-etsa-primary mb-2">
-              {totalSpeakers}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total Speakers
-            </div>
-          </div>
-          <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="text-3xl font-bold text-etsa-primary mb-2">
-              {totalTalks}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total Presentations
-            </div>
-          </div>
-          <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="text-3xl font-bold text-etsa-primary mb-2">
-              {averageTalksPerSpeaker}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Avg Talks/Speaker
-            </div>
-          </div>
-          <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="text-3xl font-bold text-etsa-primary mb-2">
-              {activeSpeakers}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Multi-Talk Speakers
-            </div>
-          </div>
-        </div>
-
-        {/* Speakers Table */}
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title text-2xl">Speaker Directory</h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Search and explore our community of {totalSpeakers} speakers
-            </p>
-          </div>
-          <div className="card-content p-0">
-            <SpeakersTable speakers={speakersData} />
-          </div>
+        <div className="card-content p-0">
+          <SpeakersTable speakers={speakersData} />
         </div>
       </div>
-    </div>
+    </ContentPageLayout>
   );
 }

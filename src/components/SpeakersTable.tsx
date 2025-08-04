@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getSpeakerUrl, formatDate } from "@/lib/utils";
+import { EmptyState } from "@/components/EmptyState";
 import type { Speaker, PostSummary } from "@/types/post";
 
 interface SpeakerData {
@@ -243,64 +244,115 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
       </div>
 
       {viewMode === "table" ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Speaker</span>
-                    <SortIcon
-                      field="name"
-                      currentSortField={sortField}
-                      sortDirection={sortDirection}
-                    />
-                  </div>
-                </th>
+        <div className="space-y-4">
+          {/* Desktop Table View */}
+          <div className="hidden lg:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th
+                    className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    onClick={() => handleSort("name")}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Speaker</span>
+                      <SortIcon
+                        field="name"
+                        currentSortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </div>
+                  </th>
 
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  onClick={() => handleSort("talkCount")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Talks</span>
+                  <th
+                    className="px-2 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    onClick={() => handleSort("talkCount")}
+                  >
+                    <div className="flex items-center justify-center space-x-1">
+                      <span>Talks</span>
+                      <SortIcon
+                        field="talkCount"
+                        currentSortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </div>
+                  </th>
+                  <th
+                    className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors hidden md:table-cell"
+                    onClick={() => handleSort("latestTalk")}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Latest Talk</span>
+                      <SortIcon
+                        field="latestTalk"
+                        currentSortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </div>
+                  </th>
+                  <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredAndSortedSpeakers.map((speakerData) => (
+                  <SpeakerTableRow
+                    key={speakerData.name}
+                    speakerData={speakerData}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile List View */}
+          <div className="lg:hidden">
+            {/* Mobile Sort Controls */}
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Sort by:
+                </span>
+                <div className="flex items-center space-x-2">
+                  <select
+                    value={sortField}
+                    onChange={(e) => setSortField(e.target.value as SortField)}
+                    className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-etsa-primary focus:border-etsa-primary"
+                  >
+                    <option value="name">Name</option>
+                    <option value="talkCount">Talk Count</option>
+                    <option value="latestTalk">Latest Talk</option>
+                  </select>
+                  <button
+                    onClick={() =>
+                      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+                    }
+                    className="p-1 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    title={`Sort ${
+                      sortDirection === "asc" ? "descending" : "ascending"
+                    }`}
+                  >
                     <SortIcon
-                      field="talkCount"
+                      field={sortField}
                       currentSortField={sortField}
                       sortDirection={sortDirection}
                     />
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  onClick={() => handleSort("latestTalk")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Latest Talk</span>
-                    <SortIcon
-                      field="latestTalk"
-                      currentSortField={sortField}
-                      sortDirection={sortDirection}
-                    />
-                  </div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Speaker List */}
+            <div className="space-y-4">
               {filteredAndSortedSpeakers.map((speakerData) => (
-                <SpeakerTableRow
+                <SpeakerMobileRow
                   key={speakerData.name}
                   speakerData={speakerData}
                 />
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
@@ -311,17 +363,122 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
       )}
 
       {filteredAndSortedSpeakers.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-4xl mb-4">🔍</div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            No speakers found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Try adjusting your search terms or clearing the search to see all
-            speakers.
-          </p>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title="No speakers found"
+          description="Try adjusting your search terms or clearing the search to see all speakers."
+        />
       )}
+    </div>
+  );
+}
+
+function SpeakerMobileRow({
+  speakerData,
+}: Readonly<{ speakerData: SpeakerData }>) {
+  const { name, speaker, talkCount, latestTalk } = speakerData;
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
+      <div className="flex items-start space-x-4">
+        {/* Avatar */}
+        <div className="flex-shrink-0">
+          {speaker.image ? (
+            <Image
+              src={speaker.image}
+              alt={name}
+              width={48}
+              height={48}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+          ) : (
+            <div className="h-12 w-12 rounded-full bg-etsa-primary flex items-center justify-center">
+              <span className="text-white font-semibold text-lg">
+                {name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Speaker Name and Title */}
+          <div className="mb-2">
+            <Link
+              href={getSpeakerUrl(name)}
+              className="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-etsa-primary transition-colors"
+            >
+              {name}
+            </Link>
+            {speaker.title && (
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {speaker.title}
+              </p>
+            )}
+          </div>
+
+          {/* Stats and Latest Talk */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            {/* Talk Count */}
+            <div className="flex items-center space-x-2">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-etsa-primary text-white">
+                {talkCount} talk{talkCount !== 1 ? "s" : ""}
+              </span>
+            </div>
+
+            {/* Latest Talk */}
+            <div className="flex-1 min-w-0">
+              {latestTalk ? (
+                <div className="text-right sm:text-left">
+                  <Link
+                    href={`/presentation/${latestTalk.slug}`}
+                    className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-etsa-primary transition-colors line-clamp-1"
+                    title={latestTalk.frontmatter.title}
+                  >
+                    {latestTalk.frontmatter.title}
+                  </Link>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {formatDate(latestTalk.frontmatter.date)}
+                  </p>
+                </div>
+              ) : (
+                <div className="text-right sm:text-left">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    No presentations yet
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Action Button */}
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <Link
+              href={getSpeakerUrl(name)}
+              className="inline-flex items-center text-sm font-medium text-etsa-primary hover:text-etsa-primary-dark transition-colors"
+            >
+              View Profile
+              <svg
+                className="ml-1 h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -333,20 +490,20 @@ function SpeakerTableRow({
 
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-3 py-3 whitespace-nowrap">
         <div className="flex items-center">
-          <div className="flex-shrink-0 h-12 w-12">
+          <div className="flex-shrink-0 h-10 w-10">
             {speaker.image ? (
               <Image
                 src={speaker.image}
                 alt={name}
-                width={48}
-                height={48}
-                className="h-12 w-12 rounded-full object-cover"
+                width={40}
+                height={40}
+                className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
-              <div className="h-12 w-12 rounded-full bg-etsa-primary flex items-center justify-center">
-                <span className="text-white font-semibold text-lg">
+              <div className="h-10 w-10 rounded-full bg-etsa-primary flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">
                   {name
                     .split(" ")
                     .map((n) => n[0])
@@ -356,15 +513,15 @@ function SpeakerTableRow({
               </div>
             )}
           </div>
-          <div className="ml-4">
+          <div className="ml-3 min-w-0 flex-1">
             <Link
               href={getSpeakerUrl(name)}
-              className="text-sm font-medium text-gray-900 dark:text-white hover:text-etsa-primary transition-colors"
+              className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-etsa-primary transition-colors block truncate"
             >
               {name}
             </Link>
             {speaker.title && (
-              <div className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {speaker.title}
               </div>
             )}
@@ -372,23 +529,23 @@ function SpeakerTableRow({
         </div>
       </td>
 
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-etsa-primary text-white">
-            {talkCount}
-          </span>
-        </div>
+      <td className="px-2 py-3 whitespace-nowrap text-center">
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-etsa-primary text-white">
+          {talkCount}
+        </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+
+      <td className="px-3 py-3 whitespace-nowrap hidden md:table-cell">
         {latestTalk ? (
-          <div>
+          <div className="max-w-xs">
             <Link
               href={`/presentation/${latestTalk.slug}`}
-              className="text-sm font-medium text-gray-900 dark:text-white hover:text-etsa-primary transition-colors line-clamp-1"
+              className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-etsa-primary transition-colors line-clamp-1"
+              title={latestTalk.frontmatter.title}
             >
               {latestTalk.frontmatter.title}
             </Link>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {formatDate(latestTalk.frontmatter.date)}
             </div>
           </div>
@@ -396,12 +553,13 @@ function SpeakerTableRow({
           <span className="text-sm text-gray-500 dark:text-gray-400">—</span>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+
+      <td className="px-2 py-3 whitespace-nowrap text-center">
         <Link
           href={getSpeakerUrl(name)}
-          className="text-etsa-primary hover:text-etsa-primary-dark transition-colors"
+          className="inline-flex items-center px-2 py-1 text-xs font-medium text-etsa-primary hover:text-etsa-primary-dark transition-colors border border-etsa-primary rounded hover:bg-etsa-primary hover:text-white"
         >
-          View Profile
+          View
         </Link>
       </td>
     </tr>
@@ -440,7 +598,7 @@ function SpeakerCard({ speakerData }: Readonly<{ speakerData: SpeakerData }>) {
           <div className="flex-1 min-w-0">
             <Link
               href={getSpeakerUrl(name)}
-              className="text-lg font-semibold text-gray-900 dark:text-white hover:text-etsa-primary transition-colors block"
+              className="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-etsa-primary transition-colors block"
             >
               {name}
             </Link>
@@ -470,7 +628,7 @@ function SpeakerCard({ speakerData }: Readonly<{ speakerData: SpeakerData }>) {
         <div className="flex-1 flex flex-col">
           {latestTalk ? (
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 flex-1 flex flex-col">
-              <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+              <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Latest Talk:
               </h4>
               <div className="flex-1 flex flex-col justify-between">

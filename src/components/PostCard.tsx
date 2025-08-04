@@ -11,9 +11,14 @@ import { SpeakerList } from "@/components/SpeakerLink";
 interface PostCardProps {
   post: PostSummary;
   featured?: boolean;
+  showSpeakers?: boolean; // New prop to control speaker display
 }
 
-export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
+export function PostCard({
+  post,
+  featured = false,
+  showSpeakers = true,
+}: Readonly<PostCardProps>) {
   const { slug, frontmatter, readingTime } = post;
   const { title, date, excerpt, tags } = frontmatter;
 
@@ -28,7 +33,7 @@ export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
       <div className="card-header">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <Link href={getPostUrl(slug)} className="group">
+            <Link href={getPostUrl(slug, frontmatter)} className="group">
               <h3
                 className={`card-title group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors ${
                   featured ? "text-xl" : "text-lg"
@@ -38,7 +43,7 @@ export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
               </h3>
             </Link>
 
-            {speakers.length > 0 && (
+            {speakers.length > 0 && showSpeakers && !frontmatter.blogpost && (
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                 <span className="font-medium">
                   Speaker{speakers.length > 1 ? "s" : ""}:{" "}
@@ -79,7 +84,10 @@ export function PostCard({ post, featured = false }: Readonly<PostCardProps>) {
       </div>
 
       <div className="card-footer">
-        <Link href={getPostUrl(slug)} className="btn btn-outline btn-sm">
+        <Link
+          href={getPostUrl(slug, frontmatter)}
+          className="btn btn-outline btn-sm"
+        >
           Read More
           <svg
             className="ml-2 h-4 w-4"

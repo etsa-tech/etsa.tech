@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { PostSummary } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
+import { EmptyState } from "@/components/EmptyState";
 import { getPostSpeakers } from "@/lib/utils";
 
 interface SearchComponentProps {
@@ -97,26 +98,19 @@ export default function SearchComponent({
 
     if (searchQuery) {
       return (
-        /* No Results */
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">🔍</div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No presentations found
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            We couldn&apos;t find any presentations matching &quot;
-            {searchQuery}&quot;. Try different keywords or browse all
-            presentations.
-          </p>
-          <div className="space-x-4">
+        <EmptyState
+          icon="🔍"
+          title="No presentations found"
+          description={`We couldn't find any presentations matching "${searchQuery}". Try different keywords or browse all presentations.`}
+          action={
             <button
               onClick={clearSearch}
               className="bg-etsa-primary hover:bg-etsa-secondary text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
               Show All Presentations
             </button>
-          </div>
-        </div>
+          }
+        />
       );
     }
 
