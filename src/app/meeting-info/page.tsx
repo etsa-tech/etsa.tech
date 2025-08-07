@@ -1,4 +1,4 @@
-import { getAllPosts } from "@/lib/blog";
+import { getPresentationPosts } from "@/lib/blog";
 import { getPostSpeakers } from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
 import GoogleMapEmbed from "@/components/GoogleMapEmbed";
@@ -26,7 +26,7 @@ const DEFAULT_LOCATION = {
 };
 
 export default function MeetingInfoPage() {
-  const posts = getAllPosts();
+  const posts = getPresentationPosts();
   const latestPost = posts[0];
 
   // Check if latest post has custom location

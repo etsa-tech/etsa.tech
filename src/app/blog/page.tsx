@@ -16,7 +16,7 @@ export default function BlogPage() {
 
   const sidebar = (
     <>
-      <TagsCard title="Popular Tags" />
+      <TagsCard title="Browse by Topic" limit={25} showViewAll={true} />
       <StatsCard
         title="Blog Stats"
         stats={[{ label: "Total Posts", value: blogPosts.length }]}
