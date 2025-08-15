@@ -11,7 +11,7 @@
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.0",
     "@types/js-yaml": "^4.0.9",
-    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer": "^7.0.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
     "next": "15.4.6",
