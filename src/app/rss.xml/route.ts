@@ -29,7 +29,7 @@ export async function GET() {
     const rssItems = posts
       .map((post) => {
         const { frontmatter, slug } = post;
-        const postUrl = `${siteUrl}${getPostUrl(slug)}`;
+        const postUrl = `${siteUrl}${getPostUrl(slug, frontmatter)}`;
         const pubDate = new Date(frontmatter.date).toUTCString();
 
         // Get speaker information for description and author

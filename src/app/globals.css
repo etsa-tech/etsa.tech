@@ -119,6 +119,10 @@
     @apply text-gray-900 dark:text-gray-100;
   }
 
+  .prose p {
+    @apply mb-4;
+  }
+
   .prose h1,
   .prose h2,
   .prose h3,
@@ -368,6 +372,28 @@
 
   .animate-slide-down {
     animation: slideDown 0.5s ease-out;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
   }
 }
 

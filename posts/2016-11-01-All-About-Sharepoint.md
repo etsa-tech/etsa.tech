@@ -1,5 +1,5 @@
 ---
-title: "ETENN, History and Future"
+title: "All About SharePoint"
 date: "2016-11-01"
 excerpt: "Rob Barker shares his experience deploying and supporting SharePoint at ORNL, including a look at roles, responsibilities, and a live SP 2016 dev farm demo."
 tags:

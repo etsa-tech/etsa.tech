@@ -211,7 +211,7 @@ meetingLocation: # Custom meeting location object
   contact: "Located in downtown Market Square" # Additional contact/location info
 
 # Content Management (Optional)
-featured: false # Whether to feature this post prominently
+blogpost: false # Whether this is a blog post (true) or presentation (false/undefined)
 published: true # Whether the post is published (false = draft)
 ---
 # Your markdown content here
@@ -291,7 +291,7 @@ meetingLocation:
 
 #### Content Management
 
-- **featured**: Set to `true` to highlight this post prominently on the site
+- **blogpost**: Set to `true` for blog posts, `false` or omit for presentations/meetup content
 - **published**: Set to `false` to save as draft (won't appear on public pages)
 
 ### Usage Examples

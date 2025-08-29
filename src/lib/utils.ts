@@ -13,9 +13,25 @@ export function formatDate(dateString: string): string {
   });
 }
 
-// Generate presentation URL
-export function getPostUrl(slug: string): string {
+// Generate post URL based on post type
+export function getPostUrl(
+  slug: string,
+  frontmatter?: PostFrontmatter,
+): string {
+  if (frontmatter?.blogpost === true) {
+    return `/blog/${encodeURIComponent(slug)}`;
+  }
   return `/presentation/${encodeURIComponent(slug)}`;
+}
+
+// Legacy function for backward compatibility
+export function getPresentationUrl(slug: string): string {
+  return `/presentation/${encodeURIComponent(slug)}`;
+}
+
+// Generate blog post URL
+export function getBlogUrl(slug: string): string {
+  return `/blog/${encodeURIComponent(slug)}`;
 }
 
 // Generate tag URL

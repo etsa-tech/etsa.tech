@@ -1,4 +1,4 @@
-import { getAllPosts } from "@/lib/blog";
+import { getPresentationPosts } from "@/lib/blog";
 import RSVPForm from "@/components/RSVPForm";
 
 export const metadata = {
@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default function RSVPPage() {
-  const posts = getAllPosts();
+  const posts = getPresentationPosts();
   const latestPost = posts[0];
 
   // Get meeting information from latest post or use defaults

@@ -6,6 +6,7 @@ import html from "remark-html";
 import { Post, PostSummary, PostFrontmatter, Speaker } from "@/types/post";
 
 const postsDirectory = path.join(process.cwd(), "posts");
+const blogPostsDirectory = path.join(process.cwd(), "posts_blog");
 
 // Calculate reading time (average 200 words per minute)
 function calculateReadingTime(content: string): number {
@@ -15,8 +16,88 @@ function calculateReadingTime(content: string): number {
   return readingTime;
 }
 
-// Get all post slugs
+// Helper function to sort posts by date (newest first)
+function sortPostsByDate(posts: PostSummary[]): PostSummary[] {
+  return posts.sort((a, b) => {
+    return (
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime()
+    );
+  });
+}
+
+// Helper function to read posts from a directory
+function readPostsFromDirectory(
+  directory: string,
+  slugs: string[],
+  isBlogPost: boolean = false,
+): PostSummary[] {
+  return slugs
+    .map((slug) => {
+      try {
+        const fullPath = path.join(directory, `${slug}.md`);
+        const fileContents = fs.readFileSync(fullPath, "utf8");
+        const { data, content } = matter(fileContents);
+
+        const readingTime = calculateReadingTime(content);
+
+        return {
+          slug,
+          frontmatter: isBlogPost
+            ? ({ ...data, blogpost: true } as PostFrontmatter)
+            : (data as PostFrontmatter),
+          readingTime,
+        };
+      } catch (error) {
+        console.error(
+          `Error reading ${isBlogPost ? "blog" : "presentation"} post ${slug}:`,
+          error,
+        );
+        return null;
+      }
+    })
+    .filter((post): post is PostSummary => post !== null);
+}
+
+// Get all post slugs from both directories
 export function getPostSlugs(): string[] {
+  const slugs: string[] = [];
+
+  // Get presentation posts from /posts
+  if (fs.existsSync(postsDirectory)) {
+    const presentationFiles = fs.readdirSync(postsDirectory);
+    const presentationSlugs = presentationFiles
+      .filter((fileName) => fileName.endsWith(".md"))
+      .map((fileName) => fileName.replace(/\.md$/, ""));
+    slugs.push(...presentationSlugs);
+  }
+
+  // Get blog posts from /posts_blog
+  if (fs.existsSync(blogPostsDirectory)) {
+    const blogFiles = fs.readdirSync(blogPostsDirectory);
+    const blogSlugs = blogFiles
+      .filter((fileName) => fileName.endsWith(".md"))
+      .map((fileName) => fileName.replace(/\.md$/, ""));
+    slugs.push(...blogSlugs);
+  }
+
+  return slugs;
+}
+
+// Get blog post slugs only
+export function getBlogPostSlugs(): string[] {
+  if (!fs.existsSync(blogPostsDirectory)) {
+    return [];
+  }
+
+  const fileNames = fs.readdirSync(blogPostsDirectory);
+  return fileNames
+    .filter((fileName) => fileName.endsWith(".md"))
+    .map((fileName) => fileName.replace(/\.md$/, ""));
+}
+
+// Get presentation post slugs only
+export function getPresentationPostSlugs(): string[] {
   if (!fs.existsSync(postsDirectory)) {
     return [];
   }
@@ -27,10 +108,16 @@ export function getPostSlugs(): string[] {
     .map((fileName) => fileName.replace(/\.md$/, ""));
 }
 
-// Get post data by slug
+// Get post data by slug (checks both directories)
 export async function getPostBySlug(slug: string): Promise<Post | null> {
   try {
-    const fullPath = path.join(postsDirectory, `${slug}.md`);
+    // First check blog posts directory
+    let fullPath = path.join(blogPostsDirectory, `${slug}.md`);
+
+    // If not found in blog posts, check presentations directory
+    if (!fs.existsSync(fullPath)) {
+      fullPath = path.join(postsDirectory, `${slug}.md`);
+    }
 
     if (!fs.existsSync(fullPath)) {
       return null;
@@ -39,8 +126,18 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
 
+    // Clean up invisible Unicode characters and normalize line breaks
+    const cleanedContent = content
+      .replace(/\u200B/g, "") // Remove zero-width spaces
+      .replace(/\u200C/g, "") // Remove zero-width non-joiners
+      .replace(/\u200D/g, "") // Remove zero-width joiners
+      .replace(/\uFEFF/g, "") // Remove byte order marks
+      .replace(/\r\n/g, "\n") // Normalize Windows line endings
+      .replace(/\r/g, "\n") // Normalize Mac line endings
+      .trim(); // Remove leading/trailing whitespace
+
     // Process markdown content to HTML
-    const processedContent = await remark().use(html).process(content);
+    const processedContent = await remark().use(html).process(cleanedContent);
     const contentHtml = processedContent.toString();
 
     const readingTime = calculateReadingTime(content);
@@ -59,37 +156,27 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 
 // Get all posts with frontmatter only (for listing pages)
 export function getAllPosts(): PostSummary[] {
-  const slugs = getPostSlugs();
-  const posts = slugs
-    .map((slug) => {
-      try {
-        const fullPath = path.join(postsDirectory, `${slug}.md`);
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data, content } = matter(fileContents);
+  const posts: PostSummary[] = [];
 
-        const readingTime = calculateReadingTime(content);
+  // Get presentation posts from /posts
+  const presentationSlugs = getPresentationPostSlugs();
+  const presentationPosts = readPostsFromDirectory(
+    postsDirectory,
+    presentationSlugs,
+    false,
+  );
 
-        return {
-          slug,
-          frontmatter: data as PostFrontmatter,
-          readingTime,
-        };
-      } catch (error) {
-        console.error(`Error reading post ${slug}:`, error);
-        return null;
-      }
-    })
-    .filter((post): post is PostSummary => post !== null)
-    .filter((post) => post.frontmatter.published !== false)
-    .sort((a, b) => {
-      // Sort by date, newest first
-      return (
-        new Date(b.frontmatter.date).getTime() -
-        new Date(a.frontmatter.date).getTime()
-      );
-    });
+  // Get blog posts from /posts_blog
+  const blogSlugs = getBlogPostSlugs();
+  const blogPosts = readPostsFromDirectory(blogPostsDirectory, blogSlugs, true);
 
-  return posts;
+  // Combine all posts
+  posts.push(...presentationPosts, ...blogPosts);
+
+  // Filter and sort
+  return sortPostsByDate(
+    posts.filter((post) => post.frontmatter.published !== false),
+  );
 }
 
 // Get posts by tag
@@ -139,10 +226,40 @@ export function getPopularTags(limit: number = 25): string[] {
     .map(({ tag }) => tag);
 }
 
-// Get featured posts
-export function getFeaturedPosts(): PostSummary[] {
-  const allPosts = getAllPosts();
-  return allPosts.filter((post) => post.frontmatter.featured === true);
+// Get blog posts only (from /posts_blog directory)
+export function getBlogPosts(): PostSummary[] {
+  const blogSlugs = getBlogPostSlugs();
+  const posts = readPostsFromDirectory(blogPostsDirectory, blogSlugs, true);
+
+  return sortPostsByDate(
+    posts.filter((post) => post.frontmatter.published !== false),
+  );
+}
+
+// Get presentation posts only (from /posts directory)
+export function getPresentationPosts(): PostSummary[] {
+  const presentationSlugs = getPresentationPostSlugs();
+  const posts = readPostsFromDirectory(
+    postsDirectory,
+    presentationSlugs,
+    false,
+  );
+
+  return sortPostsByDate(
+    posts.filter((post) => post.frontmatter.published !== false),
+  );
+}
+
+// Get recent blog posts
+export function getRecentBlogPosts(limit: number = 5): PostSummary[] {
+  const blogPosts = getBlogPosts();
+  return blogPosts.slice(0, limit);
+}
+
+// Get recent presentation posts
+export function getRecentPresentationPosts(limit: number = 5): PostSummary[] {
+  const presentationPosts = getPresentationPosts();
+  return presentationPosts.slice(0, limit);
 }
 
 // Get recent posts
@@ -202,9 +319,9 @@ export function getSpeakerUrl(speakerName: string): string {
   )}`;
 }
 
-// Get all speakers from posts (both legacy and new format)
+// Get all speakers from presentation posts (both legacy and new format)
 export function getAllSpeakers(): string[] {
-  const allPosts = getAllPosts();
+  const allPosts = getPresentationPosts();
   const speakers = new Set<string>();
 
   allPosts.forEach((post) => {
@@ -226,9 +343,9 @@ export function getAllSpeakers(): string[] {
   return Array.from(speakers).sort((a, b) => a.localeCompare(b));
 }
 
-// Get posts by speaker name
+// Get presentation posts by speaker name
 export function getPostsBySpeaker(speakerName: string): PostSummary[] {
-  const allPosts = getAllPosts();
+  const allPosts = getPresentationPosts();
   const normalizedSpeakerName = speakerName.toLowerCase();
 
   return allPosts.filter((post) => {
