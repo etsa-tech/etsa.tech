@@ -458,9 +458,7 @@ function ActionButtons({
           disabled={isLoading}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-etsa-primary hover:bg-etsa-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary disabled:opacity-50"
         >
-          {isLoading
-            ? "Saving..."
-            : `Save to ${isViewingPRBranch ? viewingBranch : "branch"}`}
+          {isLoading ? "Saving..." : "Save to branch"}
         </button>
       )}
 
@@ -555,6 +553,7 @@ export default function BlogPostEditor({
   >([]);
   const [loadingAssets, setLoadingAssets] = useState(false);
   const [searchedPaths, setSearchedPaths] = useState<string[]>([]);
+  const [uploadingAsset, setUploadingAsset] = useState(false);
 
   const {
     register,
@@ -665,6 +664,60 @@ export default function BlogPostEditor({
       fetchExistingAssets();
     }
   }, [slug, showAssets, fetchExistingAssets]);
+
+  // Function to handle asset upload
+  const handleAssetUpload = async (file: File) => {
+    if (!slug) return;
+
+    setUploadingAsset(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("slug", slug);
+      formData.append("branch", currentBranch);
+
+      const response = await fetch("/api/admin/assets/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Upload successful:", result);
+
+        // Show success message
+        alert(
+          `${result.message}${
+            result.pullRequest ? ` (PR #${result.pullRequest.prNumber})` : ""
+          }`,
+        );
+
+        // Refresh assets after successful upload
+        await fetchExistingAssets();
+      } else {
+        const error = await response.json();
+        console.error("Upload failed:", error);
+        alert(`Upload failed: ${error.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Upload failed. Please try again.");
+    } finally {
+      setUploadingAsset(false);
+    }
+  };
+
+  // Function to insert asset into markdown
+  const insertAssetIntoMarkdown = (assetName: string) => {
+    const assetMarkdown = `![${assetName}](/presentation/${slug}/${assetName})`;
+
+    // Get current content and append the asset markdown
+    const currentContent = content;
+    const newContent = currentContent + "\n\n" + assetMarkdown;
+
+    // Update the content
+    setContent(newContent);
+  };
 
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
     // Use the YAML reconstruction function to preserve format and handle multi-document YAML
@@ -856,6 +909,63 @@ export default function BlogPostEditor({
 
           {showAssets && (
             <div className="space-y-6">
+              {/* Upload Assets */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-medium text-gray-900 dark:text-white">
+                    Upload New Asset
+                  </h4>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="file"
+                    id="asset-upload"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleAssetUpload(file);
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor="asset-upload"
+                    className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-etsa-primary hover:bg-etsa-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary cursor-pointer ${
+                      uploadingAsset ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {uploadingAsset ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                        Upload File
+                      </>
+                    )}
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Upload files to public/presentation/{slug}/
+                  </p>
+                </div>
+              </div>
+
+              <hr className="border-gray-200 dark:border-gray-700" />
+
               {/* Existing Assets */}
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -920,6 +1030,13 @@ export default function BlogPostEditor({
                             className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800"
                           >
                             Use
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => insertAssetIntoMarkdown(asset.name)}
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800"
+                          >
+                            Insert
                           </button>
                         </div>
                       </div>
