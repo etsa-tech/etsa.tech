@@ -1,8 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface AdminBlogPost {
@@ -18,7 +16,6 @@ interface AdminBlogPost {
 }
 
 export default function AdminDashboard() {
-  const { data: session } = useSession();
   const [blogPosts, setBlogPosts] = useState<AdminBlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,28 +68,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center space-x-4">
-          {session?.user?.image && (
-            <Image
-              src={session.user.image}
-              alt={session.user.name || "User"}
-              width={48}
-              height={48}
-              className="h-12 w-12 rounded-full"
-            />
-          )}
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome back, {session?.user?.name}!
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {session?.user?.email} • ETSA Admin Panel
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
           <div className="p-5">
@@ -194,7 +169,7 @@ export default function AdminDashboard() {
                     Asset Management
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    Available
+                    Coming later
                   </dd>
                 </dl>
               </div>

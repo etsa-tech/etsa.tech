@@ -31,16 +31,6 @@ export default function AdminNavigation({
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between">
           <div className="flex">
-            <div className="flex flex-shrink-0 items-center">
-              <Link href="/admin" className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded bg-etsa-primary flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">E</span>
-                </div>
-                <span className="text-xl font-bold text-etsa-primary">
-                  ETSA Admin
-                </span>
-              </Link>
-            </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {navigation.map((item) => (
                 <Link
