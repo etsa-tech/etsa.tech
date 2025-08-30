@@ -252,12 +252,24 @@ export default function AdminDashboard() {
             Quick Actions
           </h3>
           <div className="mt-5">
-            <div className="flex space-x-3">
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="/admin/posts/new"
                 className="inline-flex items-center rounded-md bg-etsa-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-etsa-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-etsa-primary"
               >
                 Create New Post
+              </Link>
+              <Link
+                href="/admin/posts"
+                className="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+              >
+                Manage Posts
+              </Link>
+              <Link
+                href="/admin/analytics"
+                className="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600"
+              >
+                📊 View Analytics
               </Link>
               <Link
                 href="/admin/assets"

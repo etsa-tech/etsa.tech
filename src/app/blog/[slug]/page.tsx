@@ -8,6 +8,7 @@ import {
   getRecentBlogPosts,
 } from "@/lib/blog";
 import { formatDate, getTagUrl } from "@/lib/utils";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -60,6 +61,9 @@ export default async function BlogPostPage({ params }: Readonly<PageProps>) {
 
   return (
     <div className="container py-12">
+      {/* Analytics Tracker */}
+      <AnalyticsTracker page={`/blog/${decodedSlug}`} title={title} />
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-3">

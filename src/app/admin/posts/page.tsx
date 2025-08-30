@@ -11,6 +11,7 @@ interface BlogPost {
   name: string;
   path: string;
   size: number;
+  views?: number;
   frontmatter?: {
     title: string;
     date: string;
@@ -34,14 +35,17 @@ export default function BlogPostsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(
+        // Fetch posts
+        const postsResponse = await fetch(
           `/api/admin/posts?branch=${encodeURIComponent(selectedBranch)}`,
         );
-        if (!response.ok) {
+        if (!postsResponse.ok) {
           throw new Error("Failed to fetch posts");
         }
-        const data = await response.json();
-        setBlogPosts(data.posts || []);
+        const postsData = await postsResponse.json();
+        const posts = postsData.posts || [];
+
+        setBlogPosts(posts);
       } catch (err) {
         setError(
           "Failed to load blog posts. Please check GitHub configuration.",

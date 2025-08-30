@@ -61,6 +61,38 @@ export default function BlogPostsTable({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [statusFilter] = useState<"all" | "published" | "draft">("all");
+  const [selectedPostStats, setSelectedPostStats] = useState<{
+    slug: string;
+    title: string;
+    totalViews: number;
+    dailyViews: Array<{ date: string; views: number }>;
+  } | null>(null);
+  const [loadingStats, setLoadingStats] = useState(false);
+
+  // Handle viewing stats for a specific post
+  const handleViewStats = async (slug: string) => {
+    setLoadingStats(true);
+    try {
+      const response = await fetch(
+        `/api/admin/analytics?page=/blog/${slug}&days=30`,
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedPostStats({
+          slug,
+          title: data.page,
+          totalViews: data.totalViews,
+          dailyViews: data.dailyViews,
+        });
+      } else {
+        console.error("Failed to fetch post stats");
+      }
+    } catch (error) {
+      console.error("Error fetching post stats:", error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   // Parse posts and extract data
   const parsedPosts = useMemo(() => {
@@ -289,6 +321,7 @@ export default function BlogPostsTable({
                   />
                 </div>
               </th>
+
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Actions
               </th>
@@ -337,6 +370,7 @@ export default function BlogPostsTable({
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   {post.date ? formatDate(post.date) : "No date"}
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex items-center space-x-3">
                     <Link
@@ -352,6 +386,12 @@ export default function BlogPostsTable({
                     >
                       Edit
                     </Link>
+                    <button
+                      onClick={() => handleViewStats(post.slug)}
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                    >
+                      📊 Stats
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -504,6 +544,87 @@ export default function BlogPostsTable({
               </Link>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Stats Modal */}
+      {selectedPostStats && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  📊 Analytics for {selectedPostStats.title}
+                </h3>
+                <button
+                  onClick={() => setSelectedPostStats(null)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {selectedPostStats.totalViews.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      Total Views (Last 30 days)
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                    Daily Views (Last 7 days)
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedPostStats.dailyViews.slice(-7).map((day) => (
+                      <div
+                        key={day.date}
+                        className="flex justify-between items-center"
+                      >
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {new Date(day.date).toLocaleDateString()}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {day.views} views
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Stats Modal */}
+      {loadingStats && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <div className="mt-3 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-etsa-primary mx-auto"></div>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
+                Loading analytics...
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>
