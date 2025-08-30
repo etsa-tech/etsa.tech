@@ -12,6 +12,7 @@
     "@hcaptcha/react-hcaptcha": "^1.12.0",
     "@hookform/resolvers": "^5.2.1",
     "@monaco-editor/react": "^4.7.0",
+    "@octokit/app": "^16.1.0",
     "@octokit/rest": "^22.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/nodemailer": "^7.0.0",

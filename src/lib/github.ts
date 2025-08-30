@@ -1,11 +1,15 @@
 import { Octokit } from "@octokit/rest";
+import { getGitHubClient, getRepoInfo } from "./github-app";
 
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-});
+// Legacy function to get octokit client - now uses GitHub App
+async function getOctokit(): Promise<Octokit> {
+  return getGitHubClient();
+}
 
-const REPO_OWNER = "etsa-tech";
-const REPO_NAME = "etsa.tech";
+// Get repository info from environment
+function getRepo() {
+  return getRepoInfo();
+}
 
 export interface GitHubFile {
   name: string;
@@ -28,9 +32,12 @@ export async function getRepoContents(
   branch: string = "main",
 ): Promise<GitHubFile[]> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     const response = await octokit.rest.repos.getContent({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       path,
       ref: branch,
     });
@@ -58,9 +65,12 @@ export async function getFileContent(
   branch: string = "main",
 ): Promise<string> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     const response = await octokit.rest.repos.getContent({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       path,
       ref: branch,
     });
@@ -82,9 +92,12 @@ export async function getFileContentWithSha(
   branch: string = "main",
 ): Promise<{ content: string; sha: string }> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     const response = await octokit.rest.repos.getContent({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       path,
       ref: branch,
     });
@@ -121,9 +134,12 @@ export async function getBlogPost(
 // Get available branches
 export async function getBranches(): Promise<string[]> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     const response = await octokit.rest.repos.listBranches({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
     });
 
     return response.data.map((branch) => branch.name);
@@ -142,9 +158,12 @@ export async function createOrUpdateFile(
   branch?: string,
 ): Promise<void> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     await octokit.rest.repos.createOrUpdateFileContents({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       path,
       message,
       content: Buffer.from(content).toString("base64"),
@@ -160,17 +179,20 @@ export async function createOrUpdateFile(
 // Create branch
 export async function createBranch(branchName: string): Promise<void> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     // Get the main branch reference
     const mainBranch = await octokit.rest.git.getRef({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       ref: "heads/main",
     });
 
     // Create new branch
     await octokit.rest.git.createRef({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       ref: `refs/heads/${branchName}`,
       sha: mainBranch.data.object.sha,
     });
@@ -185,10 +207,13 @@ export async function getPullRequestForBranch(
   branchName: string,
 ): Promise<number | null> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     const response = await octokit.rest.pulls.list({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      head: `${REPO_OWNER}:${branchName}`,
+      owner,
+      repo,
+      head: `${owner}:${branchName}`,
       state: "open",
     });
 
@@ -204,9 +229,12 @@ export async function getOpenPRForPost(
   slug: string,
 ): Promise<{ branchName: string; prNumber: number } | null> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     const response = await octokit.rest.pulls.list({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       state: "open",
     });
 
@@ -245,9 +273,12 @@ export async function createOrGetPullRequest(
     }
 
     // Create new PR
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     const response = await octokit.rest.pulls.create({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       title,
       body,
       head: branchName,
@@ -281,9 +312,12 @@ export async function uploadAsset(
   message: string,
 ): Promise<void> {
   try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
     await octokit.rest.repos.createOrUpdateFileContents({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
+      owner,
+      repo,
       path: `public/${path}`,
       message,
       content: content.toString("base64"),

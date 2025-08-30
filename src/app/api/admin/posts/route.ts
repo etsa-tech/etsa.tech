@@ -50,8 +50,27 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ posts: postsWithFrontmatter });
   } catch (error) {
     console.error("Error fetching posts:", error);
+
+    // Provide more detailed error information
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Detailed error:", {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      envCheck: {
+        GITHUB_APP_ID: !!process.env.GITHUB_APP_ID,
+        GITHUB_APP_INSTALLATION_ID: !!process.env.GITHUB_APP_INSTALLATION_ID,
+        GITHUB_OWNER: !!process.env.GITHUB_OWNER,
+        GITHUB_REPO: !!process.env.GITHUB_REPO,
+        GITHUB_APP_PRIVATE_KEY: !!process.env.GITHUB_APP_PRIVATE_KEY,
+      },
+    });
+
     return NextResponse.json(
-      { error: "Failed to fetch posts" },
+      {
+        error: "Failed to fetch posts",
+        details: errorMessage,
+        timestamp: new Date().toISOString(),
+      },
       { status: 500 },
     );
   }

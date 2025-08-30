@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface AdminBlogPost {
@@ -72,6 +73,15 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center space-x-4">
+          {session?.user?.image && (
+            <Image
+              src={session.user.image}
+              alt={session.user.name || "User"}
+              width={48}
+              height={48}
+              className="h-12 w-12 rounded-full"
+            />
+          )}
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Welcome back, {session?.user?.name}!
@@ -246,7 +256,11 @@ export default function AdminDashboard() {
                   Please ensure the following environment variables are set:
                 </p>
                 <ul className="mt-1 list-disc list-inside">
-                  <li>GITHUB_TOKEN</li>
+                  <li>GITHUB_APP_ID</li>
+                  <li>GITHUB_APP_PRIVATE_KEY</li>
+                  <li>GITHUB_APP_INSTALLATION_ID</li>
+                  <li>GITHUB_OWNER</li>
+                  <li>GITHUB_REPO</li>
                   <li>GOOGLE_CLIENT_ID</li>
                   <li>GOOGLE_CLIENT_SECRET</li>
                   <li>NEXTAUTH_SECRET</li>

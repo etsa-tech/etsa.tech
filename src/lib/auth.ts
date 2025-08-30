@@ -24,12 +24,23 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async session({ session }) {
-      // Add any additional session data here
+    async session({ session, token }) {
+      // Ensure profile image is included in session
+      if (token.picture && session.user) {
+        session.user.image = String(token.picture);
+      }
       return session;
     },
-    async jwt({ token }) {
-      // Add any additional token data here
+    async jwt({ token, account, profile }) {
+      // Store the profile picture in the token
+      if (
+        account?.provider === "google" &&
+        profile &&
+        "picture" in profile &&
+        typeof profile.picture === "string"
+      ) {
+        token.picture = profile.picture;
+      }
       return token;
     },
   },

@@ -138,9 +138,36 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=http://localhost:3000  # or your production URL
 
-# GitHub Integration (for content management)
-GITHUB_TOKEN=your_github_personal_access_token
+# GitHub App Authentication (for content management)
+GITHUB_APP_ID=your_github_app_id
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nyour_private_key_here\n-----END RSA PRIVATE KEY-----"
+GITHUB_APP_INSTALLATION_ID=your_installation_id
+GITHUB_WEBHOOK_SECRET=your_webhook_secret
+GITHUB_OWNER=etsa
+GITHUB_REPO=etsa.tech
 ```
+
+#### How to create GitHub App
+
+1. Create a new app [here](https://github.com/settings/apps).
+1. The following permissions are required
+
+```json
+{
+  "contents": "write", // Create/edit blog post files
+  "pull_requests": "write", // Create PRs for blog posts
+  "metadata": "read", // Basic repository information
+  "issues": "write", // Create issues for blog discussions
+  "actions": "read" // Monitor build status (optional)
+}
+```
+
+3. Install the app to ETSA and limit the repo scope
+1. Copy the installation ID
+
+#### How to generate RSA Key
+
+`awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' etsa-admin-interface.2025-08-29.private-key.pem | pbcopy`
 
 ### Setup Instructions
 
@@ -152,11 +179,12 @@ GITHUB_TOKEN=your_github_personal_access_token
    - Create OAuth 2.0 credentials
    - Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
 
-2. **GitHub Token Setup**:
+2. **GitHub App Setup**:
 
-   - Go to GitHub Settings > Developer settings > Personal access tokens
-   - Create a new token with `repo` permissions
-   - Add the token to your environment variables
+   - Create a GitHub App in your organization settings
+   - Set permissions: Contents (Write), Pull Requests (Write), Metadata (Read)
+   - Install the app on your repository only
+   - Generate a private key and add all credentials to environment variables
 
 3. **Access the Admin Interface**:
    - Navigate to `/admin`
