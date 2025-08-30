@@ -10,13 +10,11 @@ import { SpeakerList } from "@/components/SpeakerLink";
 
 interface PostCardProps {
   post: PostSummary;
-  featured?: boolean;
   showSpeakers?: boolean; // New prop to control speaker display
 }
 
 export function PostCard({
   post,
-  featured = false,
   showSpeakers = true,
 }: Readonly<PostCardProps>) {
   const { slug, frontmatter, readingTime } = post;
@@ -25,20 +23,12 @@ export function PostCard({
   const speakers = getPostSpeakers(frontmatter);
 
   return (
-    <article
-      className={`card hover:shadow-md transition-shadow ${
-        featured ? "border-blue-200 dark:border-blue-800" : ""
-      }`}
-    >
+    <article className="card hover:shadow-md transition-shadow">
       <div className="card-header">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <Link href={getPostUrl(slug, frontmatter)} className="group">
-              <h3
-                className={`card-title group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors ${
-                  featured ? "text-xl" : "text-lg"
-                }`}
-              >
+              <h3 className="card-title text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {title}
               </h3>
             </Link>
@@ -52,8 +42,6 @@ export function PostCard({
               </div>
             )}
           </div>
-
-          {featured && <span className="tag tag-primary ml-4">Featured</span>}
         </div>
 
         <div className="flex items-center space-x-4 text-sm text-light-muted dark:text-dark-muted mt-3">

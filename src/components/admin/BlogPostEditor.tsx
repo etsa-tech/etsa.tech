@@ -33,7 +33,6 @@ const blogPostSchema = z.object({
   recordingUrl: z.string().optional(),
   eventDate: z.string().optional(),
   eventLocation: z.string().optional(),
-  featured: z.boolean().optional(),
   published: z.boolean().optional(),
   rawYaml: z.string().optional(), // For manual YAML editing
 });
@@ -161,7 +160,6 @@ function reconstructYamlContent(
           .filter(Boolean),
         author: formData.author,
         published: formData.published,
-        featured: formData.featured,
       };
 
       // Add optional fields if they have values
@@ -199,7 +197,6 @@ function reconstructYamlContent(
         .filter(Boolean),
       author: formData.author,
       published: formData.published,
-      featured: formData.featured,
       ...(formData.speakerName && { speakerName: formData.speakerName }),
       ...(formData.speakerTitle && { speakerTitle: formData.speakerTitle }),
       ...(formData.speakerCompany && {
@@ -526,7 +523,6 @@ function createDefaultValues(
     recordingUrl: getStringValue(frontmatter?.recordingUrl),
     eventDate: getStringValue(frontmatter?.eventDate),
     eventLocation: getStringValue(frontmatter?.eventLocation),
-    featured: Boolean(frontmatter?.featured),
     published: frontmatter?.published !== false,
     rawYaml: "", // Will be populated from the raw frontmatter content
   };
@@ -769,21 +765,6 @@ export default function BlogPostEditor({
           </div>
 
           <div className="mt-6 flex items-center space-x-6">
-            <div className="flex items-center">
-              <input
-                id="featured"
-                type="checkbox"
-                {...register("featured")}
-                className="h-4 w-4 text-etsa-primary focus:ring-etsa-primary border-gray-300 rounded"
-              />
-              <label
-                htmlFor="featured"
-                className="ml-2 block text-sm text-gray-900 dark:text-white"
-              >
-                Featured post
-              </label>
-            </div>
-
             <div className="flex items-center">
               <input
                 id="published"

@@ -381,7 +381,6 @@ presentationSlides: "https://slides.google.com/docker-networking"
 recordingUrl: "https://youtube.com/watch?v=docker-recording-2024"
 eventDate: "2024-03-15"
 eventLocation: "Knoxville Entrepreneur Center"
-featured: true
 published: true
 ---
 ```
@@ -443,7 +442,6 @@ presentationSlides: "https://slides.google.com/devops-panel-2024"
 recordingUrl: "https://youtube.com/watch?v=devops-panel-recording-2024"
 eventDate: "2024-05-15"
 eventLocation: "Knoxville Entrepreneur Center"
-featured: true
 published: true
 ---
 ```
