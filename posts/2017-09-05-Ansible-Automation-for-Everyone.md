@@ -1,28 +1,33 @@
 ---
 title: "Ansible: Automation for Everyone!"
 date: "2017-09-05"
-excerpt: "Ansible brings simple, agent-less automation to sysadmins who didn’t sign up to be programmers—making your job easier and more enjoyable."
+excerpt: >-
+  Ansible brings simple, agent-less automation to sysadmins who didn’t sign up
+  to be programmers—making your job easier and more enjoyable.
 tags:
-  [
-    "Ansible",
-    "Automation",
-    "System Administration",
-    "DevOps",
-    "Configuration Management",
-    "IT Operations",
-    "Cross-Platform",
-    "IaC",
-  ]
-author: "ETSA"
+  - Ansible
+  - Automation
+  - System Administration
+  - DevOps
+  - Configuration Management
+  - IT Operations
+  - Cross-Platform
+  - IaC
+author: ETSA
 speakers:
-  - name: "Matt Hermanson"
-    title: "Senior Specialist Solution Architect"
-    company: "Red Hat"
-    image: "/images/speakers/matt_hermanson.jpeg"
-    bio: "Matt Hermanson is Cloud Solutions Architect for Red Hat. He received his Bachelors in Computer Science from Tennessee Tech University, and spent the last decade of his career in financial services and government research. When he's not working, he enjoys Golf, Softball, and anything that keeps him active."
-    linkedIn: "https://www.linkedin.com/in/mjhermanson/"
+  - name: Matt Hermanson
+    title: Senior Specialist Solution Architect
+    company: Red Hat
+    image: /images/speakers/matt_hermanson.jpeg
+    bio: >-
+      Matt Hermanson is Cloud Solutions Architect for Red Hat. He received his
+      Bachelors in Computer Science from Tennessee Tech University, and spent
+      the last decade of his career in financial services and government
+      research. When he's not working, he enjoys Golf, Softball, and anything
+      that keeps him active.
+    linkedIn: https://www.linkedin.com/in/mjhermanson/
 eventDate: "2017-09-05"
-eventLocation: "TekSystems"
+eventLocation: TekSystems
 published: true
 ---
 

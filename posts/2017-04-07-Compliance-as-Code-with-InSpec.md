@@ -1,30 +1,37 @@
 ---
-title: "Compliance as Code with InSpec"
+title: Compliance as Code with InSpec
 date: "2017-04-07"
-excerpt: "Bridge the gap between DevOps and Security with InSpec—bringing compliance into the pipeline so everyone can join the adventure (even Security)."
+excerpt: >-
+  Bridge the gap between DevOps and Security with InSpec—bringing compliance
+  into the pipeline so everyone can join the adventure (even Security).
 tags:
-  [
-    "DevOps",
-    "Security",
-    "InSpec",
-    "Compliance as Code",
-    "Automation",
-    "Infrastructure as Code",
-    "Collaboration",
-    "Security Compliance",
-    "CI/CD",
-    "DevSecOps",
-  ]
-author: "ETSA"
+  - DevOps
+  - Security
+  - InSpec
+  - Compliance as Code
+  - Automation
+  - Infrastructure as Code
+  - Collaboration
+  - Security Compliance
+  - CI/CD
+  - DevSecOps
+author: ETSA
 speakers:
-  - name: "Nolan Davidson"
-    title: "Systems Engineer"
-    company: "Chef Software"
-    image: "/images/speakers/nolan_davidson.jpeg"
-    bio: "Nolan Davidson is a systems engineer with over 15 years of experience.  Currently an engineer for Chef Software, Nolan focuses on infrastructure design, automation, and application delivery.  He also spends time on tool development, both internal and contributing to open source automation related projects. When not automating all the things, he enjoys video games, reading, and failing miserably at keeping up with his wife and two daughters."
-    linkedIn: "https://www.linkedin.com/in/rob-barker-14018392/"
+  - name: Nolan Davidson
+    title: Systems Engineer
+    company: Chef Software
+    image: /images/speakers/nolan_davidson.jpeg
+    bio: >-
+      Nolan Davidson is a systems engineer with over 15 years of experience. 
+      Currently an engineer for Chef Software, Nolan focuses on infrastructure
+      design, automation, and application delivery.  He also spends time on tool
+      development, both internal and contributing to open source automation
+      related projects. When not automating all the things, he enjoys video
+      games, reading, and failing miserably at keeping up with his wife and two
+      daughters.
+    linkedIn: https://www.linkedin.com/in/rob-barker-14018392/
 eventDate: "2017-04-07"
-eventLocation: "TekSystems"
+eventLocation: TekSystems
 published: true
 ---
 

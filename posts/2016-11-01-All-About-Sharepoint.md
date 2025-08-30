@@ -1,26 +1,30 @@
 ---
-title: "All About SharePoint"
+title: All About SharePoint
 date: "2016-11-01"
-excerpt: "Rob Barker shares his experience deploying and supporting SharePoint at ORNL, including a look at roles, responsibilities, and a live SP 2016 dev farm demo."
+excerpt: >-
+  Rob Barker shares his experience deploying and supporting SharePoint at ORNL,
+  including a look at roles, responsibilities, and a live SP 2016 dev farm demo.
 tags:
-  [
-    "SharePoint",
-    "Collaboration Tools",
-    "IT Infrastructure",
-    "System Administration",
-    "Enterprise Software",
-    "SharePoint Roles",
-  ]
-author: "ETSA"
+  - SharePoint
+  - Collaboration Tools
+  - IT Infrastructure
+  - System Administration
+  - Enterprise Software
+  - SharePoint Roles
+author: ETSA
 speakers:
-  - name: "Rob Barker"
-    title: "IT Team Lead"
-    company: "Oak Ridge National Lab"
-    image: "/images/speakers/rob_barker.jpeg"
-    bio: "Rob Barker has over 20 years of experience in IT, ranging from Lotus Notes Development to a whole slew of Microsoft products, including Active Directory, Exchange, and SharePoint. He is currently SharePoint & Web Team Lead at Oak Ridge National Laboratory."
-    linkedIn: "https://www.linkedin.com/in/rob-barker-14018392/"
+  - name: Rob Barker
+    title: IT Team Lead
+    company: Oak Ridge National Lab
+    image: /images/speakers/rob_barker.jpeg
+    bio: >-
+      Rob Barker has over 20 years of experience in IT, ranging from Lotus Notes
+      Development to a whole slew of Microsoft products, including Active
+      Directory, Exchange, and SharePoint. He is currently SharePoint & Web Team
+      Lead at Oak Ridge National Laboratory.
+    linkedIn: https://www.linkedin.com/in/rob-barker-14018392/
 eventDate: "2016-11-01"
-eventLocation: "Pellissippi State Community College"
+eventLocation: Pellissippi State Community College
 published: true
 ---
 
