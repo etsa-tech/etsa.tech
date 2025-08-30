@@ -38,7 +38,7 @@ export default function Overtracking({
         defer
         onLoad={() => {
           // Avoid logging site ID to prevent exposure in build logs
-          console.log("Overtracking: Script loaded successfully");
+          // console.log("Overtracking: Script loaded successfully");
         }}
         onError={(e) => {
           console.error("Overtracking: Failed to load script", e);
@@ -54,7 +54,7 @@ export function useOvertracking() {
     if (window.overtracking && process.env.NODE_ENV === "production") {
       window.overtracking.track(event, properties);
       // Avoid logging event details to prevent potential information exposure
-      console.log("Overtracking: Event tracked");
+      // console.log("Overtracking: Event tracked");
     } else {
       console.log("Overtracking: Event would be tracked in production");
     }
@@ -64,7 +64,7 @@ export function useOvertracking() {
     if (window.overtracking && process.env.NODE_ENV === "production") {
       window.overtracking.identify(userId, traits);
       // Avoid logging user details to prevent potential information exposure
-      console.log("Overtracking: User identified");
+      // console.log("Overtracking: User identified");
     } else {
       console.log("Overtracking: User would be identified in production");
     }
@@ -74,7 +74,7 @@ export function useOvertracking() {
     if (window.overtracking && process.env.NODE_ENV === "production") {
       window.overtracking.page(name, properties);
       // Avoid logging page details to prevent potential information exposure
-      console.log("Overtracking: Page tracked");
+      // console.log("Overtracking: Page tracked");
     } else {
       console.log("Overtracking: Page would be tracked in production");
     }
