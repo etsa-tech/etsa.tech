@@ -114,10 +114,10 @@ async function processMarkdownPreview(
 
 // Branch Status Indicator Component
 interface BranchStatusIndicatorProps {
-  currentBranch: string;
-  viewingBranch?: string;
-  isUpdateBranchForThisPost: boolean;
-  isUpdateBranchForOtherPost: boolean;
+  readonly currentBranch: string;
+  readonly viewingBranch?: string;
+  readonly isUpdateBranchForThisPost: boolean;
+  readonly isUpdateBranchForOtherPost: boolean;
 }
 
 function BranchStatusIndicator({
@@ -247,12 +247,12 @@ function BranchStatusIndicator({
 
 // Action Buttons Component
 interface ActionButtonsProps {
-  isUpdateBranchForThisPost: boolean;
-  isMainBranch: boolean;
-  isUpdateBranchForOtherPost: boolean;
-  isLoading?: boolean;
-  onSaveDraft: () => void;
-  onCreatePR: () => void;
+  readonly isUpdateBranchForThisPost: boolean;
+  readonly isMainBranch: boolean;
+  readonly isUpdateBranchForOtherPost: boolean;
+  readonly isLoading?: boolean;
+  readonly onSaveDraft: () => void;
+  readonly onCreatePR: () => void;
 }
 
 function ActionButtons({

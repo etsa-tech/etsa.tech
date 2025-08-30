@@ -4,7 +4,6 @@
 // Run with: node test-github-app.mjs
 
 import { App } from '@octokit/app';
-import { Octokit } from '@octokit/rest';
 
 // Load environment variables from .env.local
 import { readFileSync } from 'fs';
