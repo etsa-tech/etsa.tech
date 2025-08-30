@@ -11,6 +11,7 @@ import {
   getBranches,
 } from "@/lib/github";
 import matter from "gray-matter";
+import { formatBlogPostContent } from "@/lib/server-only-formatter";
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
@@ -29,13 +30,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { searchParams } = new URL(request.url);
     const branch = searchParams.get("branch") || "main";
 
-    const content = await getBlogPost(slug, branch);
-    const { data: frontmatter, content: markdown } = matter(content);
+    const rawContent = await getBlogPost(slug, branch);
+    const { data: frontmatter, content: markdown } = matter(rawContent);
 
     return NextResponse.json({
       slug,
       frontmatter,
       content: markdown,
+      rawContent, // Include raw content for multi-document YAML parsing
     });
   } catch (error) {
     console.error("Error fetching post:", error);
@@ -61,7 +63,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const branch = searchParams.get("branch") || "main";
 
     // Combine frontmatter and content
-    const fullContent = matter.stringify(content, frontmatter);
+    const rawContent = matter.stringify(content, frontmatter);
+
+    // Format the content using Prettier for consistent formatting
+    const fullContent = await formatBlogPostContent(rawContent);
 
     if (createPR) {
       // Check if there's already an update branch for this post
@@ -123,8 +128,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         `Update blog post: ${frontmatter.title || slug}`,
         `This PR updates the blog post "${
           frontmatter.title || slug
-        }".\n\nChanges made via ETSA Admin interface by ${session!.user
-          ?.name} (${session!.user?.email}).`,
+        }".\n\nChanges made by ${session!.user?.name}.`,
       );
 
       return NextResponse.json({

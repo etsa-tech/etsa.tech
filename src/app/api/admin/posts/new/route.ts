@@ -8,6 +8,7 @@ import {
   createOrGetPullRequest,
 } from "@/lib/github";
 import matter from "gray-matter";
+import { formatBlogPostContent } from "@/lib/server-only-formatter";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +30,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Combine frontmatter and content
-    const fullContent = matter.stringify(content, frontmatter);
+    const rawContent = matter.stringify(content, frontmatter);
+
+    // Format the content using Prettier for consistent formatting
+    const fullContent = await formatBlogPostContent(rawContent);
 
     if (createPR) {
       // Create a new branch for the changes

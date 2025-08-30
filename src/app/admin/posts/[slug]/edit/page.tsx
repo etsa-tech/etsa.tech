@@ -145,9 +145,15 @@ export default function EditPostPage() {
     setMessage(null);
 
     try {
+      // Determine which branch to save to:
+      // - If viewing a different branch (like a PR branch), save to that branch
+      // - Otherwise, save to the selected branch
+      const saveToBranch =
+        viewBranch !== selectedBranch ? viewBranch : selectedBranch;
+
       // Use slug directly - Next.js handles URL encoding/decoding
       const response = await fetch(
-        `/api/admin/posts/${slug}?branch=${encodeURIComponent(selectedBranch)}`,
+        `/api/admin/posts/${slug}?branch=${encodeURIComponent(saveToBranch)}`,
         {
           method: "PUT",
           headers: {
@@ -332,6 +338,7 @@ export default function EditPostPage() {
         isLoading={isLoading}
         currentBranch={selectedBranch}
         viewingBranch={viewBranch}
+        openPR={openPR}
       />
     </div>
   );
