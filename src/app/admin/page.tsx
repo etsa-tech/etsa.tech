@@ -156,66 +156,6 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-
-        <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">🖼️</span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Asset Management
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    Coming later
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-700 px-5 py-3">
-            <div className="text-sm">
-              <Link
-                href="/admin/assets"
-                className="font-medium text-etsa-primary hover:text-etsa-primary-dark"
-              >
-                Manage assets
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">⚙️</span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Settings
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    Configure
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-700 px-5 py-3">
-            <div className="text-sm">
-              <Link
-                href="/admin/settings"
-                className="font-medium text-etsa-primary hover:text-etsa-primary-dark"
-              >
-                View settings
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
 
       {error && (
@@ -258,12 +198,6 @@ export default function AdminDashboard() {
                 className="inline-flex items-center rounded-md bg-etsa-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-etsa-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-etsa-primary"
               >
                 Create New Post
-              </Link>
-              <Link
-                href="/admin/assets"
-                className="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
-                Upload Assets
               </Link>
             </div>
           </div>

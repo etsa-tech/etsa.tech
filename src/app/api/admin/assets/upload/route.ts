@@ -117,9 +117,9 @@ export async function POST(request: NextRequest) {
       owner,
       repo,
       path: filePath,
-      message: `Upload asset: ${file.name} for ${slug}
+      message: `Upload asset: ${file.name} for ${slug} [skip ci]
 
-Uploaded via ETSA Admin interface by ${session!.user?.name}. [skip ci]`,
+Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
       content: base64Content,
       branch: targetBranch,
       ...(existingFileSha && { sha: existingFileSha }),

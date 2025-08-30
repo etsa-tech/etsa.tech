@@ -554,6 +554,7 @@ export default function BlogPostEditor({
   const [loadingAssets, setLoadingAssets] = useState(false);
   const [searchedPaths, setSearchedPaths] = useState<string[]>([]);
   const [uploadingAsset, setUploadingAsset] = useState(false);
+  const [deletingAsset, setDeletingAsset] = useState<string | null>(null);
 
   const {
     register,
@@ -717,6 +718,52 @@ export default function BlogPostEditor({
 
     // Update the content
     setContent(newContent);
+  };
+
+  // Function to handle asset deletion
+  const handleAssetDelete = async (assetName: string) => {
+    if (!slug) return;
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${assetName}"? This action cannot be undone.`,
+    );
+
+    if (!confirmDelete) return;
+
+    setDeletingAsset(assetName);
+    try {
+      const response = await fetch(
+        `/api/admin/posts/${encodeURIComponent(
+          slug,
+        )}/assets?fileName=${encodeURIComponent(
+          assetName,
+        )}&branch=${encodeURIComponent(currentBranch)}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(
+          `${result.message}${
+            result.pullRequest ? ` (PR #${result.pullRequest.prNumber})` : ""
+          }`,
+        );
+
+        // Refresh assets after successful deletion
+        await fetchExistingAssets();
+      } else {
+        const error = await response.json();
+        console.error("Delete failed:", error);
+        alert(`Delete failed: ${error.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Delete failed. Please try again.");
+    } finally {
+      setDeletingAsset(null);
+    }
   };
 
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
@@ -1014,9 +1061,11 @@ export default function BlogPostEditor({
                               {asset.name}
                             </a>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {asset.size
-                                ? `${Math.round(asset.size / 1024)} KB`
-                                : "Unknown size"}
+                              {asset.size && asset.size > 0
+                                ? asset.size < 1024
+                                  ? `${asset.size} bytes`
+                                  : `${Math.round(asset.size / 1024)} KB`
+                                : "Size unavailable"}
                             </p>
                           </div>
                         </div>
@@ -1037,6 +1086,21 @@ export default function BlogPostEditor({
                             className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800"
                           >
                             Insert
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAssetDelete(asset.name)}
+                            disabled={deletingAsset === asset.name}
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {deletingAsset === asset.name ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-700 dark:border-red-300 mr-1"></div>
+                                Deleting...
+                              </>
+                            ) : (
+                              "Delete"
+                            )}
                           </button>
                         </div>
                       </div>
