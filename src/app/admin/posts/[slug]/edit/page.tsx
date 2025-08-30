@@ -250,9 +250,6 @@ export default function EditPostPage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Edit Blog Post: {String(postData.frontmatter.title || "Untitled")}
         </h1>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Make changes to your blog post.
-        </p>
       </div>
 
       {/* Branch Selector for viewing different versions */}

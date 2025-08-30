@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -142,7 +142,7 @@ function parseMultiDocumentYaml(content: string): {
 function reconstructYamlContent(
   formData: BlogPostFormData,
   rawYaml: string,
-  _remainingDocuments: string, // For future multi-document support
+  remainingDocuments: string, // For future multi-document support
 ): Record<string, unknown> {
   try {
     // If raw YAML is provided and valid, use it as the base
@@ -543,11 +543,24 @@ export default function BlogPostEditor({
   const [rawYaml, setRawYaml] = useState("");
   const [remainingDocuments, setRemainingDocuments] = useState("");
   const [showYamlEditor, setShowYamlEditor] = useState(false);
+  const [showAssets, setShowAssets] = useState(false);
+  const [existingAssets, setExistingAssets] = useState<
+    Array<{
+      name: string;
+      path: string;
+      url: string;
+      type: string;
+      size?: number;
+    }>
+  >([]);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+  const [searchedPaths, setSearchedPaths] = useState<string[]>([]);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
@@ -615,6 +628,44 @@ export default function BlogPostEditor({
     currentBranch.startsWith("update-post-") && !isUpdateBranchForThisPost;
   const isMainBranch = currentBranch === "main";
 
+  // Function to fetch existing assets for the current slug
+  const fetchExistingAssets = useCallback(async () => {
+    if (!slug) return;
+
+    setLoadingAssets(true);
+    try {
+      const branch = viewingBranch || currentBranch;
+      const response = await fetch(
+        `/api/admin/posts/${encodeURIComponent(
+          slug,
+        )}/assets?branch=${encodeURIComponent(branch)}`,
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setExistingAssets(data.assets || []);
+        setSearchedPaths(data.searchedPath ? [data.searchedPath] : []);
+      } else {
+        console.error("Failed to fetch assets:", response.statusText);
+        setExistingAssets([]);
+        setSearchedPaths([]);
+      }
+    } catch (error) {
+      console.error("Error fetching assets:", error);
+      setExistingAssets([]);
+      setSearchedPaths([]);
+    } finally {
+      setLoadingAssets(false);
+    }
+  }, [slug, viewingBranch, currentBranch]);
+
+  // Fetch existing assets when slug changes or assets section is shown
+  useEffect(() => {
+    if (slug && showAssets) {
+      fetchExistingAssets();
+    }
+  }, [slug, showAssets, fetchExistingAssets]);
+
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
     // Use the YAML reconstruction function to preserve format and handle multi-document YAML
     const frontmatter = reconstructYamlContent(
@@ -673,14 +724,14 @@ export default function BlogPostEditor({
                 htmlFor="slug"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                Slug
+                Slug (URL path)
               </label>
               <input
                 id="slug"
                 type="text"
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                readOnly
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 shadow-sm cursor-not-allowed sm:text-sm"
               />
             </div>
 
@@ -780,6 +831,265 @@ export default function BlogPostEditor({
               </label>
             </div>
           </div>
+        </div>
+
+        {/* Assets Section */}
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                Presentation Assets
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Add links to presentation slides, recordings, and other
+                resources.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAssets(!showAssets)}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary"
+            >
+              {showAssets ? "Hide Assets" : "Show Assets"}
+            </button>
+          </div>
+
+          {showAssets && (
+            <div className="space-y-6">
+              {/* Existing Assets */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-medium text-gray-900 dark:text-white">
+                    Existing Assets
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={fetchExistingAssets}
+                    disabled={loadingAssets}
+                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50"
+                  >
+                    {loadingAssets ? "Loading..." : "Refresh"}
+                  </button>
+                </div>
+
+                {loadingAssets ? (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-etsa-primary"></div>
+                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                      Loading assets...
+                    </span>
+                  </div>
+                ) : existingAssets.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-3">
+                    {existingAssets.map((asset, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+                      >
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          <div className="flex-shrink-0">
+                            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                              <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                                {asset.type}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <a
+                              href={asset.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline truncate block"
+                            >
+                              {asset.name}
+                            </a>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {asset.size
+                                ? `${Math.round(asset.size / 1024)} KB`
+                                : "Unknown size"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              // Use just the filename - the blog system will auto-insert the slug path
+                              setValue("presentationSlides", asset.name);
+                            }}
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800"
+                          >
+                            Use
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                      No assets found
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      No assets were found for this post slug. Upload assets to
+                      one of these locations:
+                    </p>
+                    {searchedPaths.length > 0 && (
+                      <details className="mt-3 text-left">
+                        <summary className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
+                          Show searched locations ({searchedPaths.length})
+                        </summary>
+                        <div className="mt-2 bg-gray-50 dark:bg-gray-700 rounded p-2 text-xs text-gray-600 dark:text-gray-400">
+                          <ul className="space-y-1">
+                            {searchedPaths.slice(0, 6).map((path, index) => (
+                              <li key={index} className="font-mono">
+                                {path}/
+                              </li>
+                            ))}
+                            {searchedPaths.length > 6 && (
+                              <li className="text-gray-500 dark:text-gray-500">
+                                ... and {searchedPaths.length - 6} more
+                                locations
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <hr className="border-gray-200 dark:border-gray-700" />
+              {/* Presentation Slides */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    htmlFor="presentationSlides"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Presentation Slides URL (Use only the filename when stored
+                    in Git under the slug)
+                  </label>
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const title = watch("title");
+                        const date = watch("date");
+                        if (title && date) {
+                          const slugURL = `presentation.pdf`;
+                          setValue("presentationSlides", slugURL);
+                        }
+                      }}
+                      className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800"
+                    >
+                      Local Git Storage
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const title = watch("title");
+                        const date = watch("date");
+                        if (title && date) {
+                          const googleSlidesUrl = `https://docs.google.com/presentation/d/YOUR_PRESENTATION_ID/edit#slide=id.p`;
+                          setValue("presentationSlides", googleSlidesUrl);
+                        }
+                      }}
+                      className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800"
+                    >
+                      Google Slides Template
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const title = watch("title");
+                        const date = watch("date");
+                        if (title && date) {
+                          const slideshareUrl = `https://www.slideshare.net/YOUR_USERNAME/${title
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}-${date}`;
+                          setValue("presentationSlides", slideshareUrl);
+                        }
+                      }}
+                      className="text-xs px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded hover:bg-orange-200 dark:hover:bg-orange-800"
+                    >
+                      SlideShare Template
+                    </button>
+                  </div>
+                </div>
+                <input
+                  id="presentationSlides"
+                  type="url"
+                  {...register("presentationSlides")}
+                  placeholder="https://docs.google.com/presentation/d/..."
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                />
+              </div>
+
+              {/* Recording URL */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    htmlFor="recordingUrl"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Recording URL
+                  </label>
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const title = watch("title");
+                        const date = watch("date");
+                        if (title && date) {
+                          const youtubeUrl = `https://www.youtube.com/watch?v=YOUR_VIDEO_ID`;
+                          setValue("recordingUrl", youtubeUrl);
+                        }
+                      }}
+                      className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-800"
+                    >
+                      YouTube Template
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const title = watch("title");
+                        const date = watch("date");
+                        if (title && date) {
+                          const vimeoUrl = `https://vimeo.com/YOUR_VIDEO_ID`;
+                          setValue("recordingUrl", vimeoUrl);
+                        }
+                      }}
+                      className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800"
+                    >
+                      Vimeo Template
+                    </button>
+                  </div>
+                </div>
+                <input
+                  id="recordingUrl"
+                  type="url"
+                  {...register("recordingUrl")}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Advanced YAML Editor */}
