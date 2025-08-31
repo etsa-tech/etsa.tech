@@ -109,6 +109,9 @@ export default function EditPostPage() {
 
         console.log(`Fetching post ${slug} from branch: ${branchToUse}`);
 
+        // Set loading state when refetching due to branch change
+        setIsLoadingPost(true);
+
         // Use slug directly - Next.js handles URL encoding/decoding
         const response = await fetch(
           `/api/admin/posts/${slug}?branch=${encodeURIComponent(branchToUse)}`,
@@ -118,6 +121,9 @@ export default function EditPostPage() {
         }
         const data = await response.json();
         setPostData(data);
+
+        // Clear any previous error messages when successfully loading new branch data
+        setMessage(null);
       } catch (error) {
         console.error("Error fetching post:", error);
         setMessage({
@@ -146,10 +152,18 @@ export default function EditPostPage() {
 
     try {
       // Determine which branch to save to:
-      // - If viewing a different branch (like a PR branch), save to that branch
-      // - Otherwise, save to the selected branch
-      const saveToBranch =
-        viewBranch !== selectedBranch ? viewBranch : selectedBranch;
+      let saveToBranch: string;
+
+      if (data.createPR && openPR) {
+        // If user clicks "Save to PR" and there's an open PR, always save to the PR branch
+        saveToBranch = openPR.branchName;
+      } else if (viewBranch !== selectedBranch) {
+        // If viewing a different branch (like a PR branch), save to that branch
+        saveToBranch = viewBranch;
+      } else {
+        // Otherwise, save to the selected branch
+        saveToBranch = selectedBranch;
+      }
 
       // Use slug directly - Next.js handles URL encoding/decoding
       const response = await fetch(

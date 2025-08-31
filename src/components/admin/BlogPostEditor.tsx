@@ -276,7 +276,9 @@ function BranchStatusIndicator({
 }: BranchStatusIndicatorProps) {
   // When viewing content from a different branch (like a PR branch)
   if (viewingBranch && viewingBranch !== currentBranch) {
-    const saveToBranch = viewingBranch; // Save to the branch we're viewing, not currentBranch
+    // If there's an open PR and we're viewing main, save to PR branch
+    const saveToBranch =
+      openPR && viewingBranch === "main" ? openPR.branchName : viewingBranch;
 
     return (
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
@@ -462,8 +464,20 @@ function ActionButtons({
         </button>
       )}
 
-      {/* Create PR button - only show on main branch when not viewing a different branch */}
-      {isMainBranch && !isViewingPRBranch && (
+      {/* Save to PR button - show when there's an open PR and we're on main branch */}
+      {openPR && isMainBranch && !isViewingPRBranch && (
+        <button
+          type="button"
+          onClick={onCreatePR}
+          disabled={isLoading}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-etsa-primary hover:bg-etsa-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary disabled:opacity-50"
+        >
+          {isLoading ? "Saving..." : "Save to PR"}
+        </button>
+      )}
+
+      {/* Create PR button - only show on main branch when there's no open PR and not viewing a different branch */}
+      {isMainBranch && !openPR && !isViewingPRBranch && (
         <button
           type="button"
           onClick={onCreatePR}
@@ -561,6 +575,7 @@ export default function BlogPostEditor({
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
@@ -568,6 +583,42 @@ export default function BlogPostEditor({
   });
 
   const title = watch("title");
+
+  // Update form and component state when initialData changes (e.g., branch switch)
+  useEffect(() => {
+    if (initialData) {
+      // Reset form with new data
+      reset(createDefaultValues(initialData));
+
+      // Update component state
+      setContent(initialData.content || "");
+      setSlug(initialData.slug || "");
+
+      // Update YAML content if available
+      if (initialData.rawContent) {
+        try {
+          const { rawFirstDocument, remainingDocuments: remaining } =
+            parseMultiDocumentYaml(initialData.rawContent);
+          setRawYaml(rawFirstDocument);
+          setRemainingDocuments(remaining);
+        } catch (error) {
+          console.error("Error parsing multi-document YAML:", error);
+          if (initialData.frontmatter) {
+            const yamlString = yaml.dump(initialData.frontmatter, {
+              indent: 2,
+              lineWidth: -1,
+              noRefs: true,
+            });
+            setRawYaml(yamlString);
+          }
+        }
+      }
+
+      // Clear assets when switching branches (they'll be refetched if needed)
+      setExistingAssets([]);
+      setShowAssets(false);
+    }
+  }, [initialData, reset]);
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -580,45 +631,6 @@ export default function BlogPostEditor({
   useEffect(() => {
     processMarkdownPreview(content, setPreview);
   }, [content]);
-
-  // Initialize raw YAML from raw content when component loads
-  useEffect(() => {
-    if (initialData?.rawContent) {
-      try {
-        // Parse multi-document YAML from raw content
-        const { rawFirstDocument, remainingDocuments: remaining } =
-          parseMultiDocumentYaml(initialData.rawContent);
-        setRawYaml(rawFirstDocument);
-        setRemainingDocuments(remaining);
-      } catch (error) {
-        console.error("Error parsing multi-document YAML:", error);
-        // Fallback to converting frontmatter to YAML
-        if (initialData?.frontmatter) {
-          const yamlString = yaml.dump(initialData.frontmatter, {
-            indent: 2,
-            lineWidth: -1,
-            noRefs: true,
-            sortKeys: false,
-          });
-          setRawYaml(yamlString);
-        }
-      }
-    } else if (initialData?.frontmatter) {
-      // Fallback for when rawContent is not available
-      try {
-        const yamlString = yaml.dump(initialData.frontmatter, {
-          indent: 2,
-          lineWidth: -1,
-          noRefs: true,
-          sortKeys: false,
-        });
-        setRawYaml(yamlString);
-      } catch (error) {
-        console.error("Error converting frontmatter to YAML:", error);
-        setRawYaml("");
-      }
-    }
-  }, [initialData?.rawContent, initialData?.frontmatter]);
 
   // Determine if we're on an update branch for THIS specific post
   const isUpdateBranchForThisPost = currentBranch.startsWith(
