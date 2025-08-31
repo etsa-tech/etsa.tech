@@ -120,6 +120,27 @@ function formatFileSize(size: number | undefined): string {
   return `${Math.round(size / 1024)} KB`;
 }
 
+// Helper function to generate preview slug
+function generatePreviewSlug(
+  slug: string,
+  date: string,
+  title: string,
+): string {
+  if (slug) {
+    return slug;
+  }
+
+  if (date && title) {
+    return generateSlugFromDateAndTitle(date, title);
+  }
+
+  if (title) {
+    return generateSlugFromTitle(title);
+  }
+
+  return "your-post-slug";
+}
+
 // Helper function to generate slug from date and title (ETSA format: YYYY-MM-DD-Title)
 function generateSlugFromDateAndTitle(date: string, title: string): string {
   const titleSlug = title
@@ -1223,12 +1244,7 @@ export default function BlogPostEditor({
                   Preview:{" "}
                   <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">
                     /blog/
-                    {slug ||
-                      (date && title
-                        ? generateSlugFromDateAndTitle(date, title)
-                        : title
-                          ? generateSlugFromTitle(title)
-                          : "your-post-slug")}
+                    {generatePreviewSlug(slug, date, title)}
                   </code>
                 </p>
               )}

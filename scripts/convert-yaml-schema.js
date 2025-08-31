@@ -27,7 +27,7 @@ function cleanStringValue(value) {
     ) {
       const unquoted = trimmed.slice(1, -1);
       // Only remove quotes if the unquoted string doesn't contain special YAML characters
-      if (!/[:\[\]{}|>*&!%@`]/.test(unquoted)) {
+      if (!/[:[\]{}|>*&!%@`]/.test(unquoted)) {
         return unquoted;
       }
     }
