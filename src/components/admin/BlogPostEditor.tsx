@@ -711,6 +711,11 @@ export default function BlogPostEditor({
   const [rawYaml, setRawYaml] = useState("");
   const [remainingDocuments, setRemainingDocuments] = useState(""); // Used in onSubmit for multi-document YAML
   const [showYamlEditor, setShowYamlEditor] = useState(!initialData); // Auto-expand for new posts
+
+  // Debug viewingBranch changes
+  useEffect(() => {
+    console.log("viewingBranch changed to:", viewingBranch);
+  }, [viewingBranch]);
   const [showAssets, setShowAssets] = useState(false);
   const [existingAssets, setExistingAssets] = useState<
     Array<{
@@ -772,8 +777,9 @@ export default function BlogPostEditor({
       }
 
       // Clear assets when switching branches (they'll be refetched if needed)
+      // But don't hide the assets section if it was already open (e.g., after asset upload)
       setExistingAssets([]);
-      setShowAssets(false);
+      // Don't automatically hide assets section - let user control it
     }
   }, [initialData, reset]);
 
@@ -835,8 +841,15 @@ export default function BlogPostEditor({
 
   // Function to fetch existing assets for the current slug
   const fetchExistingAssets = useCallback(async () => {
+    console.log("fetchExistingAssets called with:", {
+      slug,
+      currentBranch,
+      viewingBranch,
+    });
+
     // For new posts without a slug, we can't fetch assets yet
     if (!slug) {
+      console.log("No slug, clearing assets");
       setExistingAssets([]);
       setSearchedPaths([]);
       return;
@@ -853,6 +866,8 @@ export default function BlogPostEditor({
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Assets API response:", data);
+        console.log("Setting assets:", data.assets || []);
         setExistingAssets(data.assets || []);
         setSearchedPaths(data.searchedPath ? [data.searchedPath] : []);
       } else {
@@ -926,10 +941,20 @@ export default function BlogPostEditor({
           });
         }
 
-        // Refresh assets after successful upload - use a small delay to ensure branch state is updated
-        setTimeout(async () => {
-          await fetchExistingAssets();
-        }, 500);
+        // Show assets section
+        setShowAssets(true);
+
+        // If a PR was created, the assets are already refreshed by the branch switch
+        // No need for additional refresh since onPRCreated will trigger a branch change
+        if (!result.pullRequest) {
+          // Only refresh if no PR was created (direct commit to main)
+          console.log("No PR created, refreshing assets...");
+          setTimeout(async () => {
+            await fetchExistingAssets();
+          }, 1000);
+        } else {
+          console.log("PR created, assets will be refreshed by branch switch");
+        }
       } else {
         const error = await response.json();
         console.error("Upload failed:", error);
