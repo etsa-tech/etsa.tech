@@ -107,6 +107,19 @@ function getStringValue(value: unknown, defaultValue = ""): string {
   return typeof value === "string" ? value : defaultValue;
 }
 
+// Helper function to format file size
+function formatFileSize(size: number | undefined): string {
+  if (!size || size <= 0) {
+    return "Size unavailable";
+  }
+
+  if (size < 1024) {
+    return `${size} bytes`;
+  }
+
+  return `${Math.round(size / 1024)} KB`;
+}
+
 // Helper function to generate slug from date and title (ETSA format: YYYY-MM-DD-Title)
 function generateSlugFromDateAndTitle(date: string, title: string): string {
   const titleSlug = title
@@ -1510,132 +1523,140 @@ export default function BlogPostEditor({
                   </button>
                 </div>
 
-                {loadingAssets ? (
-                  <div className="flex items-center justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-etsa-primary"></div>
-                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                      Loading assets...
-                    </span>
-                  </div>
-                ) : existingAssets.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-3">
-                    {existingAssets.map((asset) => (
-                      <div
-                        key={asset.url || asset.name}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
-                      >
-                        <div className="flex items-center space-x-3 flex-1 min-w-0">
-                          <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                              <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
-                                {asset.type}
-                              </span>
+                {(() => {
+                  if (loadingAssets) {
+                    return (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-etsa-primary"></div>
+                        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                          Loading assets...
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  if (existingAssets.length > 0) {
+                    return (
+                      <div className="grid grid-cols-1 gap-3">
+                        {existingAssets.map((asset) => (
+                          <div
+                            key={asset.url || asset.name}
+                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+                          >
+                            <div className="flex items-center space-x-3 flex-1 min-w-0">
+                              <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                  <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                                    {asset.type}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <a
+                                  href={asset.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline truncate block"
+                                >
+                                  {asset.name}
+                                </a>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {formatFileSize(asset.size)}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2 flex-shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  // Use just the filename - the blog system will auto-insert the slug path
+                                  setValue("presentationSlides", asset.name);
+                                }}
+                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800"
+                              >
+                                Use
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  insertAssetIntoMarkdown(asset.name)
+                                }
+                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800"
+                              >
+                                Insert
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleAssetDelete(asset.name)}
+                                disabled={deletingAsset === asset.name}
+                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {deletingAsset === asset.name ? (
+                                  <>
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-700 dark:border-red-300 mr-1"></div>
+                                    Deleting...
+                                  </>
+                                ) : (
+                                  "Delete"
+                                )}
+                              </button>
                             </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <a
-                              href={asset.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline truncate block"
-                            >
-                              {asset.name}
-                            </a>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {asset.size && asset.size > 0
-                                ? asset.size < 1024
-                                  ? `${asset.size} bytes`
-                                  : `${Math.round(asset.size / 1024)} KB`
-                                : "Size unavailable"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2 flex-shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              // Use just the filename - the blog system will auto-insert the slug path
-                              setValue("presentationSlides", asset.name);
-                            }}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800"
-                          >
-                            Use
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => insertAssetIntoMarkdown(asset.name)}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800"
-                          >
-                            Insert
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleAssetDelete(asset.name)}
-                            disabled={deletingAsset === asset.name}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {deletingAsset === asset.name ? (
-                              <>
-                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-700 dark:border-red-300 mr-1"></div>
-                                Deleting...
-                              </>
-                            ) : (
-                              "Delete"
-                            )}
-                          </button>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                      {!slug
-                        ? "Enter title and date to browse assets"
-                        : "No assets found"}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                      {!slug
-                        ? "Fill in the title and date fields above to generate a slug, then you can browse and upload assets for this post."
-                        : "No assets were found for this post slug. Upload assets to one of these locations:"}
-                    </p>
-                    {searchedPaths.length > 0 && (
-                      <details className="mt-3 text-left">
-                        <summary className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
-                          Show searched locations ({searchedPaths.length})
-                        </summary>
-                        <div className="mt-2 bg-gray-50 dark:bg-gray-700 rounded p-2 text-xs text-gray-600 dark:text-gray-400">
-                          <ul className="space-y-1">
-                            {searchedPaths.slice(0, 6).map((path, index) => (
-                              <li key={index} className="font-mono">
-                                {path}/
-                              </li>
-                            ))}
-                            {searchedPaths.length > 6 && (
-                              <li className="text-gray-500 dark:text-gray-500">
-                                ... and {searchedPaths.length - 6} more
-                                locations
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-                      </details>
-                    )}
-                  </div>
-                )}
+                    );
+                  }
+
+                  return (
+                    <div className="text-center py-4">
+                      <svg
+                        className="mx-auto h-12 w-12 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                        {!slug
+                          ? "Enter title and date to browse assets"
+                          : "No assets found"}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {!slug
+                          ? "Fill in the title and date fields above to generate a slug, then you can browse and upload assets for this post."
+                          : "No assets were found for this post slug. Upload assets to one of these locations:"}
+                      </p>
+                      {searchedPaths.length > 0 && (
+                        <details className="mt-3 text-left">
+                          <summary className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
+                            Show searched locations ({searchedPaths.length})
+                          </summary>
+                          <div className="mt-2 bg-gray-50 dark:bg-gray-700 rounded p-2 text-xs text-gray-600 dark:text-gray-400">
+                            <ul className="space-y-1">
+                              {searchedPaths.slice(0, 6).map((path) => (
+                                <li key={path} className="font-mono">
+                                  {path}/
+                                </li>
+                              ))}
+                              {searchedPaths.length > 6 && (
+                                <li className="text-gray-500 dark:text-gray-500">
+                                  ... and {searchedPaths.length - 6} more
+                                  locations
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        </details>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
 
               <hr className="border-gray-200 dark:border-gray-700" />
@@ -2107,9 +2128,16 @@ export default function BlogPostEditor({
         {showSpeakerImageModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             {/* Overlay */}
-            <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default"
               onClick={() => setShowSpeakerImageModal(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setShowSpeakerImageModal(false);
+                }
+              }}
+              aria-label="Close modal"
             />
 
             {/* Modal */}
@@ -2202,71 +2230,80 @@ export default function BlogPostEditor({
                     </span>
                   </div>
                   <div className="max-h-[55vh] overflow-y-auto">
-                    <table className="w-full">
-                      <thead className="bg-secondary-100 dark:bg-secondary-800 sticky top-0">
-                        <tr>
-                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
-                            Preview
-                          </th>
-                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
-                            Name
-                          </th>
-                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
-                            Size
-                          </th>
-                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
-                            Action
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {filteredSpeakerImages.map((image) => (
-                          <tr
-                            key={image.url}
-                            className="hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                          >
-                            <td className="px-4 py-2">
-                              <Image
-                                src={image.url}
-                                alt={image.name}
-                                width={40}
-                                height={40}
-                                className="w-10 h-10 rounded-full object-cover"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                {image.name}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400">
-                                {image.url.split("/").pop()}
-                              </div>
-                            </td>
-                            <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-                              {(image.size / 1024).toFixed(1)} KB
-                            </td>
-                            <td className="px-4 py-2">
-                              <button
-                                onClick={() => selectSpeakerImage(image.url)}
-                                className="inline-flex items-center px-3 py-1 rounded-md border border-etsa-primary text-etsa-primary hover:bg-etsa-primary hover:text-white text-xs font-medium transition-colors"
-                              >
-                                Select
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {filteredSpeakerImages.length === 0 && (
+                    {loadingSpeakerImages ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-etsa-primary"></div>
+                        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                          Loading speaker images...
+                        </span>
+                      </div>
+                    ) : (
+                      <table className="w-full">
+                        <thead className="bg-secondary-100 dark:bg-secondary-800 sticky top-0">
                           <tr>
-                            <td
-                              colSpan={4}
-                              className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
-                            >
-                              No images found.
-                            </td>
+                            <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                              Preview
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                              Name
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                              Size
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                              Action
+                            </th>
                           </tr>
-                        )}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                          {filteredSpeakerImages.map((image) => (
+                            <tr
+                              key={image.url}
+                              className="hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                            >
+                              <td className="px-4 py-2">
+                                <Image
+                                  src={image.url}
+                                  alt={image.name}
+                                  width={40}
+                                  height={40}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+                              </td>
+                              <td className="px-4 py-2">
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {image.name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {image.url.split("/").pop()}
+                                </div>
+                              </td>
+                              <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                {(image.size / 1024).toFixed(1)} KB
+                              </td>
+                              <td className="px-4 py-2">
+                                <button
+                                  onClick={() => selectSpeakerImage(image.url)}
+                                  className="inline-flex items-center px-3 py-1 rounded-md border border-etsa-primary text-etsa-primary hover:bg-etsa-primary hover:text-white text-xs font-medium transition-colors"
+                                >
+                                  Select
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                          {filteredSpeakerImages.length === 0 && (
+                            <tr>
+                              <td
+                                colSpan={4}
+                                className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
+                              >
+                                No images found.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    )}
                   </div>
                 </div>
               </div>
