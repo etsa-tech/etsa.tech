@@ -137,8 +137,14 @@ function getFirstTuesdayOfNextMonth(): string {
   // Find the first Tuesday (day 2, where Sunday = 0)
   const firstTuesday = new Date(nextMonth);
   const dayOfWeek = nextMonth.getDay();
-  const daysToAdd =
-    dayOfWeek === 0 ? 2 : dayOfWeek <= 2 ? 2 - dayOfWeek : 9 - dayOfWeek;
+  let daysToAdd: number;
+  if (dayOfWeek === 0) {
+    daysToAdd = 2;
+  } else if (dayOfWeek <= 2) {
+    daysToAdd = 2 - dayOfWeek;
+  } else {
+    daysToAdd = 9 - dayOfWeek;
+  }
   firstTuesday.setDate(nextMonth.getDate() + daysToAdd);
 
   return firstTuesday.toISOString().split("T")[0];
@@ -1513,9 +1519,9 @@ export default function BlogPostEditor({
                   </div>
                 ) : existingAssets.length > 0 ? (
                   <div className="grid grid-cols-1 gap-3">
-                    {existingAssets.map((asset, index) => (
+                    {existingAssets.map((asset) => (
                       <div
-                        key={index}
+                        key={asset.url || asset.name}
                         className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
                       >
                         <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -2013,9 +2019,10 @@ export default function BlogPostEditor({
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <p className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   YAML Frontmatter (First Document)
-                </label>
+                </p>
+
                 <MonacoEditor
                   height="300px"
                   defaultLanguage="yaml"
@@ -2023,6 +2030,7 @@ export default function BlogPostEditor({
                   onChange={(value) => setRawYaml(value || "")}
                   theme="vs-dark"
                   options={{
+                    ariaLabel: "YAML Frontmatter (First Document)",
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
                     fontSize: 14,
@@ -2212,9 +2220,9 @@ export default function BlogPostEditor({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {filteredSpeakerImages.map((image, index) => (
+                        {filteredSpeakerImages.map((image) => (
                           <tr
-                            key={index}
+                            key={image.url}
                             className="hover:bg-gray-50 dark:hover:bg-gray-800/60"
                           >
                             <td className="px-4 py-2">
