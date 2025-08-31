@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { remark } from "remark";
 import html from "remark-html";
 import yaml from "js-yaml";
+import Image from "next/image";
 
 // Dynamically import Monaco Editor to avoid SSR issues
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
@@ -283,7 +284,7 @@ function parseMultiDocumentYaml(content: string): {
 function reconstructYamlContent(
   formData: BlogPostFormData,
   rawYaml: string,
-  remainingDocuments: string, // Used in onSubmit function for multi-document YAML support
+  _remainingDocuments: string, // Used in onSubmit function for multi-document YAML support
 ): Record<string, unknown> {
   try {
     // If raw YAML is provided and valid, use it as the base
@@ -749,6 +750,7 @@ export default function BlogPostEditor({
   >([]);
   const [loadingSpeakerImages, setLoadingSpeakerImages] = useState(false);
   const [uploadingSpeakerImage, setUploadingSpeakerImage] = useState(false);
+  const [speakerSearchQuery, setSpeakerSearchQuery] = useState("");
 
   const {
     register,
@@ -813,38 +815,42 @@ export default function BlogPostEditor({
     }
   }, [title, date, initialData?.slug]);
 
-  // Update YAML template with live data from form for both new posts and edit mode
+  // Live-update YAML whenever any form field changes (new posts and edit mode)
   useEffect(() => {
-    if (showYamlEditor) {
-      const formData = {
-        title: title || "",
-        date: date || "",
-        excerpt: watch("excerpt") || "",
-        tags: watch("tags") || "",
-        author: watch("author") || "",
-        published: watch("published") ?? true,
-        speakerName: watch("speakerName") || "",
-        speakerTitle: watch("speakerTitle") || "",
-        speakerCompany: watch("speakerCompany") || "",
-        speakerBio: watch("speakerBio") || "",
-        speakerImage: watch("speakerImage") || "",
-        presentationTitle: watch("presentationTitle") || "",
-        presentationDescription: watch("presentationDescription") || "",
-        presentationSlides: watch("presentationSlides") || "",
-        recordingUrl: watch("recordingUrl") || "",
-        eventDate: watch("eventDate") || "",
-        eventLocation: watch("eventLocation") || "",
-        eventLocationName: watch("eventLocationName") || "",
-        eventLocationAddress: watch("eventLocationAddress") || "",
-        eventLocationLat: watch("eventLocationLat") || "",
-        eventLocationLng: watch("eventLocationLng") || "",
-        rawYaml: "",
-      };
+    if (!showYamlEditor) return;
 
-      const template = generateDefaultYamlTemplate(formData);
+    const subscription = watch((value) => {
+      const v = value as Partial<BlogPostFormData>;
+      const template = generateDefaultYamlTemplate({
+        title: v.title || "",
+        date: v.date || "",
+        excerpt: v.excerpt || "",
+        tags: v.tags || "",
+        author: v.author || "",
+        published: v.published ?? true,
+        speakerName: v.speakerName || "",
+        speakerTitle: v.speakerTitle || "",
+        speakerCompany: v.speakerCompany || "",
+        speakerBio: v.speakerBio || "",
+        speakerImage: v.speakerImage || "",
+        presentationTitle: v.presentationTitle || "",
+        presentationDescription: v.presentationDescription || "",
+        presentationSlides: v.presentationSlides || "",
+        recordingUrl: v.recordingUrl || "",
+        eventDate: v.eventDate || "",
+        eventLocation: v.eventLocation || "",
+        eventLocationName: v.eventLocationName || "",
+        eventLocationAddress: v.eventLocationAddress || "",
+        eventLocationLat: v.eventLocationLat || "",
+        eventLocationLng: v.eventLocationLng || "",
+        rawYaml: "",
+      } as BlogPostFormData);
+
       setRawYaml(template);
-    }
-  }, [title, date, watch, showYamlEditor]);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch, showYamlEditor]);
 
   // Update preview when content changes
   useEffect(() => {
@@ -1121,6 +1127,10 @@ export default function BlogPostEditor({
     setValue("speakerImage", imageUrl);
     setShowSpeakerImageModal(false);
   };
+  // Derived list filtered by the search box
+  const filteredSpeakerImages = speakerImages.filter((img) =>
+    img.name.toLowerCase().includes(speakerSearchQuery.toLowerCase()),
+  );
 
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
     // Use the YAML reconstruction function to preserve format and handle multi-document YAML
@@ -2087,61 +2097,169 @@ export default function BlogPostEditor({
 
         {/* Speaker Image Modal */}
         {showSpeakerImageModal && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Select Speaker Image
-                </h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Overlay */}
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowSpeakerImageModal(false)}
+            />
+
+            {/* Modal */}
+            <div className="relative bg-white dark:bg-etsa-dark rounded-xl shadow-2xl w-full max-w-4xl mx-4 max-h-[80vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-etsa-primary" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Select Speaker Image
+                  </h3>
+                </div>
                 <button
                   onClick={() => setShowSpeakerImageModal(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-gray-500 hover:text-etsa-primary dark:text-gray-400 dark:hover:text-etsa-light"
+                  aria-label="Close"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <button className="px-4 py-2 bg-blue-500 text-white rounded">
-                  Upload New Image
-                </button>
+              {/* Body */}
+              <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-hidden">
+                {/* Left: Actions/Search */}
+                <div className="space-y-4 lg:col-span-1">
+                  {/* Upload */}
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Upload New Image
+                    </h4>
+                    <input
+                      type="file"
+                      id="speaker-image-upload-modal"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleSpeakerImageUpload(file);
+                      }}
+                    />
+                    <label
+                      htmlFor="speaker-image-upload-modal"
+                      className={`btn btn-primary w-full justify-center ${
+                        uploadingSpeakerImage
+                          ? "opacity-60 cursor-not-allowed"
+                          : ""
+                      }`}
+                      aria-disabled={uploadingSpeakerImage}
+                    >
+                      {uploadingSpeakerImage ? "Uploading..." : "Choose File"}
+                    </label>
+                  </div>
 
-                <div className="border rounded">
-                  <table className="w-full">
-                    <thead className="bg-gray-100 dark:bg-gray-700">
-                      <tr>
-                        <th className="px-4 py-2 text-left">Preview</th>
-                        <th className="px-4 py-2 text-left">Name</th>
-                        <th className="px-4 py-2 text-left">Size</th>
-                        <th className="px-4 py-2 text-left">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {speakerImages.map((image, index) => (
-                        <tr key={index} className="border-t">
-                          <td className="px-4 py-2">
-                            <img
-                              src={image.url}
-                              alt={image.name}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          </td>
-                          <td className="px-4 py-2">{image.name}</td>
-                          <td className="px-4 py-2">
-                            {(image.size / 1024).toFixed(1)} KB
-                          </td>
-                          <td className="px-4 py-2">
-                            <button
-                              onClick={() => selectSpeakerImage(image.url)}
-                              className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
-                            >
-                              Select
-                            </button>
-                          </td>
+                  {/* Search */}
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Search
+                    </h4>
+                    <div className="relative">
+                      <svg
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"
+                        />
+                      </svg>
+                      <input
+                        type="text"
+                        value={speakerSearchQuery}
+                        onChange={(e) => setSpeakerSearchQuery(e.target.value)}
+                        placeholder="Search speaker images..."
+                        className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-9 pr-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-etsa-primary focus:ring-etsa-primary"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Table */}
+                <div className="lg:col-span-2 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="bg-etsa-primary/10 dark:bg-etsa-primary/20 px-4 py-2 flex items-center justify-between">
+                    <span className="text-sm text-gray-700 dark:text-gray-200">
+                      {filteredSpeakerImages.length} image
+                      {filteredSpeakerImages.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  <div className="max-h-[55vh] overflow-y-auto">
+                    <table className="w-full">
+                      <thead className="bg-secondary-100 dark:bg-secondary-800 sticky top-0">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                            Preview
+                          </th>
+                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                            Name
+                          </th>
+                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                            Size
+                          </th>
+                          <th className="px-4 py-2 text-left text-xs font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">
+                            Action
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        {filteredSpeakerImages.map((image, index) => (
+                          <tr
+                            key={index}
+                            className="hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                          >
+                            <td className="px-4 py-2">
+                              <Image
+                                src={image.url}
+                                alt={image.name}
+                                width={40}
+                                height={40}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                {image.name}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {image.url.split("/").pop()}
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                              {(image.size / 1024).toFixed(1)} KB
+                            </td>
+                            <td className="px-4 py-2">
+                              <button
+                                onClick={() => selectSpeakerImage(image.url)}
+                                className="inline-flex items-center px-3 py-1 rounded-md border border-etsa-primary text-etsa-primary hover:bg-etsa-primary hover:text-white text-xs font-medium transition-colors"
+                              >
+                                Select
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredSpeakerImages.length === 0 && (
+                          <tr>
+                            <td
+                              colSpan={4}
+                              className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
+                            >
+                              No images found.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
