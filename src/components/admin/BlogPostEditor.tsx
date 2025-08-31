@@ -33,6 +33,10 @@ const blogPostSchema = z.object({
   recordingUrl: z.string().optional(),
   eventDate: z.string().optional(),
   eventLocation: z.string().optional(),
+  eventLocationName: z.string().optional(),
+  eventLocationAddress: z.string().optional(),
+  eventLocationLat: z.string().optional(),
+  eventLocationLng: z.string().optional(),
   published: z.boolean().optional(),
   rawYaml: z.string().optional(), // For manual YAML editing
 });
@@ -56,6 +60,15 @@ interface BlogPostFrontmatter {
   speakerBio?: string;
   presentationSlides?: string;
   recordingUrl?: string;
+  eventDate?: string;
+  eventLocation?: {
+    name?: string;
+    address?: string;
+    coordinates?: {
+      lat?: string;
+      lng?: string;
+    };
+  };
   [key: string]: unknown;
 }
 
@@ -79,6 +92,11 @@ interface BlogPostEditorProps {
     branchName: string;
     prNumber: number;
   } | null;
+  readonly onPRCreated?: (prInfo: {
+    prNumber: number;
+    branchName: string;
+    isNew: boolean;
+  }) => void;
 }
 
 // Helper function to safely extract string values from frontmatter
@@ -86,7 +104,125 @@ function getStringValue(value: unknown, defaultValue = ""): string {
   return typeof value === "string" ? value : defaultValue;
 }
 
-// Helper function to generate slug from title
+// Helper function to generate slug from date and title (ETSA format: YYYY-MM-DD-Title)
+function generateSlugFromDateAndTitle(date: string, title: string): string {
+  const titleSlug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim();
+
+  return date ? `${date}-${titleSlug}` : titleSlug;
+}
+
+// Default meeting location (from meeting-info page)
+const DEFAULT_LOCATION = {
+  name: "Knoxville Entrepreneur Center",
+  address: "17 Market Square SUITE 101, Knoxville, TN 37902",
+  coordinates: {
+    lat: "35.965179",
+    lng: "-83.919846",
+  },
+};
+
+// Helper function to get first Tuesday of next month
+function getFirstTuesdayOfNextMonth(): string {
+  const now = new Date();
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+  // Find the first Tuesday (day 2, where Sunday = 0)
+  const firstTuesday = new Date(nextMonth);
+  const dayOfWeek = nextMonth.getDay();
+  const daysToAdd =
+    dayOfWeek === 0 ? 2 : dayOfWeek <= 2 ? 2 - dayOfWeek : 9 - dayOfWeek;
+  firstTuesday.setDate(nextMonth.getDate() + daysToAdd);
+
+  return firstTuesday.toISOString().split("T")[0];
+}
+
+// Google Maps integration function (server-side API call)
+async function searchGoogleMaps(query: string): Promise<{
+  name: string;
+  address: string;
+  lat: string;
+  lng: string;
+} | null> {
+  try {
+    console.log(`Searching for location: ${query}`);
+
+    const response = await fetch(
+      `/api/admin/google-maps/search?query=${encodeURIComponent(query)}`,
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log("No results found for:", query);
+        return null;
+      }
+      throw new Error(`Search failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Search result:", result);
+
+    return result;
+  } catch (error) {
+    console.error("Error searching Google Maps:", error);
+    return null;
+  }
+}
+
+// Helper function to generate default YAML template with live data (ETSA format)
+function generateDefaultYamlTemplate(formData: BlogPostFormData): string {
+  const tagsArray = formData.tags
+    ? formData.tags
+        .split(",")
+        .map((tag) => `  - ${tag.trim()}`)
+        .join("\n")
+    : `  - Tag 1
+  - Tag 2
+  - Tag 3`;
+
+  const yaml = `title: ${formData.title || "Your Post Title"}
+date: ${formData.date || new Date().toISOString().split("T")[0]}
+excerpt: >-
+  ${
+    formData.excerpt ||
+    "Brief description of your post content and what attendees will learn."
+  }
+tags:
+${tagsArray}
+author: ${formData.author || "ETSA"}
+speakers:
+  - name: ${formData.speakerName || "Speaker Name"}
+    title: ${formData.speakerTitle || "Speaker Title"}
+    company: ${formData.speakerCompany || "Company Name"}
+    image: /images/speakers/${
+      formData.speakerName
+        ? formData.speakerName.toLowerCase().replace(/\s+/g, "_")
+        : "speaker_name"
+    }.jpeg
+    bio: >-
+      ${
+        formData.speakerBio ||
+        "Brief speaker biography highlighting their experience and expertise."
+      }
+    linkedIn: https://www.linkedin.com/in/speaker-profile/
+presentationSlides: ${formData.presentationSlides || "slides.pdf"}
+eventDate: ${formData.eventDate || getFirstTuesdayOfNextMonth()}
+eventLocation:
+  name: ${formData.eventLocationName || DEFAULT_LOCATION.name}
+  address: ${formData.eventLocationAddress || DEFAULT_LOCATION.address}
+  coordinates:
+    lat: "${formData.eventLocationLat || DEFAULT_LOCATION.coordinates.lat}"
+    lng: "${formData.eventLocationLng || DEFAULT_LOCATION.coordinates.lng}"
+published: ${formData.published}`;
+
+  return yaml;
+}
+
+// Helper function to generate slug from title only (fallback)
 function generateSlugFromTitle(title: string): string {
   return title
     .toLowerCase()
@@ -142,7 +278,7 @@ function parseMultiDocumentYaml(content: string): {
 function reconstructYamlContent(
   formData: BlogPostFormData,
   rawYaml: string,
-  remainingDocuments: string, // For future multi-document support
+  remainingDocuments: string, // Used in onSubmit function for multi-document YAML support
 ): Record<string, unknown> {
   try {
     // If raw YAML is provided and valid, use it as the base
@@ -522,7 +658,7 @@ function createDefaultValues(
     ),
     excerpt: getStringValue(frontmatter?.excerpt),
     tags: Array.isArray(frontmatter?.tags) ? frontmatter.tags.join(", ") : "",
-    author: getStringValue(frontmatter?.author),
+    author: getStringValue(frontmatter?.author, "ETSA"), // Default to ETSA
     speakerName: getStringValue(frontmatter?.speakerName),
     speakerTitle: getStringValue(frontmatter?.speakerTitle),
     speakerCompany: getStringValue(frontmatter?.speakerCompany),
@@ -533,8 +669,27 @@ function createDefaultValues(
     ),
     presentationSlides: getStringValue(frontmatter?.presentationSlides),
     recordingUrl: getStringValue(frontmatter?.recordingUrl),
-    eventDate: getStringValue(frontmatter?.eventDate),
+    eventDate: getStringValue(
+      frontmatter?.eventDate,
+      getFirstTuesdayOfNextMonth(),
+    ),
     eventLocation: getStringValue(frontmatter?.eventLocation),
+    eventLocationName: getStringValue(
+      frontmatter?.eventLocation?.name,
+      DEFAULT_LOCATION.name,
+    ),
+    eventLocationAddress: getStringValue(
+      frontmatter?.eventLocation?.address,
+      DEFAULT_LOCATION.address,
+    ),
+    eventLocationLat: getStringValue(
+      frontmatter?.eventLocation?.coordinates?.lat,
+      DEFAULT_LOCATION.coordinates.lat,
+    ),
+    eventLocationLng: getStringValue(
+      frontmatter?.eventLocation?.coordinates?.lng,
+      DEFAULT_LOCATION.coordinates.lng,
+    ),
     published: frontmatter?.published !== false,
     rawYaml: "", // Will be populated from the raw frontmatter content
   };
@@ -547,14 +702,15 @@ export default function BlogPostEditor({
   currentBranch = "main",
   viewingBranch,
   openPR,
+  onPRCreated,
 }: Readonly<BlogPostEditorProps>) {
   const [content, setContent] = useState(initialData?.content || "");
   const [preview, setPreview] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const [slug, setSlug] = useState(initialData?.slug || "");
   const [rawYaml, setRawYaml] = useState("");
-  const [remainingDocuments, setRemainingDocuments] = useState("");
-  const [showYamlEditor, setShowYamlEditor] = useState(false);
+  const [remainingDocuments, setRemainingDocuments] = useState(""); // Used in onSubmit for multi-document YAML
+  const [showYamlEditor, setShowYamlEditor] = useState(!initialData); // Auto-expand for new posts
   const [showAssets, setShowAssets] = useState(false);
   const [existingAssets, setExistingAssets] = useState<
     Array<{
@@ -583,6 +739,7 @@ export default function BlogPostEditor({
   });
 
   const title = watch("title");
+  const date = watch("date");
 
   // Update form and component state when initialData changes (e.g., branch switch)
   useEffect(() => {
@@ -620,12 +777,48 @@ export default function BlogPostEditor({
     }
   }, [initialData, reset]);
 
-  // Auto-generate slug from title
+  // Auto-generate slug from date and title for new posts
   useEffect(() => {
-    if (title && !initialData?.slug) {
-      setSlug(generateSlugFromTitle(title));
+    if (!initialData?.slug) {
+      if (title && date) {
+        setSlug(generateSlugFromDateAndTitle(date, title));
+      } else if (title) {
+        setSlug(generateSlugFromTitle(title));
+      }
     }
-  }, [title, initialData?.slug]);
+  }, [title, date, initialData?.slug]);
+
+  // Update YAML template with live data from form for new posts
+  useEffect(() => {
+    if (!initialData && showYamlEditor) {
+      const formData = {
+        title: title || "",
+        date: date || "",
+        excerpt: watch("excerpt") || "",
+        tags: watch("tags") || "",
+        author: watch("author") || "",
+        published: watch("published") ?? true,
+        speakerName: watch("speakerName") || "",
+        speakerTitle: watch("speakerTitle") || "",
+        speakerCompany: watch("speakerCompany") || "",
+        speakerBio: watch("speakerBio") || "",
+        presentationTitle: watch("presentationTitle") || "",
+        presentationDescription: watch("presentationDescription") || "",
+        presentationSlides: watch("presentationSlides") || "",
+        recordingUrl: watch("recordingUrl") || "",
+        eventDate: watch("eventDate") || "",
+        eventLocation: watch("eventLocation") || "",
+        eventLocationName: watch("eventLocationName") || "",
+        eventLocationAddress: watch("eventLocationAddress") || "",
+        eventLocationLat: watch("eventLocationLat") || "",
+        eventLocationLng: watch("eventLocationLng") || "",
+        rawYaml: "",
+      };
+
+      const template = generateDefaultYamlTemplate(formData);
+      setRawYaml(template);
+    }
+  }, [title, date, watch, initialData, showYamlEditor]);
 
   // Update preview when content changes
   useEffect(() => {
@@ -642,7 +835,12 @@ export default function BlogPostEditor({
 
   // Function to fetch existing assets for the current slug
   const fetchExistingAssets = useCallback(async () => {
-    if (!slug) return;
+    // For new posts without a slug, we can't fetch assets yet
+    if (!slug) {
+      setExistingAssets([]);
+      setSearchedPaths([]);
+      return;
+    }
 
     setLoadingAssets(true);
     try {
@@ -680,7 +878,12 @@ export default function BlogPostEditor({
 
   // Function to handle asset upload
   const handleAssetUpload = async (file: File) => {
-    if (!slug) return;
+    if (!slug) {
+      alert(
+        "Please enter a title and date to generate a slug before uploading assets.",
+      );
+      return;
+    }
 
     setUploadingAsset(true);
     try {
@@ -705,8 +908,28 @@ export default function BlogPostEditor({
           }`,
         );
 
-        // Refresh assets after successful upload
-        await fetchExistingAssets();
+        // If a PR was created and we have a callback, notify the parent to switch branches
+        if (result.pullRequest && onPRCreated) {
+          console.log(
+            "Asset upload created/updated PR, calling onPRCreated:",
+            result.pullRequest,
+          );
+          onPRCreated({
+            prNumber: result.pullRequest.prNumber,
+            branchName: result.pullRequest.branchName,
+            isNew: result.pullRequest.isNew,
+          });
+        } else {
+          console.log("No PR created or no onPRCreated callback:", {
+            hasPR: !!result.pullRequest,
+            hasCallback: !!onPRCreated,
+          });
+        }
+
+        // Refresh assets after successful upload - use a small delay to ensure branch state is updated
+        setTimeout(async () => {
+          await fetchExistingAssets();
+        }, 500);
       } else {
         const error = await response.json();
         console.error("Upload failed:", error);
@@ -845,6 +1068,20 @@ export default function BlogPostEditor({
                 readOnly
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 shadow-sm cursor-not-allowed sm:text-sm"
               />
+              {!initialData && (title || date) && (
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Preview:{" "}
+                  <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">
+                    /blog/
+                    {slug ||
+                      (date && title
+                        ? generateSlugFromDateAndTitle(date, title)
+                        : title
+                          ? generateSlugFromTitle(title)
+                          : "your-post-slug")}
+                  </code>
+                </p>
+              )}
             </div>
 
             <div>
@@ -1134,11 +1371,14 @@ export default function BlogPostEditor({
                       />
                     </svg>
                     <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                      No assets found
+                      {!slug
+                        ? "Enter title and date to browse assets"
+                        : "No assets found"}
                     </h3>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                      No assets were found for this post slug. Upload assets to
-                      one of these locations:
+                      {!slug
+                        ? "Fill in the title and date fields above to generate a slug, then you can browse and upload assets for this post."
+                        : "No assets were found for this post slug. Upload assets to one of these locations:"}
                     </p>
                     {searchedPaths.length > 0 && (
                       <details className="mt-3 text-left">
@@ -1285,16 +1525,190 @@ export default function BlogPostEditor({
           )}
         </div>
 
+        {/* Event Information */}
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+            Event Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                htmlFor="eventDate"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Event Date
+              </label>
+              <input
+                id="eventDate"
+                type="date"
+                {...register("eventDate")}
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Defaults to first Tuesday of next month
+              </p>
+            </div>
+
+            <div>
+              <label
+                htmlFor="eventLocationName"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Venue Name
+              </label>
+              <input
+                id="eventLocationName"
+                type="text"
+                {...register("eventLocationName")}
+                placeholder="Knoxville Entrepreneur Center"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="eventLocationAddress"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Address
+              </label>
+              <input
+                id="eventLocationAddress"
+                type="text"
+                {...register("eventLocationAddress")}
+                placeholder="2201 Kerns Rising Way, Knoxville, TN 37920"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Full address for the event location
+              </p>
+            </div>
+
+            <div>
+              <label
+                htmlFor="eventLocationLat"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Latitude
+              </label>
+              <input
+                id="eventLocationLat"
+                type="text"
+                {...register("eventLocationLat")}
+                placeholder="35.953336"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="eventLocationLng"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Longitude
+              </label>
+              <input
+                id="eventLocationLng"
+                type="text"
+                {...register("eventLocationLng")}
+                placeholder="-83.914406"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="text"
+                  placeholder="Search for a location..."
+                  className="flex-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                  onKeyDown={async (e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const query = (e.target as HTMLInputElement).value;
+                      if (!query.trim()) return;
+
+                      try {
+                        const result = await searchGoogleMaps(query);
+                        if (result) {
+                          setValue("eventLocationName", result.name);
+                          setValue("eventLocationAddress", result.address);
+                          setValue("eventLocationLat", result.lat);
+                          setValue("eventLocationLng", result.lng);
+                          (e.target as HTMLInputElement).value = "";
+                        } else {
+                          alert(
+                            "No results found for that location. Please try a different search term.",
+                          );
+                        }
+                      } catch (error) {
+                        console.error("Search error:", error);
+                        alert(
+                          "Error searching for location. Please try again.",
+                        );
+                      }
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const input = document.querySelector(
+                      'input[placeholder="Search for a location..."]',
+                    ) as HTMLInputElement;
+                    const query = input?.value;
+                    if (!query?.trim()) {
+                      alert("Please enter a location to search for.");
+                      return;
+                    }
+
+                    try {
+                      const result = await searchGoogleMaps(query);
+                      if (result) {
+                        setValue("eventLocationName", result.name);
+                        setValue("eventLocationAddress", result.address);
+                        setValue("eventLocationLat", result.lat);
+                        setValue("eventLocationLng", result.lng);
+                        input.value = "";
+                      } else {
+                        alert(
+                          "No results found for that location. Please try a different search term.",
+                        );
+                      }
+                    } catch (error) {
+                      console.error("Search error:", error);
+                      alert("Error searching for location. Please try again.");
+                    }
+                  }}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary"
+                >
+                  📍 Search
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Search for a location to automatically fill address and
+                coordinates. Press Enter or click Search.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Advanced YAML Editor */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 Advanced YAML Editor
+                {!initialData && (
+                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    Required for new posts
+                  </span>
+                )}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Edit the raw YAML frontmatter. Changes here will override form
-                fields above.
+                {!initialData
+                  ? "Configure your post metadata below. The template updates automatically as you fill in the Basic Information above."
+                  : "Edit the raw YAML frontmatter. Changes here will override form fields above."}
               </p>
             </div>
             <button
@@ -1308,36 +1722,69 @@ export default function BlogPostEditor({
 
           {showYamlEditor && (
             <div className="space-y-4">
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg
-                      className="h-5 w-5 text-amber-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                      Advanced Editor
-                    </h3>
-                    <div className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                      <p>
-                        This editor shows the first YAML document from
-                        frontmatter. Fields edited in the form above will
-                        override values here when saving. Use this for complex
-                        fields not available in the form.
-                      </p>
+              {!initialData ? (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-blue-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        Live Template
+                      </h3>
+                      <div className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                        <p>
+                          This template updates automatically as you fill in the
+                          Basic Information above. You can customize any field
+                          directly in the YAML below. This metadata controls how
+                          your post appears on the website.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-amber-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                        Advanced Editor
+                      </h3>
+                      <div className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                        <p>
+                          This editor shows the first YAML document from
+                          frontmatter. Fields edited in the form above will
+                          override values here when saving. Use this for complex
+                          fields not available in the form.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

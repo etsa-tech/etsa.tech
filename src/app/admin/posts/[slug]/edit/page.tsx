@@ -227,6 +227,29 @@ export default function EditPostPage() {
     }
   };
 
+  const handlePRCreated = (prInfo: {
+    prNumber: number;
+    branchName: string;
+    isNew: boolean;
+  }) => {
+    // Update the open PR state
+    setOpenPR({
+      branchName: prInfo.branchName,
+      prNumber: prInfo.prNumber,
+    });
+
+    // Switch to viewing the PR branch
+    setViewBranch(prInfo.branchName);
+
+    // Show success message
+    setMessage({
+      type: "success",
+      text: `Asset uploaded successfully! ${
+        prInfo.isNew ? "Created" : "Updated"
+      } PR #${prInfo.prNumber}. Switched to PR branch.`,
+    });
+  };
+
   if (isLoadingPost) {
     return (
       <div className="space-y-6">
@@ -350,6 +373,7 @@ export default function EditPostPage() {
         currentBranch={selectedBranch}
         viewingBranch={viewBranch}
         openPR={openPR}
+        onPRCreated={handlePRCreated}
       />
     </div>
   );

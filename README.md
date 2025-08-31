@@ -364,23 +364,29 @@ published: true
 
 ```yaml
 ---
-title: "Advanced Docker Networking"
-date: "2024-03-15"
-excerpt: "Deep dive into Docker networking concepts and best practices"
-tags: ["Docker", "Networking", "Containers"]
-author: "ETSA"
+title: DevOps Emporium in the Real World
+date: 2025-08-30
+excerpt: >-
+  Dive into the evolving world of DevOps, cloud computing, and the shifting role.
+tags:
+  - AWS
+  - Cloud Computing
+  - Public Cloud
+  - Systems Administration
+  - Infrastructure
+  - DevOps
+author: ETSA
 speakers:
-  - name: "John Doe"
-    title: "Senior Platform Engineer"
-    company: "CloudTech Solutions"
-    bio: "John has 8+ years of experience in containerization and cloud infrastructure"
-    image: "/images/speakers/john-doe.jpg"
-    linkedIn: "https://linkedin.com/in/johndoe"
-    github: "https://github.com/johndoe"
-presentationSlides: "https://slides.google.com/docker-networking"
-recordingUrl: "https://youtube.com/watch?v=docker-recording-2024"
-eventDate: "2024-03-15"
-eventLocation: "Knoxville Entrepreneur Center"
+  - name: John Doe
+    title: Enterprise Consultant
+    company: DevOps Emporium
+    image: /images/speakers/john_doe.jpeg
+    bio: >-
+      John Doe is an accomplished speaker
+    linkedIn: https://www.linkedin.com/in/speaker/
+presentationSlides: slides.pdf
+eventDate: 2025-09-02
+eventLocation: Knoxville Entrepreneur Center
 published: true
 ---
 ```

@@ -11,6 +11,14 @@ export default function NewPostPage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [currentBranch] = useState("main");
+  const [viewingBranch, setViewingBranch] = useState<string | undefined>(
+    undefined,
+  );
+  const [openPR, setOpenPR] = useState<{
+    branchName: string;
+    prNumber: number;
+  } | null>(null);
 
   const handleSave = async (data: {
     slug: string;
@@ -36,6 +44,10 @@ export default function NewPostPage() {
         throw new Error(result.error || "Failed to create post");
       }
 
+      console.log("Post creation result:", result);
+      console.log("Slug from form data:", data.slug);
+      console.log("Slug from API response:", result.slug);
+
       setMessage({
         type: "success",
         text: data.createPR
@@ -44,14 +56,17 @@ export default function NewPostPage() {
       });
 
       if (data.createPR) {
-        // For PR creation, redirect to edit page to show the update branch UI
+        // For PR creation, redirect to edit page with branch parameter
         setTimeout(() => {
           setMessage({
             type: "success",
             text: "Redirecting to edit page...",
           });
           setTimeout(() => {
-            router.push(`/admin/posts/${result.slug}/edit`);
+            // Use the slug from the API response to ensure consistency
+            const editUrl = `/admin/posts/${result.slug}/edit`;
+            console.log("Redirecting to:", editUrl);
+            router.push(editUrl);
           }, 500);
         }, 1500);
       } else {
@@ -69,6 +84,31 @@ export default function NewPostPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePRCreated = (prInfo: {
+    prNumber: number;
+    branchName: string;
+    isNew: boolean;
+  }) => {
+    console.log("New post page: PR created from asset upload", prInfo);
+
+    // Update the open PR state
+    setOpenPR({
+      branchName: prInfo.branchName,
+      prNumber: prInfo.prNumber,
+    });
+
+    // Switch to viewing the PR branch
+    setViewingBranch(prInfo.branchName);
+
+    // Show success message for asset upload
+    setMessage({
+      type: "success",
+      text: `Asset uploaded successfully! ${
+        prInfo.isNew ? "Created" : "Updated"
+      } PR #${prInfo.prNumber}. Switched to PR branch.`,
+    });
   };
 
   return (
@@ -109,7 +149,10 @@ export default function NewPostPage() {
       <BlogPostEditor
         onSave={handleSave}
         isLoading={isLoading}
-        currentBranch="main"
+        currentBranch={currentBranch}
+        viewingBranch={viewingBranch}
+        openPR={openPR}
+        onPRCreated={handlePRCreated}
       />
     </div>
   );
