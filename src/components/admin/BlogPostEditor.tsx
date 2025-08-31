@@ -27,6 +27,7 @@ const blogPostSchema = z.object({
   speakerTitle: z.string().optional(),
   speakerCompany: z.string().optional(),
   speakerBio: z.string().optional(),
+  speakerImage: z.string().optional(),
   presentationTitle: z.string().optional(),
   presentationDescription: z.string().optional(),
   presentationSlides: z.string().optional(),
@@ -58,6 +59,7 @@ interface BlogPostFrontmatter {
   speakerTitle?: string;
   speakerCompany?: string;
   speakerBio?: string;
+  speakerImage?: string;
   presentationSlides?: string;
   recordingUrl?: string;
   eventDate?: string;
@@ -198,11 +200,14 @@ speakers:
   - name: ${formData.speakerName || "Speaker Name"}
     title: ${formData.speakerTitle || "Speaker Title"}
     company: ${formData.speakerCompany || "Company Name"}
-    image: /images/speakers/${
-      formData.speakerName
-        ? formData.speakerName.toLowerCase().replace(/\s+/g, "_")
-        : "speaker_name"
-    }.jpeg
+    image: ${
+      formData.speakerImage ||
+      `/images/speakers/${
+        formData.speakerName
+          ? formData.speakerName.toLowerCase().replace(/\s+/g, "_")
+          : "speaker_name"
+      }.jpeg`
+    }
     bio: >-
       ${
         formData.speakerBio ||
@@ -663,6 +668,7 @@ function createDefaultValues(
     speakerTitle: getStringValue(frontmatter?.speakerTitle),
     speakerCompany: getStringValue(frontmatter?.speakerCompany),
     speakerBio: getStringValue(frontmatter?.speakerBio),
+    speakerImage: getStringValue(frontmatter?.speakerImage),
     presentationTitle: getStringValue(frontmatter?.presentationTitle),
     presentationDescription: getStringValue(
       frontmatter?.presentationDescription,
@@ -704,6 +710,7 @@ export default function BlogPostEditor({
   openPR,
   onPRCreated,
 }: Readonly<BlogPostEditorProps>) {
+  console.log("BlogPostEditor rendering - component loaded successfully");
   const [content, setContent] = useState(initialData?.content || "");
   const [preview, setPreview] = useState("");
   const [showPreview, setShowPreview] = useState(false);
@@ -730,6 +737,18 @@ export default function BlogPostEditor({
   const [searchedPaths, setSearchedPaths] = useState<string[]>([]);
   const [uploadingAsset, setUploadingAsset] = useState(false);
   const [deletingAsset, setDeletingAsset] = useState<string | null>(null);
+
+  // Speaker image management
+  const [showSpeakerImageModal, setShowSpeakerImageModal] = useState(false);
+  const [speakerImages, setSpeakerImages] = useState<
+    Array<{
+      name: string;
+      url: string;
+      size: number;
+    }>
+  >([]);
+  const [loadingSpeakerImages, setLoadingSpeakerImages] = useState(false);
+  const [uploadingSpeakerImage, setUploadingSpeakerImage] = useState(false);
 
   const {
     register,
@@ -794,9 +813,9 @@ export default function BlogPostEditor({
     }
   }, [title, date, initialData?.slug]);
 
-  // Update YAML template with live data from form for new posts
+  // Update YAML template with live data from form for both new posts and edit mode
   useEffect(() => {
-    if (!initialData && showYamlEditor) {
+    if (showYamlEditor) {
       const formData = {
         title: title || "",
         date: date || "",
@@ -808,6 +827,7 @@ export default function BlogPostEditor({
         speakerTitle: watch("speakerTitle") || "",
         speakerCompany: watch("speakerCompany") || "",
         speakerBio: watch("speakerBio") || "",
+        speakerImage: watch("speakerImage") || "",
         presentationTitle: watch("presentationTitle") || "",
         presentationDescription: watch("presentationDescription") || "",
         presentationSlides: watch("presentationSlides") || "",
@@ -824,7 +844,7 @@ export default function BlogPostEditor({
       const template = generateDefaultYamlTemplate(formData);
       setRawYaml(template);
     }
-  }, [title, date, watch, initialData, showYamlEditor]);
+  }, [title, date, watch, showYamlEditor]);
 
   // Update preview when content changes
   useEffect(() => {
@@ -1026,6 +1046,82 @@ export default function BlogPostEditor({
     }
   };
 
+  // Function to fetch existing speaker images
+  const fetchSpeakerImages = useCallback(async () => {
+    setLoadingSpeakerImages(true);
+    try {
+      const response = await fetch("/api/admin/speakers/list");
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Speaker images API response:", data);
+        console.log("Setting speaker images:", data.images || []);
+        console.log("Number of images:", (data.images || []).length);
+        setSpeakerImages(data.images || []);
+      } else {
+        console.error(
+          "API response not OK:",
+          response.status,
+          response.statusText,
+        );
+        console.error("Failed to fetch speaker images:", response.statusText);
+        setSpeakerImages([]);
+      }
+    } catch (error) {
+      console.error("Error fetching speaker images:", error);
+      setSpeakerImages([]);
+    } finally {
+      setLoadingSpeakerImages(false);
+    }
+  }, []);
+
+  // Fetch speaker images when speaker images modal is shown
+  useEffect(() => {
+    if (showSpeakerImageModal) {
+      fetchSpeakerImages();
+    }
+  }, [showSpeakerImageModal, fetchSpeakerImages]);
+
+  // Function to handle speaker image upload
+  const handleSpeakerImageUpload = async (file: File) => {
+    setUploadingSpeakerImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/admin/speakers/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message);
+
+        // Refresh speaker images after successful upload
+        await fetchSpeakerImages();
+
+        // Auto-select the uploaded image
+        setValue("speakerImage", result.file.url);
+      } else {
+        const error = await response.json();
+        console.error("Speaker image upload failed:", error);
+        alert(`Upload failed: ${error.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Speaker image upload error:", error);
+      alert("Upload failed. Please try again.");
+    } finally {
+      setUploadingSpeakerImage(false);
+    }
+  };
+
+  // Function to select an existing speaker image
+  const selectSpeakerImage = (imageUrl: string) => {
+    setValue("speakerImage", imageUrl);
+    setShowSpeakerImageModal(false);
+  };
+
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
     // Use the YAML reconstruction function to preserve format and handle multi-document YAML
     const frontmatter = reconstructYamlContent(
@@ -1187,6 +1283,101 @@ export default function BlogPostEditor({
             {errors.tags && (
               <p className="mt-1 text-sm text-red-600">{errors.tags.message}</p>
             )}
+          </div>
+
+          {/* Speaker Information Section */}
+          <div className="mt-8">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              Speaker Information
+            </h3>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="speakerName"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Speaker Name
+                </label>
+                <input
+                  id="speakerName"
+                  type="text"
+                  {...register("speakerName")}
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="speakerTitle"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Speaker Title
+                </label>
+                <input
+                  id="speakerTitle"
+                  type="text"
+                  {...register("speakerTitle")}
+                  placeholder="Senior Developer, CTO, etc."
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="speakerCompany"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Speaker Company
+                </label>
+                <input
+                  id="speakerCompany"
+                  type="text"
+                  {...register("speakerCompany")}
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="speakerImage"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Speaker Image
+                </label>
+                <div className="mt-1 flex items-center space-x-2">
+                  <input
+                    id="speakerImage"
+                    type="text"
+                    {...register("speakerImage")}
+                    placeholder="/images/speakers/speaker.jpg"
+                    className="flex-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSpeakerImageModal(true)}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary"
+                  >
+                    Browse
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <label
+                htmlFor="speakerBio"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Speaker Bio
+              </label>
+              <textarea
+                id="speakerBio"
+                rows={3}
+                {...register("speakerBio")}
+                placeholder="Brief speaker biography highlighting their experience and expertise."
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+              />
+            </div>
           </div>
 
           <div className="mt-6 flex items-center space-x-6">
@@ -1893,6 +2084,69 @@ export default function BlogPostEditor({
           currentBranch={currentBranch}
           openPR={openPR}
         />
+
+        {/* Speaker Image Modal */}
+        {showSpeakerImageModal && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Select Speaker Image
+                </h3>
+                <button
+                  onClick={() => setShowSpeakerImageModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <button className="px-4 py-2 bg-blue-500 text-white rounded">
+                  Upload New Image
+                </button>
+
+                <div className="border rounded">
+                  <table className="w-full">
+                    <thead className="bg-gray-100 dark:bg-gray-700">
+                      <tr>
+                        <th className="px-4 py-2 text-left">Preview</th>
+                        <th className="px-4 py-2 text-left">Name</th>
+                        <th className="px-4 py-2 text-left">Size</th>
+                        <th className="px-4 py-2 text-left">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {speakerImages.map((image, index) => (
+                        <tr key={index} className="border-t">
+                          <td className="px-4 py-2">
+                            <img
+                              src={image.url}
+                              alt={image.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          </td>
+                          <td className="px-4 py-2">{image.name}</td>
+                          <td className="px-4 py-2">
+                            {(image.size / 1024).toFixed(1)} KB
+                          </td>
+                          <td className="px-4 py-2">
+                            <button
+                              onClick={() => selectSpeakerImage(image.url)}
+                              className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
+                            >
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );
