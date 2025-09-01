@@ -324,7 +324,6 @@ function parseMultiDocumentYaml(content: string): {
 function reconstructYamlContent(
   formData: BlogPostFormData,
   rawYaml: string,
-  _remainingDocuments: string, // Used in onSubmit function for multi-document YAML support
 ): Record<string, unknown> {
   try {
     // If raw YAML is provided and valid, use it as the base
@@ -757,7 +756,7 @@ export default function BlogPostEditor({
   const [showPreview, setShowPreview] = useState(false);
   const [slug, setSlug] = useState(initialData?.slug || "");
   const [rawYaml, setRawYaml] = useState("");
-  const [remainingDocuments, setRemainingDocuments] = useState(""); // Used in onSubmit for multi-document YAML
+  // Note: keeping single-document YAML only in the editor; multi-document support can be added later if needed
   const [showYamlEditor, setShowYamlEditor] = useState(!initialData); // Auto-expand for new posts
 
   // Debug viewingBranch changes
@@ -820,10 +819,10 @@ export default function BlogPostEditor({
       // Update YAML content if available
       if (initialData.rawContent) {
         try {
-          const { rawFirstDocument, remainingDocuments: remaining } =
-            parseMultiDocumentYaml(initialData.rawContent);
+          const { rawFirstDocument } = parseMultiDocumentYaml(
+            initialData.rawContent,
+          );
           setRawYaml(rawFirstDocument);
-          setRemainingDocuments(remaining);
         } catch (error) {
           console.error("Error parsing multi-document YAML:", error);
           if (initialData.frontmatter) {
@@ -1174,11 +1173,7 @@ export default function BlogPostEditor({
 
   const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
     // Use the YAML reconstruction function to preserve format and handle multi-document YAML
-    const frontmatter = reconstructYamlContent(
-      data,
-      rawYaml,
-      remainingDocuments,
-    );
+    const frontmatter = reconstructYamlContent(data, rawYaml);
 
     await onSave({
       slug,
