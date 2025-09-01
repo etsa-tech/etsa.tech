@@ -13,7 +13,7 @@ export default function GlobalErrorPage({
 
   // Global error pages automatically return 500 status in Next.js App Router
   return (
-    <html>
+    <html lang="en">
       <body>
         <div className="min-h-screen flex items-center justify-center bg-white dark:bg-etsa-dark">
           <div className="max-w-md w-full text-center px-4">
