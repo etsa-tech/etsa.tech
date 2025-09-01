@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 
-export default function GlobalError({
+export default function GlobalErrorPage({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  readonly error: Error & { digest?: string };
+  readonly reset: () => void;
 }) {
   console.error("Global error:", error);
+
+  // Global error pages automatically return 500 status in Next.js App Router
   return (
     <html>
       <body>

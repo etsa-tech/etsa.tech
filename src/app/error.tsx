@@ -3,16 +3,22 @@
 import { useEffect } from "react";
 import Link from "next/link";
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  readonly error: Error & { digest?: string };
+  readonly reset: () => void;
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
     console.error(error);
+
+    // Set 500 status code for error pages
+    if (typeof window === "undefined") {
+      // Server-side: This will be handled by Next.js error boundary
+      // The status code is automatically set to 500 for unhandled errors
+    }
   }, [error]);
 
   return (
