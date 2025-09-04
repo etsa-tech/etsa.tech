@@ -1,29 +1,35 @@
 ---
-title: "CFEngine - The Tool and Language"
+title: CFEngine - The Tool and Language
 date: "2015-11-03"
-excerpt: "Explore the strengths, challenges, and real-world lessons of deploying CFEngine, a lightweight yet powerful configuration management tool."
+excerpt: >-
+  Explore the strengths, challenges, and real-world lessons of deploying
+  CFEngine, a lightweight yet powerful configuration management tool.
 tags:
-  [
-    "CFEngine",
-    "Configuration Management",
-    "DevOps",
-    "Iac",
-    "System Administration",
-    "IT Automation",
-    "Open Source",
-    "Security",
-    "SysOps",
-  ]
-author: "ETSA"
+  - CFEngine
+  - Configuration Management
+  - DevOps
+  - Iac
+  - System Administration
+  - IT Automation
+  - Open Source
+  - Security
+  - SysOps
+author: ETSA
 speakers:
-  - name: "Bryan Burke"
-    title: "IT Administrator"
-    company: "University of Tennessee, Knoxville"
-    image: "/images/speakers/bryan_burke.jpeg"
-    bio: "I am an IT administrator for the Electrical Engineering and Computer Science Department (EECS) at the University of Tennessee, Knoxville. I also keep a home infrastructure, which I give out to people for free, and which I use to test software. In my spare time, I enjoy board and video games, moonlighting as a sysadmin and software developer, and making life difficult for my awesome girlfriend and cats."
-    linkedIn: "https://www.linkedin.com/in/bryan-t-burke/"
+  - name: Bryan Burke
+    title: IT Administrator
+    company: University of Tennessee, Knoxville
+    image: /images/speakers/bryan_burke.jpeg
+    bio: >-
+      I am an IT administrator for the Electrical Engineering and Computer
+      Science Department (EECS) at the University of Tennessee, Knoxville. I
+      also keep a home infrastructure, which I give out to people for free, and
+      which I use to test software. In my spare time, I enjoy board and video
+      games, moonlighting as a sysadmin and software developer, and making life
+      difficult for my awesome girlfriend and cats.
+    linkedIn: https://www.linkedin.com/in/bryan-t-burke/
 eventDate: "2015-11-03"
-eventLocation: "Cafe 4"
+eventLocation: Cafe 4
 published: true
 ---
 

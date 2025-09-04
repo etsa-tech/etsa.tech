@@ -117,6 +117,100 @@ npm run dev
 └── package.json           # Dependencies and scripts
 ```
 
+## Admin Interface
+
+The ETSA website includes a secure admin interface for content management accessible at `/admin`.
+
+### Features
+
+- **Google OAuth Authentication**: Restricted to @etsa.tech Google Workspace accounts
+- **Blog Post Management**: Create, edit, and manage blog posts with markdown editor
+- **GitHub Integration**: Automatic pull request creation for content changes
+- **Asset Management**: Upload and manage images and files (coming soon)
+- **Social Media Integration**: LinkedIn and Mailchimp integration (coming soon)
+
+### Required Environment Variables
+
+```bash
+# Google OAuth (for admin authentication)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000  # or your production URL
+
+# GitHub App Authentication (for content management)
+GITHUB_APP_ID=your_github_app_id
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nyour_private_key_here\n-----END RSA PRIVATE KEY-----"
+GITHUB_APP_INSTALLATION_ID=your_installation_id
+GITHUB_WEBHOOK_SECRET=your_webhook_secret
+GITHUB_OWNER=etsa
+GITHUB_REPO=etsa.tech
+```
+
+#### How to create GitHub App
+
+1. Create a new app [here](https://github.com/settings/apps).
+1. The following permissions are required
+
+```json
+{
+  "contents": "write", // Create/edit blog post files
+  "pull_requests": "write", // Create PRs for blog posts
+  "metadata": "read", // Basic repository information
+  "issues": "write", // Create issues for blog discussions
+  "actions": "read" // Monitor build status (optional)
+}
+```
+
+3. Install the app to ETSA and limit the repo scope
+1. Copy the installation ID
+
+#### How to generate RSA Key
+
+`awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' etsa-admin-interface.2025-08-29.private-key.pem | pbcopy`
+
+#### GitHub App Connection Pooling
+
+The GitHub App implementation uses efficient connection pooling to minimize API calls and improve performance:
+
+- **Token Caching**: Installation access tokens are cached in the servers memory and reused until near expiry
+- **Automatic Refresh**: Tokens are refreshed 5 minutes before expiration
+- **Connection Reuse**: Same Octokit client instance is reused for multiple API calls
+- **Error Recovery**: Cache is cleared on authentication errors for automatic retry
+
+**Performance Benefits:**
+
+- First API call: ~200-500ms (creates new token)
+- Subsequent calls: ~1-5ms (uses cached token)
+- Up to 99% performance improvement for repeated calls
+
+**Monitoring:**
+
+- Use `/api/admin/github-status` to check connection status
+- Use `DELETE /api/admin/github-status` to clear token cache if needed
+
+### Setup Instructions
+
+1. **Google OAuth Setup**:
+
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials
+   - Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
+
+2. **GitHub App Setup**:
+
+   - Create a GitHub App in your organization settings
+   - Set permissions: Contents (Write), Pull Requests (Write), Metadata (Read)
+   - Install the app on your repository only
+   - Generate a private key and add all credentials to environment variables
+
+3. **Access the Admin Interface**:
+   - Navigate to `/admin`
+   - Sign in with your @etsa.tech Google account
+   - Start managing content!
+
 ## Content Management
 
 ### Adding New Speaker Posts
@@ -171,7 +265,7 @@ published: true # Whether the post is published (false = draft)
 # Your markdown content here
 ```
 
-3. The post will automatically appear on the speakers page and be available for filtering by tags.
+1. The post will automatically appear on the speakers page and be available for filtering by tags.
 
 ### Metadata Field Descriptions
 
@@ -243,7 +337,7 @@ meetingLocation:
   contact: "Additional contact info" # Extra location details or contact info
 ```
 
-#### Content Management
+#### Publishing Options
 
 - **blogpost**: Set to `true` for blog posts, `false` or omit for presentations/meetup content
 - **published**: Set to `false` to save as draft (won't appear on public pages)
@@ -270,24 +364,29 @@ published: true
 
 ```yaml
 ---
-title: "Advanced Docker Networking"
-date: "2024-03-15"
-excerpt: "Deep dive into Docker networking concepts and best practices"
-tags: ["Docker", "Networking", "Containers"]
-author: "ETSA"
+title: DevOps Emporium in the Real World
+date: 2025-08-30
+excerpt: >-
+  Dive into the evolving world of DevOps, cloud computing, and the shifting role.
+tags:
+  - AWS
+  - Cloud Computing
+  - Public Cloud
+  - Systems Administration
+  - Infrastructure
+  - DevOps
+author: ETSA
 speakers:
-  - name: "John Doe"
-    title: "Senior Platform Engineer"
-    company: "CloudTech Solutions"
-    bio: "John has 8+ years of experience in containerization and cloud infrastructure"
-    image: "/images/speakers/john-doe.jpg"
-    linkedIn: "https://linkedin.com/in/johndoe"
-    github: "https://github.com/johndoe"
-presentationSlides: "https://slides.google.com/docker-networking"
-recordingUrl: "https://youtube.com/watch?v=docker-recording-2024"
-eventDate: "2024-03-15"
-eventLocation: "Knoxville Entrepreneur Center"
-featured: true
+  - name: John Doe
+    title: Enterprise Consultant
+    company: DevOps Emporium
+    image: /images/speakers/john_doe.jpeg
+    bio: >-
+      John Doe is an accomplished speaker
+    linkedIn: https://www.linkedin.com/in/speaker/
+presentationSlides: slides.pdf
+eventDate: 2025-09-02
+eventLocation: Knoxville Entrepreneur Center
 published: true
 ---
 ```
@@ -349,7 +448,6 @@ presentationSlides: "https://slides.google.com/devops-panel-2024"
 recordingUrl: "https://youtube.com/watch?v=devops-panel-recording-2024"
 eventDate: "2024-05-15"
 eventLocation: "Knoxville Entrepreneur Center"
-featured: true
 published: true
 ---
 ```

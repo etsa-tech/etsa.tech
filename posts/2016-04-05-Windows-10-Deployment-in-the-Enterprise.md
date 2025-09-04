@@ -1,29 +1,37 @@
 ---
-title: "Windows 10 Deployment in the Enterprise"
+title: Windows 10 Deployment in the Enterprise
 date: "2016-04-05"
-excerpt: "Learn how ORNL navigated the Windows 10 migration journey, tackling deployment challenges and unlocking new opportunities for security, support, and user productivity."
+excerpt: >-
+  Learn how ORNL navigated the Windows 10 migration journey, tackling deployment
+  challenges and unlocking new opportunities for security, support, and user
+  productivity.
 tags:
-  [
-    "Windows 10",
-    "Migration",
-    "Deployment Strategy",
-    "IT Operations",
-    "Endpoint Management",
-    "Security",
-    "Patching",
-    "User Training",
-    "Enterprise IT",
-  ]
-author: "ETSA"
+  - Windows 10
+  - Migration
+  - Deployment Strategy
+  - IT Operations
+  - Endpoint Management
+  - Security
+  - Patching
+  - User Training
+  - Enterprise IT
+author: ETSA
 speakers:
-  - name: "Chad DeGuira"
-    title: "Systems Management and Engineering Team Leader"
-    company: "Oak Ridge National Lab"
-    bio: "Chad DeGuira is an Architecture & Integration Engineer at Oak Ridge National Laboratory. He has worked in Information Technology for the past 20 years in support, administrative, and management roles. He has been at Oak Ridge DOE facilities for the past 12 years with primary interests in substantial cost reductions based on efficient and effective use of computing resources through new technology, automated processes, and improved workflow."
-    linkedIn: "https://www.linkedin.com/in/chad-deguira-a1237674/"
-presentationSlides: "microsoft_deployment-chad_deguira.pptx"
+  - name: Chad DeGuira
+    title: Systems Management and Engineering Team Leader
+    company: Oak Ridge National Lab
+    bio: >-
+      Chad DeGuira is an Architecture & Integration Engineer at Oak Ridge
+      National Laboratory. He has worked in Information Technology for the past
+      20 years in support, administrative, and management roles. He has been at
+      Oak Ridge DOE facilities for the past 12 years with primary interests in
+      substantial cost reductions based on efficient and effective use of
+      computing resources through new technology, automated processes, and
+      improved workflow.
+    linkedIn: https://www.linkedin.com/in/chad-deguira-a1237674/
+presentationSlides: microsoft_deployment-chad_deguira.pptx
 eventDate: "2016-04-05"
-eventLocation: "Cafe 4"
+eventLocation: Cafe 4
 published: true
 ---
 

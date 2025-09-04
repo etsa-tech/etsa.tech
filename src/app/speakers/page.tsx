@@ -27,7 +27,6 @@ interface SpeakerData {
   talkCount: number;
   latestTalk: PostSummary | null;
   allTalks: PostSummary[];
-  totalViews?: number;
   averageRating?: number;
 }
 
@@ -66,9 +65,6 @@ export default function SpeakersPage() {
       talkCount: speakerPosts.length,
       latestTalk: speakerPosts[0] || null,
       allTalks: speakerPosts,
-      // Future enhancements
-      totalViews: Math.floor(Math.random() * 5000) + 500, // Placeholder for analytics
-      averageRating: Number((Math.random() * 2 + 3).toFixed(1)), // Placeholder for ratings
     };
   });
 
