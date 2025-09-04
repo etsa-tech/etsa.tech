@@ -8,8 +8,23 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
+          scope: "openid email profile",
           hd: "etsa.tech", // Restrict to etsa.tech Google Workspace domain
         },
+      },
+      // Map Google's OIDC fields -> NextAuth user fields so user.image is present
+      profile(profile: {
+        sub: string;
+        name?: string;
+        email?: string;
+        picture?: string;
+      }) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        };
       },
     }),
   ],
@@ -26,8 +41,8 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       // Ensure profile image is included in session
-      if (token.picture && session.user) {
-        session.user.image = String(token.picture);
+      if ((token as { picture?: unknown }).picture && session.user) {
+        session.user.image = String((token as { picture?: unknown }).picture);
       }
       return session;
     },
@@ -37,15 +52,18 @@ export const authOptions: NextAuthOptions = {
         account?.provider === "google" &&
         profile &&
         "picture" in profile &&
-        typeof profile.picture === "string"
+        typeof (profile as { picture?: unknown }).picture === "string"
       ) {
-        token.picture = profile.picture;
+        (token as { picture?: string }).picture = (
+          profile as { picture: string }
+        ).picture;
       }
       return token;
     },
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

@@ -26,6 +26,30 @@ export default function AdminNavigation({
 }: Readonly<AdminNavigationProps>) {
   const pathname = usePathname();
 
+  // Render avatar safely with Next/Image only
+  const renderAvatar = () => {
+    if (user?.image) {
+      return (
+        <Image
+          className="h-10 w-10 rounded-full ring-2 ring-white dark:ring-gray-800"
+          src={user.image}
+          alt={user.name || "User"}
+          width={40}
+          height={40}
+          referrerPolicy="no-referrer"
+        />
+      );
+    }
+
+    return (
+      <div className="h-10 w-10 rounded-full bg-etsa-primary flex items-center justify-center ring-2 ring-white dark:ring-gray-800">
+        <span className="text-white font-semibold text-sm">
+          {user?.name?.charAt(0) || "U"}
+        </span>
+      </div>
+    );
+  };
+
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -52,21 +76,7 @@ export default function AdminNavigation({
             <div className="flex-shrink-0">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-3">
-                  {user?.image ? (
-                    <Image
-                      className="h-10 w-10 rounded-full ring-2 ring-white dark:ring-gray-800"
-                      src={user.image}
-                      alt={user.name || "User"}
-                      width={40}
-                      height={40}
-                    />
-                  ) : (
-                    <div className="h-10 w-10 rounded-full bg-etsa-primary flex items-center justify-center ring-2 ring-white dark:ring-gray-800">
-                      <span className="text-white font-semibold text-sm">
-                        {user?.name?.charAt(0) || "U"}
-                      </span>
-                    </div>
-                  )}
+                  {renderAvatar()}
                   <div className="hidden sm:block text-sm">
                     <div className="font-medium text-gray-900 dark:text-white">
                       {user?.name}
