@@ -30,8 +30,26 @@ export default function NewPostPage() {
     setMessage(null);
 
     try {
-      const response = await fetch("/api/admin/posts/new", {
-        method: "POST",
+      // Determine which branch to save to and which endpoint to use
+      let endpoint: string;
+      let method: string;
+
+      if (openPR && viewingBranch) {
+        // If we have an open PR and are viewing a branch, save to that branch using the edit endpoint
+        endpoint = `/api/admin/posts/${encodeURIComponent(
+          data.slug,
+        )}?branch=${encodeURIComponent(viewingBranch)}`;
+        method = "PUT";
+        console.log(`Saving to existing PR branch: ${viewingBranch}`);
+      } else {
+        // Otherwise, create a new post
+        endpoint = "/api/admin/posts/new";
+        method = "POST";
+        console.log("Creating new post");
+      }
+
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -44,19 +62,35 @@ export default function NewPostPage() {
         throw new Error(result.error || "Failed to create post");
       }
 
-      console.log("Post creation result:", result);
+      console.log("Save result:", result);
       console.log("Slug from form data:", data.slug);
       console.log("Slug from API response:", result.slug);
 
+      let successMessage: string;
+      if (openPR && viewingBranch) {
+        // Saving to existing PR branch
+        if (data.createPR) {
+          successMessage =
+            result.isNewPR === false
+              ? `Changes saved to existing pull request #${result.prNumber}!`
+              : `Pull request #${result.prNumber} created successfully!`;
+        } else {
+          successMessage = "Changes saved to PR branch successfully!";
+        }
+      } else {
+        // Creating new post
+        successMessage = data.createPR
+          ? `Pull request #${result.prNumber} created successfully!`
+          : "Post created successfully!";
+      }
+
       setMessage({
         type: "success",
-        text: data.createPR
-          ? `Pull request #${result.prNumber} created successfully!`
-          : "Post created successfully!",
+        text: successMessage,
       });
 
-      if (data.createPR) {
-        // For PR creation, redirect to edit page with branch parameter
+      if (data.createPR && !openPR) {
+        // For new PR creation, redirect to edit page
         setTimeout(() => {
           setMessage({
             type: "success",
@@ -69,12 +103,13 @@ export default function NewPostPage() {
             router.push(editUrl);
           }, 500);
         }, 1500);
-      } else {
-        // For direct creation, redirect to posts list
+      } else if (!openPR) {
+        // For direct saves without PR, redirect to posts list
         setTimeout(() => {
           router.push("/admin/posts");
         }, 2000);
       }
+      // If we have an open PR, stay on the current page
     } catch (error) {
       console.error("Error creating post:", error);
       setMessage({

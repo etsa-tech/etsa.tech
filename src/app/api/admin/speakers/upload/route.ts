@@ -3,6 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isAuthorizedUser } from "@/lib/auth-utils";
 import { getGitHubClient, getRepoInfo } from "@/lib/github-app";
+import {
+  createBranch,
+  createOrGetPullRequest,
+  getBlogPost,
+} from "@/lib/github";
+import matter from "gray-matter";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +20,12 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
+    const slug = formData.get("slug") as string;
+    const currentBranch = formData.get("branch") as string;
 
-    if (!file) {
+    if (!file || !slug || !currentBranch) {
       return NextResponse.json(
-        { error: "Missing required field: file" },
+        { error: "Missing required fields: file, slug, or branch" },
         { status: 400 },
       );
     }
@@ -46,6 +54,46 @@ export async function POST(request: NextRequest) {
     const octokit = await getGitHubClient();
     const { owner, repo } = getRepoInfo();
 
+    // Determine the target branch for the upload
+    let targetBranch = currentBranch;
+    let shouldCreatePR = false;
+
+    // If we're on main branch, check for existing update branch or create new one
+    if (currentBranch === "main") {
+      // Check if there's already an update branch for this post
+      const existingBranchPattern = `update-post-${slug}-`;
+
+      try {
+        const { data: branches } = await octokit.rest.repos.listBranches({
+          owner,
+          repo,
+        });
+
+        const existingBranch = branches.find((branch) =>
+          branch.name.startsWith(existingBranchPattern),
+        );
+
+        if (existingBranch) {
+          // Use existing branch
+          targetBranch = existingBranch.name;
+          console.log(`Using existing update branch: ${targetBranch}`);
+        } else {
+          // Create new branch
+          const updateBranchName = `update-post-${slug}-${Date.now()}`;
+          console.log(
+            `Creating new update branch for speaker image upload: ${updateBranchName}`,
+          );
+          await createBranch(updateBranchName);
+          targetBranch = updateBranchName;
+          shouldCreatePR = true;
+        }
+      } catch (error) {
+        console.error("Error handling branch logic:", error);
+        // Fall back to current branch if branch operations fail
+        targetBranch = currentBranch;
+      }
+    }
+
     // Convert file to base64
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -54,14 +102,14 @@ export async function POST(request: NextRequest) {
     // Create the file path in /public/images/speakers/
     const filePath = `public/images/speakers/${file.name}`;
 
-    // Check if file already exists
+    // Check if file already exists on the target branch
     let existingFileSha: string | undefined;
     try {
       const existingFile = await octokit.rest.repos.getContent({
         owner,
         repo,
         path: filePath,
-        ref: "main",
+        ref: targetBranch,
       });
 
       if (
@@ -83,9 +131,38 @@ export async function POST(request: NextRequest) {
 
 Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
       content: base64Content,
-      branch: "main",
+      branch: targetBranch,
       ...(existingFileSha && { sha: existingFileSha }),
     });
+
+    // Create PR if we created a new branch
+    let prInfo = null;
+    if (shouldCreatePR) {
+      try {
+        // Get the blog post title for the PR
+        let postTitle = slug;
+        try {
+          const blogPostContent = await getBlogPost(slug);
+          const parsed = matter(blogPostContent);
+          postTitle = parsed.data.title || slug;
+        } catch {
+          // If we can't get the post title, use the slug
+        }
+
+        const { prNumber, isNew } = await createOrGetPullRequest(
+          targetBranch,
+          `Update blog post: ${postTitle}`,
+          `This PR updates the blog post "${postTitle}" by uploading the speaker image "${
+            file.name
+          }".\n\nChanges made via ETSA Admin interface by ${session!.user
+            ?.name}.`,
+        );
+        prInfo = { prNumber, isNew, branchName: targetBranch };
+      } catch (error) {
+        console.error("Failed to create PR:", error);
+        // Don't fail the upload if PR creation fails
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -96,6 +173,8 @@ Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
         size: file.size,
         sha: uploadResponse.data.content?.sha,
       },
+      branch: targetBranch,
+      pullRequest: prInfo,
       message: existingFileSha
         ? "Speaker image updated successfully"
         : "Speaker image uploaded successfully",

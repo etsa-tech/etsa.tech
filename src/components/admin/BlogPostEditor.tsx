@@ -1129,10 +1129,19 @@ export default function BlogPostEditor({
 
   // Function to handle speaker image upload
   const handleSpeakerImageUpload = async (file: File) => {
+    if (!slug) {
+      alert(
+        "Please enter a title and date to generate a slug before uploading speaker images.",
+      );
+      return;
+    }
+
     setUploadingSpeakerImage(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("slug", slug);
+      formData.append("branch", currentBranch);
 
       const response = await fetch("/api/admin/speakers/upload", {
         method: "POST",
@@ -1141,13 +1150,45 @@ export default function BlogPostEditor({
 
       if (response.ok) {
         const result = await response.json();
-        alert(result.message);
+        alert(
+          `${result.message}${
+            result.pullRequest ? ` (PR #${result.pullRequest.prNumber})` : ""
+          }`,
+        );
 
-        // Refresh speaker images after successful upload
-        await fetchSpeakerImages();
+        // If a PR was created and we have a callback, notify the parent to switch branches
+        if (result.pullRequest && onPRCreated) {
+          console.log(
+            "Speaker image upload created/updated PR, calling onPRCreated:",
+            result.pullRequest,
+          );
+          onPRCreated({
+            prNumber: result.pullRequest.prNumber,
+            branchName: result.pullRequest.branchName,
+            isNew: result.pullRequest.isNew,
+          });
+        } else {
+          console.log("No PR created or no onPRCreated callback:", {
+            hasPR: !!result.pullRequest,
+            hasCallback: !!onPRCreated,
+          });
+        }
 
         // Auto-select the uploaded image
         setValue("speakerImage", result.file.url);
+
+        // Close the modal after successful upload
+        setShowSpeakerImageModal(false);
+
+        // If a PR was created, the speaker images are already refreshed by the branch switch
+        // No need for additional refresh since onPRCreated will trigger a branch change
+        if (!result.pullRequest) {
+          // Only refresh if no PR was created (direct commit to main)
+          console.log("No PR created, refreshing speaker images...");
+          setTimeout(async () => {
+            await fetchSpeakerImages();
+          }, 500);
+        }
       } else {
         const error = await response.json();
         console.error("Speaker image upload failed:", error);
