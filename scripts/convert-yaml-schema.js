@@ -19,7 +19,18 @@ function convertTagsFormat(frontmatter) {
 // Function to clean up string values (remove unnecessary quotes)
 function cleanStringValue(value) {
   if (typeof value === "string") {
-    // Remove quotes if they're not needed
+    // Remove surrounding quotes if they exist and aren't needed for special characters
+    const trimmed = value.trim();
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      const unquoted = trimmed.slice(1, -1);
+      // Only remove quotes if the unquoted string doesn't contain special YAML characters
+      if (!/[:[\]{}|>*&!%@`]/.test(unquoted)) {
+        return unquoted;
+      }
+    }
     return value;
   }
   return value;

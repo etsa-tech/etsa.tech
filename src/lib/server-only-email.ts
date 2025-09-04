@@ -27,7 +27,7 @@ export async function sendContactEmail(formData: {
     // Email content
     const htmlContent = `
       <!DOCTYPE html>
-      <html>
+      <html lang="en">
         <head>
           <meta charset="utf-8">
           <title>Contact Form Submission - ETSA</title>

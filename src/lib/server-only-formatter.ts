@@ -75,9 +75,8 @@ export async function formatBlogPostContent(
 ): Promise<string> {
   try {
     // Split the content into frontmatter and markdown sections
-    const frontmatterMatch = fullContent.match(
-      /^---\n([\s\S]*?)\n---\n([\s\S]*)$/,
-    );
+    const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
+    const frontmatterMatch = frontmatterRegex.exec(fullContent);
 
     if (!frontmatterMatch) {
       // No frontmatter found, just format as markdown
