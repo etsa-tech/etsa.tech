@@ -13,30 +13,29 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get the private Google Maps API key
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    // Determine canonical site URL for referrer semantics.
+    // Note: This route does not make an outbound request; the browser will set
+    // the Referer header automatically when loading the iframe. If we later
+    // switch to a server-side proxy fetch, use this value as the Referer.
+    const referer =
+      process.env.NEXT_PUBLIC_WEBSITE_URL ||
+      process.env.NEXTAUTH_URL ||
+      "http://localhost:8888";
+    void referer; // keep linter happy until used in a proxy
 
-    if (!apiKey) {
-      console.error("GOOGLE_MAPS_API_KEY environment variable is not set");
-      return NextResponse.json(
-        { error: "Google Maps API key not configured" },
-        { status: 500 },
-      );
-    }
-
-    // Construct the Google Maps Embed URL
-    const embedUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(
+    // Use keyless embed to avoid exposing secrets in client-visible URLs.
+    const embedUrl = `https://www.google.com/maps?output=embed&q=${encodeURIComponent(
       address,
-    )}&zoom=${zoom}`;
+    )}&z=${encodeURIComponent(zoom)}`;
 
-    // Return the embed URL
     return NextResponse.json({
       embedUrl,
       address,
-      zoom: parseInt(zoom),
+      zoom: parseInt(zoom, 10),
     });
   } catch (error) {
-    console.error("Error generating Google Maps embed URL:", error);
+    // Minimal, non-sensitive logging
+    console.error("Error generating Google Maps embed URL");
     return NextResponse.json(
       { error: "Failed to generate map embed URL" },
       { status: 500 },
