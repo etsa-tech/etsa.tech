@@ -8,12 +8,6 @@ The ETSA website uses Google Maps to display meeting location maps on the `/meet
 
 ## Security Architecture
 
-### Before (Insecure)
-
-- Google Maps API key was exposed as `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
-- API key was visible in client-side code and browser network requests
-- Potential for API key abuse and quota exhaustion
-
 ### After (Secure)
 
 - Google Maps API key is private as `GOOGLE_MAPS_API_KEY`
@@ -67,16 +61,6 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
    - **Key**: `GOOGLE_MAPS_API_KEY`
    - **Value**: Your Google Maps API key
 5. Redeploy your site
-
-#### For Vercel:
-
-1. Go to your Vercel dashboard
-2. Select your project
-3. Go to **Settings** → **Environment Variables**
-4. Add variable:
-   - **Name**: `GOOGLE_MAPS_API_KEY`
-   - **Value**: Your Google Maps API key
-5. Redeploy your project
 
 ## How It Works
 
