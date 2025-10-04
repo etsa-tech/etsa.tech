@@ -244,7 +244,7 @@ jobs:
 
       # Hadolint for Dockerfile linting
       - name: Run Hadolint
-        uses: hadolint/hadolint-action@v3.2.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Containerfile
           failure-threshold: warning
