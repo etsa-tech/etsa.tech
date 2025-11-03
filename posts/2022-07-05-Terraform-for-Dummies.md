@@ -7,7 +7,6 @@ tags:
   - Terraform
   - Infrastructure as Code
   - IaC
-  - StratusGrid
   - Automation
   - DevOps
 author: ETSA

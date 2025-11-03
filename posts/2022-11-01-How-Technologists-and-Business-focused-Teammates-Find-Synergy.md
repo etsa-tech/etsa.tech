@@ -7,7 +7,6 @@ tags:
   - Business
   - Communication
   - Team Building
-  - StratusGrid
   - Professional Development
   - Collaboration
 author: ETSA

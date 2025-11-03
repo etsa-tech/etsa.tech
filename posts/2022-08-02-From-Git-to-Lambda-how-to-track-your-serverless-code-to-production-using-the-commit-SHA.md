@@ -8,7 +8,6 @@ tags:
   - Serverless
   - Git
   - DevOps
-  - StratusGrid
   - CI/CD
   - Version Control
 author: ETSA

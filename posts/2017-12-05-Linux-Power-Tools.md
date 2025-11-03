@@ -17,7 +17,7 @@ author: ETSA
 speakers:
   - name: Ketan Maheshwari
     title: Engineer
-    company: ORNL
+    company: Oak Ridge National Lab
     image: /images/speakers/ketan_maheshwari.jpg
     bio: >-
       Ketan is an engineer at ORNL with a background in scientific and parallel computing applications. Ketan has a PhD in computer science from University of Nice in France. He is a Linux enthusiast and likes to participate in Linux online communities such as StackExchange and r/linux.

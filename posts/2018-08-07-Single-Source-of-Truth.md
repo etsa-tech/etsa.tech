@@ -15,7 +15,7 @@ author: ETSA
 speakers:
   - name: Chad DeGuira
     title: Client Services Team Leader
-    company: ORNL
+    company: Oak Ridge National Lab
     bio: >-
       Chad DeGuira is the Client Services Team Leader in the Business Systems Group in the Information Technology Services Division at Oak Ridge National Laboratory. He has worked in Information Technology for the past 20 years in support, administrative, and management roles. He has been at Oak Ridge DOE facilities for the past 15 years with a primary focus towards systems management, with interests in substantial cost reductions based on efficient and effective use of computing resources through automated processes and improved workflow.
     linkedIn: "https://www.linkedin.com/in/chad-deguira-a1237674/"

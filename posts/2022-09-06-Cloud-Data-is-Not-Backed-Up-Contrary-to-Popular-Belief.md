@@ -8,7 +8,6 @@ tags:
   - Backup
   - Disaster Recovery
   - Atlassian
-  - StratusGrid
   - Infrastructure
 author: ETSA
 speakers:
