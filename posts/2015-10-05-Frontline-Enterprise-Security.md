@@ -18,6 +18,7 @@ speakers:
   - name: Michael Weaver
     title: Enterprise Consultant
     company: Sword & Shield Enterprise Security, Inc.
+    image: /images/speakers/michael_weaver.jpg
     bio: >-
       Michael Weaver is a Knoxville-based Enterprise Consultant who provides
       information security advisement, auditing, compliance gap analysis, design
