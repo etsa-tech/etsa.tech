@@ -18,7 +18,7 @@ author: ETSA
 speakers:
   - name: Daniel Pelfrey
     title: Principal HPC Network Engineer
-    company: ORNL
+    company: Oak Ridge National Lab
     image: /images/speakers/daniel_pelfrey.jpg
     bio: >-
       Daniel Pelfrey is a Principal Network Engineer at Oak Ridge National Laboratory in the Supercomputing Division. Daniel’s Information Technology career began at an Internet startup company in 1995. He was there from customer number 0, and all the way up to 75,000, and from location #1 to over 35+ locations in three states. This eventually led to a nationwide ISP, and ultimately to ORNL where he is on the network team that takes care of the supercomputing network. Daniel’s first round of formal educational experience was in electrical and computing engineering, and he has a Bachelor of Science in Information Systems at Strayer University. His hobbies include PC gaming-especially the game Factorio, retro gaming, electronics, science, anything space related and programming.

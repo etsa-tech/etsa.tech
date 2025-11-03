@@ -18,7 +18,7 @@ author: ETSA
 speakers:
   - name: Aaron Haun
     title: DevOps Engineer
-    company: ORNL
+    company: Oak Ridge National Lab
     image: /images/speakers/aaron_haun.jpg
     bio: >-
       Aaron Haun is a self-described systems generalist, who enjoys picking apart complex systems, and (usually) putting them back together. He currently works as a "DevOps" Engineer at a local DOE contractor, and has previously worked in the Payment Processing and Loss Prevention industries.
