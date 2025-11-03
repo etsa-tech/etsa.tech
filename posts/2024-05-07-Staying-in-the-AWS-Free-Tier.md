@@ -8,7 +8,6 @@ tags:
   - Cloud Computing
   - Cost Optimization
   - Free Tier
-  - AWS
   - Budget Management
 author: ETSA
 speakers:
