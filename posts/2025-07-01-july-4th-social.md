@@ -23,6 +23,6 @@ meetingLocation:
 published: true
 ---
 
-# 4th of July Social
+4th of July Social
 
 By popular demand, we will be holding our Summer Social at Kern's Food Hall. We will be gathering at 6pm at the round bar that sits between the two exits to the outdoor sitting area. From there we can venture forth into the Food Hall to enjoy as we please. Come join us!
