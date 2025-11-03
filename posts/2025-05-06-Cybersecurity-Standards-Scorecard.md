@@ -24,4 +24,5 @@ speakers:
 eventDate: "2025-05-06"
 published: true
 ---
+
 Since the 1990s, security frameworks—from ISO 27001 to CIS Controls—have multiplied, each prescribing its own maze of requirements. New releases appear yearly, yet no two standards map cleanly to one another, leaving system admins to wonder which controls truly matter. In this session, Russell Eubanks demystifies the landscape with a data-driven scorecard that compares scope, depth, and overlap across today's most-used frameworks. He'll unveil a practical "Cyber Rosetta Stone" that collapses the tangle into a single, reusable control library. Attendees will leave with a clear understanding of the differences and gaps in cybersecurity standards that will support their informed decisions about which standards to use when improving their cybersecurity programs.
