@@ -14,6 +14,7 @@ author: ETSA
 speakers:
   - name: Mystery Guest
     title: Operations Engineer
+    image: /images/speakers/mystery_guest.jpg
     company: Undisclosed
     bio: >-
       Mystery Guest is a operations professional at an undisclosed company where they have worked for several years. In their spare time they likes to automate things, build systems, and solve complex problems.

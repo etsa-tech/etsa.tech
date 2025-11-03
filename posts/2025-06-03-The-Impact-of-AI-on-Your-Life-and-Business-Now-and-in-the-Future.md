@@ -20,7 +20,7 @@ speakers:
     company: World Wide Technology
     image: /images/speakers/jon_duren.jpg
     bio: >-
-      Jon Duren is an accomplished technology professional with over 25 years of experience in service-provider, data center, cloud and AI solutions. He is driven by a passion for applying technical solutions to achieve business outcomes and is currently working to expand the WWT AI Solutions practice. Jon actively seeks out the best strategies to create customer value.  He is constantly monitoring marketing trends, innovative and disruptive technologies, and significant market transitions to identify opportunities for driving customer growth and success.  With a talent for breaking down complex topics into easy-to-understand concepts, Jon is able to develop and share a vision of where business and technology intersect to create better outcomes.  
+      Jon Duren is an accomplished technology professional with over 25 years of experience in service-provider, data center, cloud and AI solutions. He is driven by a passion for applying technical solutions to achieve business outcomes and is currently working to expand the WWT AI Solutions practice. Jon actively seeks out the best strategies to create customer value.  He is constantly monitoring marketing trends, innovative and disruptive technologies, and significant market transitions to identify opportunities for driving customer growth and success.  With a talent for breaking down complex topics into easy-to-understand concepts, Jon is able to develop and share a vision of where business and technology intersect to create better outcomes.
     linkedIn: https://www.linkedin.com/in/jonduren/
   - name: Earl Dodd
     title: Global Technical Solutions Architect - HPC and Supercomputing
@@ -34,6 +34,7 @@ presentationSlides: "Knox_ETSA_Presentation.pptx"
 recordingUrl: "https://www.youtube.com/watch?v=QwinR2O8Ar8"
 published: true
 ---
+
 Join ETSA for an engaging and accessible session designed to open the world of AI to everyone—whether you're a seasoned tech expert or just curious about how AI is reshaping daily life and business.
 
 In this fast-paced hour, we’ll explore:
@@ -41,6 +42,5 @@ In this fast-paced hour, we’ll explore:
 - Making AI Work for You: Learn simple but powerful prompting techniques to get better, more useful results from AI—whether you're solving business challenges, writing creatively, or just making life a little easier.
 - The Next Wave: Agentic AI: Discover how AI is moving beyond chatbots and automation into systems that can plan, adapt, and act independently.
 - Building for the AI Era: Get a behind-the-scenes look at how AI is changing data center design, and why power and cooling innovations are becoming critical to support the next generation of technology.
-
 
 Come curious, leave inspired—and walk away with practical insights you can use, no matter your background.

@@ -17,7 +17,7 @@ tags:
 author: ETSA
 speakers:
   - name: Daniel Pelfrey
-    title: Principal HPC Network Engineer 
+    title: Principal HPC Network Engineer
     company: ORNL
     image: /images/speakers/daniel_pelfrey.jpg
     bio: >-
@@ -27,4 +27,5 @@ eventDate: "2025-10-07"
 recordingUrl: "https://www.youtube.com/watch?v=tVcAT_yqApw"
 published: true
 ---
+
 Burnout impacts us all differently. This presentation will cover identifying indicators of burnout, how to recover from it, and how to prevent it. I have been in the work force for almost 35 years and have seen many others and myself go through burnout to various degrees, several times. This session will cover personal observations and experiences, and some hard lessons learned.
