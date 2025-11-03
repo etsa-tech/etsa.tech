@@ -28,7 +28,7 @@ speakers:
     image: /images/speakers/earl_dodd.jpg
     bio: >-
       Earl Dodd is World Wide Technology's Global HPC Business Practice Leader. He provides HPC/HPDA/Supercomputing strategy, technology enablement, business development, and ESG/Sustainability support to WWT's global enterprise and government customers. Earl helps an enterprise achieve its desired ROI/ROC by leveraging HPC+AI+Data technology, extreme data in motion, data center sustainability, and the cloud for secure ultra-scale architectures and collaboration environments. This effort drives the next generation of computationally steered workflows in decision support environments for real-time situational awareness, institutional learning, and ESG compliance.
-    linkedIn: https://www.linkedin.com/in/earldodd/
+    linkedIn: "https://www.linkedin.com/in/earldodd/"
 eventDate: "2025-06-03"
 presentationSlides: "Knox_ETSA_Presentation.pptx"
 recordingUrl: "https://www.youtube.com/watch?v=QwinR2O8Ar8"
