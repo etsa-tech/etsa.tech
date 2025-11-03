@@ -19,7 +19,7 @@
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
     "next": "15.5.4",
-    "next-auth": "^4.24.11",
+    "next-auth": "^4.24.12",
     "nodemailer": "^6.9.15",
     "prettier": "^3.6.2",
     "react": "^19.0.0",
