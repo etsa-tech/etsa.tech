@@ -15,11 +15,13 @@ author: ETSA
 speakers:
   - name: Veronica Eulenberg
     title: Software Developer & Coding Instructor
+    image: /images/speakers/veronica_eulenberg.jpg
     bio: >-
       Veronica Eulenberg has been developing software since 2017, beginning with LAMP development through WordPress. Specialized in modifying themes and plugins using PHP, CSS, JavaScript, and jQuery, as well as configuring Linux servers through Apache's .htaccess. She has a strong interest in writing Regex and tested complex MySQL queries in MySQL Workbench before deploying them in production. Starting in 2019, she expanded into React development at various organizations. More recently, she has been consulting on front-end projects and teaching coding to kids, covering topics like C# .NET MAUI and VEX robotics.
 eventDate: "2025-04-01"
 published: true
 ---
+
 Make tiny scripts to simplify your non-coder work life. Learn a little bit of JavaScript to make time in your non-coder life :)
 
 Do you find yourself clicking the same buttons over and over? Do you look for your name in the same long list of names multiple times a day? Do you find yourself copying and pasting from the same table over a hundred times?
