@@ -24,4 +24,5 @@ eventDate: "2022-01-04"
 recordingUrl: "https://www.youtube.com/watch?v=AIFTX7rnFUg"
 published: true
 ---
+
 PowerShell is an incredibly versatile language that enables users to automate virtually any task. You may be familiar with the more typical uses for PowerShell such as, interacting with Exchange or completing mundane Windows administration tasks, but the language is capable of so much more. For instance, did you know that you can rapidly interact with practically any web API using PowerShell? How about interacting with services that don't offer public APIs? With a bit of third-party help, PowerShell can interact with most any website directly, thus automating your manual clicks. You can even create a beautiful web-based front-end for your PowerShell scripts, through the use of PowerShell Universal Dashboard. All of this is offered in a .NET-centric environment that will make developers and scripters alike feel at home in the language.

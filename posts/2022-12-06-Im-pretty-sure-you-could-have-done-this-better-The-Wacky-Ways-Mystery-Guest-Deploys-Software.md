@@ -21,6 +21,7 @@ speakers:
 eventDate: "2022-12-06"
 published: true
 ---
+
 In IT there are plenty of best practices, guiding you on what tools to pick and what implementations to use. However, when tonight's mystery guest sees a problem, he takes a different approach. Come learn of the misadventures and hundreds of hours spent setting up a deployment pipeline for a complex web application The Mystery Guest Way™. This talk will be exactly 47 minutes long. All time spent is final. No refunds or exchanges.
 
 Note: At the speakers request their name has been kept confidential
