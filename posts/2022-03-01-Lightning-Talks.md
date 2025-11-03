@@ -16,7 +16,7 @@ speakers:
   - name: Chris Layton
     title: Research Cloud Team Member
     company: Oak Ridge National Laboratory
-    image: /images/speakers/chris_layton.jpg
+    image: /images/speakers/chris_layton.jpeg
     bio: >-
       With two decades of IT experience behind him, Chris is always looking for new challenges and opportunities to grow, especially if they involve Linux. He currently serves on Research Cloud Team at Oak Ridge National Laboratory where he helps support the technical needs of the lab's many scientific research projects. His prior experience includes working as part of a two man engineering team at a Tier 1 ISP, a year long stint as a Senior Systems Engineer at Peak Hosting, and also supporting ORNL's supercomputing effort as a member of the HPC Operations Infrastructure team. When not chasing packets or bending Linux systems to do his bidding, his time is spent trying to keep pace with his daughter, exploring the local hiking haunts, playing with embedded Linux systems, and driving mountain roads in small two seater automobiles.
     linkedIn: "https://www.linkedin.com/in/chris-layton/"
@@ -30,7 +30,7 @@ speakers:
   - name: Jonathan Evenden
     title: President and Founder
     company: Aegis IT
-    image: /images/speakers/jonathan_evenden.jpg
+    image: /images/speakers/jonathan_evenden.jpeg
     bio: >-
       Jonathan Evenden is the President and founder of Aegis IT, located in Kingsport, TN. He has been full time in the IT industry since 2004, and has owned Aegis IT for over seven years. In the rare moments he is not in front of a computer, he loves playing board games and watching Netflix with his and son.
     linkedIn: "https://www.linkedin.com/in/jonathanevenden/"

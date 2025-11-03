@@ -15,7 +15,7 @@ speakers:
   - name: Jesse Trucks
     title: Minister of Magic
     company: Splunk
-    image: /images/speakers/jesse_trucks.jpg
+    image: /images/speakers/jesse_trucks.jpeg
     bio: >-
       Jesse Trucks has over 23 years of experience in ITops and SecOps. He has worked in non-profit group and organizational management since 2005, beginning with helping draft the LOPSA Code of Ethics and being a founding member of LOPSA and then later serving as a LOPSA board member for several years. Trucks has founded and managed two LOPSA chapters - including our own LOPSA East Tennessee - as well. He routinely consults with other non-profits on their bylaws and other organizational forming and management matters, and he is a founding member of ETSA, the organization forming to take over management and operations of ETENN. He works in security for Splunk as the Minister of Magic.
     linkedIn: "https://www.linkedin.com/in/jessetrucks/"

@@ -19,7 +19,7 @@ speakers:
     bio: >-
       Matt Lindsey is the Defensive Cyber Operations Lead and chief Threat Intelligence analyst for Oak Ridge National Laboratory and a long time Cyber education enthusiast in and out of work. A fifteen year veteran of the security industrial complex, he spends much of his time doing incident handling and tracking emerging threats throughout the IT world. When he's not manning the thin blue line between federal networks and the Internet, he enjoys the traditional nerdy pastimes of podcasts, Firefly and Pokemon.
     linkedIn: "https://www.linkedin.com/in/matthew-lindsey-9b6709125/"
-eventDate: "2022-05-03"=
+eventDate: "2022-05-03"
 published: true
 ---
 

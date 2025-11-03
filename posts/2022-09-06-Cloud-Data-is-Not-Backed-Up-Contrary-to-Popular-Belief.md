@@ -14,7 +14,7 @@ speakers:
   - name: Wesley Kirkland
     title: Senior Infrastructure Engineer
     company: StratusGrid
-    image: /images/speakers/wesley_kirkland.jpg
+    image: /images/speakers/wesley_kirkland.jpeg
     bio: >-
       Wesley Kirkland is a Senior Infrastructure Engineer @ StratusGrid. StratusGrid assists customers on a daily basis with their cloud journey and maturity. Wesley enjoys baking and cooking as hobbies to get him away from his desk. Food is what powers the soul right?
     linkedIn: "https://linkedin.com/in/wesleykirkland"

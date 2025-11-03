@@ -15,7 +15,7 @@ speakers:
   - name: Wesley Kirkland
     title: Sr. Cloud Engineer
     company: Ministry Brands
-    image: /images/speakers/wesley_kirkland.jpg
+    image: /images/speakers/wesley_kirkland.jpeg
     bio: >-
       Over the last several years, Wesley Kirkland has cut his teeth doing Systems Engineering work until he got the opportunity to become a real boy again and move to a cloud-centric infrastructure role. Currently, he is a Sr. Cloud Engineer at Ministry Brands, working with AWS & Azure with PowerShell daily. Though somehow his old life follows him and he still does networking.
     linkedIn: "https://linkedin.com/in/wesleykirkland"

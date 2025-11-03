@@ -17,7 +17,7 @@ speakers:
   - name: Wesley Kirkland
     title: Sr. Systems Engineer
     company: Ministry Brands
-    image: /images/speakers/wesley_kirkland.jpg
+    image: /images/speakers/wesley_kirkland.jpeg
     bio: >-
       Over the last several years, Wesley Kirkland has gained Systems Engineering experience consisting of On Premise, Cloud, and scalable automation, primarily using PowerShell to integrate Active Directory environments and Office 365. He currently works at Ministry Brands as a Sr. Systems Engineer working with AWS & Azure.
     linkedIn: "https://linkinedin.com/in/wesleykirkland"

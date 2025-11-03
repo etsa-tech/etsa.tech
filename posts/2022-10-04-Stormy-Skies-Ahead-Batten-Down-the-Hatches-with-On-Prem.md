@@ -15,7 +15,7 @@ speakers:
   - name: Michael Campfield
     title: Linux Systems Administrator
     company: Leidos
-    image: /images/speakers/michael_campfield.jpg
+    image: /images/speakers/michael_campfield.jpeg
     bio: >-
       Michael Campfield is a Linux systems administrator with Leidos whose listed office is at a CDC facility in Atlanta skulking around the bioinformatics HPC group. As with most systems administrators he has worn many hats, frequently all at once. Something something Puppet and Ansible, something something, cloud, automation... Most importantly, Michael is seeking an academic librarianship MLIS degree from IUPUI (Go Jags!). He isn't seeking for a career change - just wants to say he is a computer scientist and a librarian. Verified by Guinness as the weirdest midlife crisis activity ever. Though a resident of East Tennessee for over twenty years, Michael's origins in Upstate New York means he eats only sweet cornbread but never drinks sweet tea.
     linkedIn: "https://www.linkedin.com/in/michael-p-campfield/"

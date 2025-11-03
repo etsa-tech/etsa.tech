@@ -15,7 +15,7 @@ speakers:
   - name: Michael Campfield
     title: Principal Systems Administrator
     company: SAIC
-    image: /images/speakers/michael_campfield.jpg
+    image: /images/speakers/michael_campfield.jpeg
     bio: >-
       Michael Campfield is a Principal Systems Administrator with the Digital Solutions Delivery group at SAIC in Oak Ridge. He is a Linux systems specialist, SME in cloud solutions, a configuration management master, and a DevOps proponent (except where DevOps doesn't work). If you sit still long enough he will wax poetically about becoming a librarian or his moderately sized collection of slide rules.
     linkedIn: "https://www.linkedin.com/in/michael-p-campfield/"

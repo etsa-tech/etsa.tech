@@ -19,7 +19,7 @@ speakers:
   - name: Wesley Kirkland
     title: Principal Solutions Architect
     company: Coupe Health
-    image: /images/speakers/wesley_kirkland.jpg
+    image: /images/speakers/wesley_kirkland.jpeg
     bio: >-
       Wesley Kirkland is a Solutions Architect at Coupe Health. He is passionate about various tech fields, including Home Automation, Email, Internet Presence, AWS, and DevOps. Wesley is also a dedicated cat dad to his two adorable tuxedo kitties. Outside of tech, he enjoys baking and cooking, finding that food fuels the soul, and provides a delightful break from the desk.
     linkedIn: https://www.linkedin.com/in/wesleykirkland/

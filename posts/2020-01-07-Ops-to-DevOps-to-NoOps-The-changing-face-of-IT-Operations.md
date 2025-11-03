@@ -16,7 +16,7 @@ speakers:
   - name: Andy Cowell
     title: Manager, Application Engineering and Automation
     company: Discovery, Inc.
-    image: /images/speakers/andy_cowell.jpg
+    image: /images/speakers/andy_cowell.jpeg
     bio: >-
       Andy Cowell has over twenty years of system administration experience in a variety of environments. Currently, he works for Discovery, Inc., as the manager of the Application Engineering and Automation group in Cloud Infrastructure. He has been responsible for some of the top destinations on the Internet, such as HGTV.com, Dilbert.com, and Metallica.com. In the past, he has worn many hats, from networking admin to full-time developer, and cut his teeth as a "Wizard" with the UTK Computer Science department. When not wrangling systems, he solders microcontrollers, plucks strings, paints toy soldiers, drinks bourbon, smokes pipes, watches hockey, grows algae, and rolls 20s.
     linkedIn: "https://www.linkedin.com/in/andy-cowell/"
