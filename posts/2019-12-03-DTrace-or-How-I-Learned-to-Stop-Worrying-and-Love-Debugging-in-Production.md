@@ -24,5 +24,5 @@ eventDate: "2019-12-03"
 recordingUrl: "https://www.youtube.com/watch?v=9E6ov16tly8"
 published: true
 ---
-DTrace is a tool for safely debugging live systems. It gives insight into both application and kernel behavior, even for 3rd party and closed-source applications. Previously only available for Unix derivatives, DTrace is now available for a very popular "Not Unix" operating system!
 
+DTrace is a tool for safely debugging live systems. It gives insight into both application and kernel behavior, even for 3rd party and closed-source applications. Previously only available for Unix derivatives, DTrace is now available for a very popular "Not Unix" operating system!

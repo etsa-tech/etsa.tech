@@ -20,6 +20,7 @@ speakers:
 eventDate: "2019-10-01"
 published: true
 ---
+
 Congratulations on your new job! You are now the head of one person operations team for a rapidly growing software development group. You are going to be taking on a new project every week, and each project deploys several times a day. Your job is simple: make the latest version of every application your developers produce available instantly, but don't release any broken code! Do you have a plan? No? Maybe this presentation will help.
 
 Note: At the speakers request their name has been kept confidential
