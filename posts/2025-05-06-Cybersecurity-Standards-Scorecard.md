@@ -22,6 +22,7 @@ speakers:
     bio: >-
       Russell Eubanks is Managing Partner & co-founder of Cyverity, a consultancy that builds governance-driven cybersecurity programs and provides fractional-CISO leadership. As the former CIO and CISO of the Federal Reserve Bank of Atlanta, he has built and led large cyber teams, turning policy into measurable risk reduction. Russell authored the first implementation guide for the CIS Critical Security Controls. Russell is a member of the IANS Faculty and a Principal Instructor with the SANS Institute. He authored SANS LDR 521: Security Culture for Leaders and SANS SEC 405: Business Finance Essentials, training hundreds of practitioners annually. Passionate about developing the next generation of cybersecurity leaders, he enjoys helping system administrators translate technical controls into business value.
 eventDate: "2025-05-06"
+recordingUrl: "https://www.youtube.com/watch?v=6CxeijuLS8k"
 published: true
 ---
 
