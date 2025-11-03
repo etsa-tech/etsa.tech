@@ -19,7 +19,7 @@ speakers:
       Wesley Kirkland is a Senior Infrastructure Engineer @ StratusGrid. StratusGrid assists customers on a daily basis with their cloud journey and maturity. Wesley enjoys baking and cooking as hobbies to get him away from his desk. Food is what powers the soul right?
     linkedIn: "https://linkedin.com/in/wesleykirkland"
 eventDate: "2022-09-06"
-recordingUrl: "https://www.youtube.com/watch?v=dXyjyIbWjSY&t=838s"
+recordingUrl: "https://www.youtube.com/watch?v=dXyjyIbWjSY&"
 published: true
 ---
 

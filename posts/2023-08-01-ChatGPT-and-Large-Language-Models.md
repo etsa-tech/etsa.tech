@@ -8,7 +8,6 @@ tags:
   - AI
   - Large Language Models
   - Machine Learning
-  - World Wide Technology
   - Microsoft
 author: ETSA
 speakers:

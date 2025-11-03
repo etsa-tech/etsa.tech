@@ -20,7 +20,7 @@ speakers:
       Ivan Casco is currently Chief Technology Officer at StratusGrid. His background is in Cloud Architecture and DevOps methodologies, especially in implementing new services and improving existing platforms, helping to achieve the best results with few resources and limited time. He is constantly evolving and investigating new technologies and trends in every single aspect of information technology, whether it is with Cloud, Software Development, or DevOps. Ivan enjoys guiding people and driving change in every team he works with, understanding their needs, and empowering them with the knowledge and tools to thrive in their own projects. In his spare time, Ivan loves to travel, eat good food from different cultures and regions, and spend lots of time with technology outside of work.
     linkedIn: "https://www.linkedin.com/in/ivancasco/"
 eventDate: "2022-08-02"
-recordingUrl: "https://www.youtube.com/watch?v=gp88gxhoL8c&t=90s"
+recordingUrl: "https://www.youtube.com/watch?v=gp88gxhoL8c"
 published: true
 ---
 
