@@ -26,3 +26,7 @@ published: true
 ---
 
 For today's engineer, automation is everything. Having a reliable and secure way to handle your automation tasks in your Hybrid Cloud is critical to having a healthy cloud. In this presentation, I'll go over how Azure Automation enables you to automate the creation, deployment, monitoring, and maintenance of resources in your Hybrid Cloud. Using Azure Automation you can orchestrate time-consuming & repeatable tasks across Azure and the Hybrid cloud using PowerShell & Python runbooks, safely use shared variables in multiple scripts, and securely pass sensitive credentials into your code without hardcoding them.
+
+Email: BenTheBuilder@cloudgeek.xyz
+Website: https://cloudgeek.xyz
+Twitter: BenMitchell1979

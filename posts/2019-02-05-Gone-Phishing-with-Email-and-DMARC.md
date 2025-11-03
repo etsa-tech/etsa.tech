@@ -26,3 +26,5 @@ published: true
 ---
 
 In this talk, we will be exploring email security, starting with the basics of SPF and DKIM. Next, we'll move all the way into DMARC, and how you can use it to protect your domain and identity. Will finish up with some live phishing demos.
+
+https://github.com/wesleykirkland/PowerShell-Email-Security

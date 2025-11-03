@@ -22,6 +22,7 @@ speakers:
       By day, Ben Taylor is a Linux Sysadmin at Oak Ridge National Laboratory. Though he's passionate about Linux, he's also a self-described Technology Ecumenist, ever seeking new ways of overcoming technological sectarianism by way of a Big Tent IT approach for building professional community. He enjoys reading aloud to his girlfriend, playing board games, cleaning up after his horses and keeping them out of trouble.
     linkedIn: "https://www.linkedin.com/in/benjamin-taylor-83b75371/"
 eventDate: "2018-02-06"
+presentationSlides: "LOPSA_GitLabPresentation.pptx"
 published: true
 ---
 

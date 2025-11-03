@@ -22,6 +22,7 @@ speakers:
     linkedIn: "https://www.linkedin.com/in/andy-cowell/"
 eventDate: "2019-05-07"
 recordingUrl: "https://www.youtube.com/watch?v=EBh871AiKFA"
+presentationSlides: "Terraform_ Everything as Code (CodeStock '19).pptx"
 published: true
 ---
 

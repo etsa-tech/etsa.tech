@@ -25,3 +25,7 @@ published: true
 ---
 
 The world of DevOps is full of amazing tools and solutions for managing various platforms and systems. However, as a Windows Admin, we often felt left behind in this brave new world. But I'm here to tell you, that simply isn't the true. Many of the modern automation tools such as Ansible, Chef, Puppet, Terraform, etc fully support Microsoft Windows. This talk will focus on using Ansible to deploy and configure Windows workloads in Azure.
+
+Email: BenTheBuilder@cloudgeek.xyz
+Website: https://cloudgeek.xyz
+Twitter: BenMitchell1979

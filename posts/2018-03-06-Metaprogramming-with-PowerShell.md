@@ -23,6 +23,7 @@ speakers:
     linkedIn: "https://linkinedin.com/in/wesleykirkland"
 eventDate: "2018-03-06"
 recordingUrl: "https://www.youtube.com/watch?v=mUkRjT62ejs&list=PL6e0QoXQoTzW_YGyfOmcqGP_wHbiAFmhW&index=1"
+presentationSlides: "PowerShell Summit - Code Writing Code (Meta Programming).pptx"
 published: true
 ---
 
