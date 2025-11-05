@@ -1,4 +1,9 @@
-import { getPresentationPosts, getAllTags, getAllSpeakers, getBlogPosts } from "@/lib/blog";
+import {
+  getPresentationPosts,
+  getAllTags,
+  getAllSpeakers,
+  getBlogPosts,
+} from "@/lib/blog";
 import { ContentPageLayout } from "@/components/ContentPageLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { TagsCard } from "@/components/TagsCard";
