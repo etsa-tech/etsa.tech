@@ -12,7 +12,7 @@ tags:
   - awk
   - sed
   - Regular Expressions
-  - ORNL
+
 author: ETSA
 speakers:
   - name: Ketan Maheshwari

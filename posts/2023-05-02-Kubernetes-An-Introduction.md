@@ -7,7 +7,6 @@ tags:
   - Kubernetes
   - Containers
   - Cloud Computing
-  - AcuityMD
   - Infrastructure
   - DevOps
 author: ETSA

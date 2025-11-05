@@ -11,7 +11,7 @@ Allow: /about
 Allow: /contact
 Allow: /rsvp
 Allow: /meeting-info
-Allow: /tag/
+Allow: /tags/
 Allow: /presentation/
 
 # Disallow admin areas and sensitive paths

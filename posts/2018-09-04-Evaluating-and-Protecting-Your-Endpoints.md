@@ -8,7 +8,7 @@ tags:
   - Cyber Security
   - Antivirus
   - Defense Strategy
-  - ORNL
+
   - Windows Administration
   - Security Operations
 author: ETSA

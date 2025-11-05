@@ -9,7 +9,6 @@ tags:
   - Smart Home
   - Security
   - DIY
-  - UScellular
 author: ETSA
 speakers:
   - name: Brian Parton

@@ -11,7 +11,6 @@ tags:
   - Phishing
   - Cyber Security
   - Identity Protection
-  - Ministry Brands
 author: ETSA
 speakers:
   - name: Wesley Kirkland

@@ -52,7 +52,7 @@ export default async function TagPage({ params }: Readonly<PageProps>) {
             </li>
             <li>/</li>
             <li>
-              <Link href="/tag" className="hover:text-primary-500">
+              <Link href="/tags" className="hover:text-primary-500">
                 Tags
               </Link>
             </li>

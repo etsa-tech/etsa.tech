@@ -6,7 +6,7 @@ excerpt: >-
 tags:
   - Linux
   - Desktop Linux
-  - ORNL
+
   - Career Development
   - Open Source
   - System Administration

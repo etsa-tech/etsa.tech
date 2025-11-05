@@ -7,7 +7,7 @@ tags:
   - Career Development
   - Automation
   - Side Projects
-  - ORNL
+
   - Linux
   - Professional Development
 author: ETSA

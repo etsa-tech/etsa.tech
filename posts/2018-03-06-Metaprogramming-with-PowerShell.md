@@ -11,7 +11,6 @@ tags:
   - Scripting
   - DevOps
   - Windows Administration
-  - Ministry Brands
 author: ETSA
 speakers:
   - name: Wesley Kirkland

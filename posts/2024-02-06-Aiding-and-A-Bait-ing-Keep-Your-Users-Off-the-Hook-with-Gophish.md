@@ -9,7 +9,7 @@ tags:
   - Security Awareness
   - Cybersecurity
   - Red Team
-  - Aegis IT
+
 author: ETSA
 speakers:
   - name: Jonathan Evenden

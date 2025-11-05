@@ -9,7 +9,7 @@ tags:
   - Communication
   - Professional Development
   - IT Support
-  - Aegis IT
+
 author: ETSA
 speakers:
   - name: Jonathan Evenden

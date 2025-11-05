@@ -9,7 +9,7 @@ tags:
   - Project Management
   - Best Practices
   - Cyber Security
-  - ORNL
+
 author: ETSA
 speakers:
   - name: Richard Whitehead

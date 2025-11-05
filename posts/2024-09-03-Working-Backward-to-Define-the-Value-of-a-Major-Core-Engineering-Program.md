@@ -6,7 +6,6 @@ excerpt: >-
 tags:
   - Program Management
   - Technical Program Management
-  - Atlassian
   - Project Management
   - Team Organization
   - Engineering Leadership

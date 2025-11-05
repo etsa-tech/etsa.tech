@@ -8,7 +8,7 @@ tags:
   - Job Search
   - Professional Development
   - Imposter Syndrome
-  - ORNL
+
   - Soft Skills
 author: ETSA
 speakers:

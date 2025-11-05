@@ -6,7 +6,7 @@ excerpt: >-
 tags:
   - IPv6
   - Networking
-  - ORNL
+
   - Internet Protocol
   - Network Security
   - Infrastructure

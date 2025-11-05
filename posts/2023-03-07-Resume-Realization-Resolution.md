@@ -8,7 +8,6 @@ tags:
   - Career Development
   - Job Search
   - Professional Development
-  - Aegis IT
   - Hiring
 author: ETSA
 speakers:

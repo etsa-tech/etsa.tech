@@ -10,7 +10,6 @@ tags:
   - Cloud Infrastructure
   - Automation
   - Career Development
-  - Discovery Inc
 author: ETSA
 speakers:
   - name: Andy Cowell

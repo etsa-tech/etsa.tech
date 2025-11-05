@@ -7,7 +7,7 @@ tags:
   - Networking
   - HPC
   - Supercomputing
-  - ORNL
+
   - Infrastructure
   - Performance
 author: ETSA
