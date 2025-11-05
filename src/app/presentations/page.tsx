@@ -1,4 +1,4 @@
-import { getPresentationPosts, getAllTags, getAllSpeakers } from "@/lib/blog";
+import { getPresentationPosts, getAllTags, getAllSpeakers, getBlogPosts } from "@/lib/blog";
 import { ContentPageLayout } from "@/components/ContentPageLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { TagsCard } from "@/components/TagsCard";
@@ -12,6 +12,7 @@ export const metadata = {
 
 export default function PresentationsPage() {
   const posts = getPresentationPosts();
+  const blogPosts = getBlogPosts();
   const allTags = getAllTags();
   const allSpeakers = getAllSpeakers();
 
@@ -26,7 +27,7 @@ export default function PresentationsPage() {
           { label: "Unique Speakers", value: allSpeakers.length },
           {
             label: "Blog Posts",
-            value: posts.filter((p) => p.frontmatter.blogpost).length,
+            value: blogPosts.length,
           },
         ]}
       />
