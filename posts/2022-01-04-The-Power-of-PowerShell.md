@@ -8,7 +8,6 @@ tags:
   - Automation
   - Scripting
   - Windows
-  - Ministry Brands
   - APIs
   - Web Development
 author: ETSA

@@ -8,7 +8,7 @@ tags:
   - Cybersecurity
   - Threat Intelligence
   - Incident Response
-  - ORNL
+
   - Malware
 author: ETSA
 speakers:

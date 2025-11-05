@@ -8,7 +8,7 @@ tags:
   - Distributed Systems
   - System Administration
   - Storage
-  - ORNL
+
   - Infrastructure
 author: ETSA
 speakers:

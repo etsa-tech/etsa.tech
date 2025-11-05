@@ -9,7 +9,6 @@ tags:
   - Verizon
   - Threat Intelligence
   - Data Breaches
-  - Splunk
   - Security Research
 author: ETSA
 speakers:

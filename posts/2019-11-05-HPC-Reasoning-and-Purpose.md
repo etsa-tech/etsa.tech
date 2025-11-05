@@ -8,7 +8,7 @@ tags:
   - High Performance Computing
   - Supercomputing
   - Infrastructure
-  - ORNL
+
   - Linux
   - Parallel Computing
 author: ETSA

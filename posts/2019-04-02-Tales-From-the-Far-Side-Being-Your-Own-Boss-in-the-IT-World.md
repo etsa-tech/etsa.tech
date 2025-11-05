@@ -9,7 +9,7 @@ tags:
   - IT Consulting
   - Career Development
   - Small Business
-  - Aegis IT
+
 author: ETSA
 speakers:
   - name: Jonathan Evenden

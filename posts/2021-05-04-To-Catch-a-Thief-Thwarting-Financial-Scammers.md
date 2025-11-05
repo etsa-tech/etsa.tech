@@ -9,7 +9,7 @@ tags:
   - Financial Fraud
   - Email Security
   - Social Engineering
-  - Aegis IT
+
 author: ETSA
 speakers:
   - name: Jonathan Evenden

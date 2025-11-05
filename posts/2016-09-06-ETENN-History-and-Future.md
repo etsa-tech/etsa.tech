@@ -5,7 +5,7 @@ excerpt: >-
   Join co-founder Jesse Trucks for an open discussion on the past, present, and
   future of LOPSA-ETENN as the organization faces pivotal decisions.
 tags:
-  - LOPSA-ETENN
+  - LOPSA
   - Community
   - Leadership
   - Tech Organizations

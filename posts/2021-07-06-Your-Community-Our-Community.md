@@ -9,7 +9,6 @@ tags:
   - Professional Development
   - Networking
   - ETSA
-  - Splunk
 author: ETSA
 speakers:
   - name: Jesse Trucks

@@ -8,7 +8,7 @@ tags:
   - Asset Management
   - Security
   - Infrastructure
-  - ORNL
+
   - Systems Management
   - Automation
 author: ETSA

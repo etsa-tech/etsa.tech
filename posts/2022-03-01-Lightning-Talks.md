@@ -8,9 +8,9 @@ tags:
   - Cloud Computing
   - Career Development
   - IaaS
-  - ORNL
+
   - GitLab
-  - Aegis IT
+
 author: ETSA
 speakers:
   - name: Chris Layton

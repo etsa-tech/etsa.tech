@@ -10,7 +10,6 @@ tags:
   - Teamwork
   - Career Development
   - Leadership
-  - UTK
 author: ETSA
 speakers:
   - name: Mike Stanley

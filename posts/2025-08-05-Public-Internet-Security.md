@@ -11,7 +11,6 @@ tags:
   - Encryption
   - IT Security
   - Cybersecurity
-  - Public-Facing Websites
   - Authentication
   - TLS
 author: ETSA

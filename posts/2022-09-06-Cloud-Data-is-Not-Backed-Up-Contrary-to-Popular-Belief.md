@@ -7,7 +7,6 @@ tags:
   - Cloud Computing
   - Backup
   - Disaster Recovery
-  - Atlassian
   - Infrastructure
 author: ETSA
 speakers:

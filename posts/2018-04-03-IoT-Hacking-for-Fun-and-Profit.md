@@ -10,7 +10,7 @@ tags:
   - Cyber Security
   - Internet of Things
   - Device Security
-  - ORNL
+
 author: ETSA
 speakers:
   - name: Matt Lindsey

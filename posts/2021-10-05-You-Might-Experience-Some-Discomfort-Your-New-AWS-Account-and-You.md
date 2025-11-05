@@ -8,7 +8,6 @@ tags:
   - Cloud Computing
   - Cost Optimization
   - FinOps
-  - The Duckbill Group
   - Cloud Economics
 author: ETSA
 speakers:

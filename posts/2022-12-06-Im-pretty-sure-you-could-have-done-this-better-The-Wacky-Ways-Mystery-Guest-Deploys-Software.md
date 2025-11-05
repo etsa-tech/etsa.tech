@@ -8,7 +8,6 @@ tags:
   - CI/CD
   - DevOps
   - Automation
-  - Mystery Guest
   - War Stories
 author: ETSA
 speakers:

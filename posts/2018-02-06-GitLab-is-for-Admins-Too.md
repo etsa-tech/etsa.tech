@@ -11,7 +11,7 @@ tags:
   - Automation
   - Infrastructure as Code
   - System Administration
-  - ORNL
+
 author: ETSA
 speakers:
   - name: Ben Taylor

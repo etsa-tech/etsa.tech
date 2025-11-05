@@ -9,7 +9,6 @@ tags:
   - CISO
   - White House
   - Threat Intelligence
-  - Splunk
   - Career Development
 author: ETSA
 speakers:

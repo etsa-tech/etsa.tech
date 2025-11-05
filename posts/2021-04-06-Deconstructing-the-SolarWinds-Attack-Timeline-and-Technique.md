@@ -9,7 +9,6 @@ tags:
   - Supply Chain Attack
   - Incident Response
   - Threat Intelligence
-  - Splunk
 author: ETSA
 speakers:
   - name: Jesse Trucks

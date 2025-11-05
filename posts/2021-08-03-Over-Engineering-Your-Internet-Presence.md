@@ -8,7 +8,6 @@ tags:
   - DNS
   - Over Engineering
   - Infrastructure
-  - Ministry Brands
   - Networking
 author: ETSA
 speakers:

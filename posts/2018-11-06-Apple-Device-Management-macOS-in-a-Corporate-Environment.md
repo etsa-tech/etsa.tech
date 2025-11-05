@@ -9,7 +9,7 @@ tags:
   - Device Management
   - Software Distribution
   - Security
-  - ORNL
+
   - System Administration
 author: ETSA
 speakers:
