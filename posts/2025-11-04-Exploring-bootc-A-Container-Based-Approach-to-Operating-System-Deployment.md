@@ -22,8 +22,9 @@ speakers:
     image: /images/speakers/jason_kincl.jpg
     bio: >-
       Jason Kincl is a Solution Architect with 15+ years as a systems engineer in high performance computing. At Red Hat he specializes in helping organizations adopt containers and OpenShift to modernize their platforms and achieve their critical objectives.
-    linkedIn: https://www.linkedin.com/in/jasonkincl/
+    linkedIn: "https://www.linkedin.com/in/jasonkincl/"
 eventDate: "2025-11-03"
+recordingUrl: "https://www.youtube.com/watch?v=bYIVAVdfffM"
 published: true
 ---
 
