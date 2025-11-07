@@ -39,6 +39,32 @@ function containsMaliciousPattern(url: string): boolean {
 }
 
 /**
+ * Check if a path requires no-cache headers
+ * Authentication flows and sensitive endpoints should never be cached
+ */
+function requiresNoCacheHeaders(pathname: string): boolean {
+  const noCachePaths = [
+    "/api/auth/", // All NextAuth endpoints
+    "/admin", // Admin pages
+    "/api/admin/", // Admin API endpoints
+    "/api/contact", // Contact form (may contain sensitive data)
+    "/api/maps/", // API endpoints
+  ];
+
+  return noCachePaths.some((path) => pathname.startsWith(path));
+}
+
+/**
+ * Add cache control headers to response
+ */
+function addCacheControlHeaders(response: NextResponse): NextResponse {
+  response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+  response.headers.set("Pragma", "no-cache");
+  response.headers.set("Expires", "0");
+  return response;
+}
+
+/**
  * Main middleware function
  */
 export default withAuth(
@@ -80,8 +106,15 @@ export default withAuth(
       }
     }
 
-    // Continue with the request
-    return NextResponse.next();
+    // Continue with the request and add cache control headers if needed
+    const response = NextResponse.next();
+
+    // Add no-cache headers for authentication and sensitive endpoints
+    if (requiresNoCacheHeaders(pathname)) {
+      return addCacheControlHeaders(response);
+    }
+
+    return response;
   },
   {
     callbacks: {

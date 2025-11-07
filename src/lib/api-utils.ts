@@ -8,6 +8,19 @@ export const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
+// Cache control headers for sensitive endpoints (F-2025-22309)
+export const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
+// Combined headers for API responses with no-cache
+export const API_HEADERS_NO_CACHE = {
+  ...CORS_HEADERS,
+  ...NO_CACHE_HEADERS,
+};
+
 // Handle OPTIONS requests (CORS preflight)
 export function handleOptions() {
   return new NextResponse(null, {
@@ -34,7 +47,7 @@ export function createErrorResponse(message: string, status: number = 400) {
  * Sanitize error messages to prevent information disclosure
  * In production, return generic messages instead of detailed errors
  */
-function sanitizeErrorMessage(message: string, status: number): string {
+function sanitizeErrorMessage(_message: string, status: number): string {
   // Map status codes to generic messages
   const genericMessages: Record<number, string> = {
     400: "Bad request",
@@ -55,6 +68,27 @@ function sanitizeErrorMessage(message: string, status: number): string {
 // Create success response with CORS headers
 export function createSuccessResponse(data: Record<string, unknown>) {
   return NextResponse.json(data, { headers: CORS_HEADERS });
+}
+
+// Create success response with no-cache headers (for sensitive data)
+export function createSuccessResponseNoCache(data: Record<string, unknown>) {
+  return NextResponse.json(data, { headers: API_HEADERS_NO_CACHE });
+}
+
+// Create error response with no-cache headers (for sensitive endpoints)
+export function createErrorResponseNoCache(
+  message: string,
+  status: number = 400,
+) {
+  const sanitizedMessage =
+    process.env.NODE_ENV === "production"
+      ? sanitizeErrorMessage(message, status)
+      : message;
+
+  return NextResponse.json(
+    { error: sanitizedMessage },
+    { status, headers: API_HEADERS_NO_CACHE },
+  );
 }
 
 // Parse and validate request body
