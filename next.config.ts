@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Production optimizations and security
+  productionBrowserSourceMaps: false, // Disable source maps in production to prevent code exposure
+  poweredByHeader: false, // Remove X-Powered-By header to avoid technology disclosure
+
   images: {
     unoptimized: true,
     // Allow Google profile images (NextAuth Google provider)
