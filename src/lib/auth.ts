@@ -48,7 +48,9 @@ export const authOptions: NextAuthOptions = {
 
       if (lastActivity && Date.now() - lastActivity > INACTIVITY_TIMEOUT) {
         console.log(
-          `[Auth] Session expired due to inactivity: ${session.user?.email || "unknown"}`,
+          `[Auth] Session expired due to inactivity: ${
+            session.user?.email || "unknown"
+          }`,
         );
         // Invalidate the token
         const jti = (token as { jti?: string }).jti;
@@ -77,7 +79,10 @@ export const authOptions: NextAuthOptions = {
       const jti = (token as { jti?: string }).jti;
       if (jti && tokenBlocklist.isBlocked(jti)) {
         console.log(
-          `[Auth] Blocked access attempt with invalidated token: ${jti.substring(0, 8)}...`,
+          `[Auth] Blocked access attempt with invalidated token: ${jti.substring(
+            0,
+            8,
+          )}...`,
         );
         // Return an empty token to force re-authentication
         return {};
@@ -117,7 +122,9 @@ export const authOptions: NextAuthOptions = {
           `[Auth] User signed out, token invalidated: ${email || "unknown"}`,
         );
       } else {
-        console.warn("[Auth] Sign out event triggered but no jti found in token");
+        console.warn(
+          "[Auth] Sign out event triggered but no jti found in token",
+        );
       }
     },
   },

@@ -1,10 +1,10 @@
 /**
  * Token Blocklist Management
- * 
+ *
  * This module provides server-side token invalidation for JWT-based sessions.
  * When a user logs out, their token identifier (jti) is added to the blocklist,
  * preventing the token from being reused even if it hasn't expired yet.
- * 
+ *
  * Security Note: This addresses the pen test finding that session cookies
  * remain valid after logout, making the application vulnerable to session
  * replay attacks and man-in-the-middle attacks.
@@ -18,7 +18,7 @@ interface BlocklistEntry {
 
 /**
  * In-memory blocklist storage
- * 
+ *
  * Note: For production environments with multiple server instances,
  * consider using Redis, DynamoDB, or another distributed cache.
  * This in-memory implementation works for single-instance deployments
@@ -43,7 +43,10 @@ class TokenBlocklist {
   add(jti: string, expiresAt: number, email?: string): void {
     this.blocklist.set(jti, { jti, expiresAt, email });
     console.log(
-      `[TokenBlocklist] Added token to blocklist: ${jti.substring(0, 8)}... (email: ${email || "unknown"})`,
+      `[TokenBlocklist] Added token to blocklist: ${jti.substring(
+        0,
+        8,
+      )}... (email: ${email || "unknown"})`,
     );
   }
 
@@ -136,4 +139,3 @@ class TokenBlocklist {
 const tokenBlocklist = new TokenBlocklist();
 
 export default tokenBlocklist;
-
