@@ -10,7 +10,10 @@ import {
   logRequestData,
 } from "@/lib/api-utils";
 
-async function handleContactSubmission(request: NextRequest) {
+async function handleContactSubmission(
+  request: NextRequest,
+  origin: string | null,
+) {
   // Parse and log request
   const requestData = await parseRequestBody(request);
   logRequestData(requestData, "Contact form");
@@ -19,7 +22,7 @@ async function handleContactSubmission(request: NextRequest) {
   const validation = validateContactForm(requestData);
   if (!validation.success) {
     console.error("Contact form validation failed:", validation.errors);
-    return createErrorResponse("Validation failed");
+    return createErrorResponse("Validation failed", 400, origin);
   }
 
   const validatedData = validation.data;
@@ -45,11 +48,19 @@ async function handleContactSubmission(request: NextRequest) {
   }
 
   console.log("Contact email sent successfully");
-  return createSuccessResponse({
-    success: true,
-    message: "Message sent successfully",
-  });
+  return createSuccessResponse(
+    {
+      success: true,
+      message: "Message sent successfully",
+    },
+    origin,
+  );
 }
 
 export const POST = createApiHandler(handleContactSubmission);
-export { handleOptions as OPTIONS } from "@/lib/api-utils";
+
+// Export OPTIONS handler with request parameter for CORS validation
+export async function OPTIONS(request: NextRequest) {
+  const { handleOptions } = await import("@/lib/api-utils");
+  return handleOptions(request);
+}

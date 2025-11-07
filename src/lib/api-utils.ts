@@ -1,7 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyHCaptcha } from "@/lib/email-config";
 
-// Common CORS headers
+/**
+ * Allowed origins for CORS (F-2025-22310)
+ * Only these origins can make cross-origin requests to the API
+ */
+const ALLOWED_ORIGINS = new Set([
+  "https://etsa.tech",
+  "https://www.etsa.tech",
+  "http://localhost:3000", // Development
+  "http://localhost:8888", // Netlify dev
+]);
+
+// Regex patterns for dynamic origins
+const NETLIFY_DEPLOY_PREVIEW_PATTERN =
+  /^https:\/\/deploy-preview-\d+-etsa-tech\.netlify\.app$/;
+const NETLIFY_BRANCH_DEPLOY_PATTERN =
+  /^https:\/\/[a-z0-9-]+--etsa-tech\.netlify\.app$/;
+
+/**
+ * Validate if an origin is allowed
+ */
+function isOriginAllowed(origin: string | null): boolean {
+  if (!origin) return false;
+
+  // Check exact match
+  if (ALLOWED_ORIGINS.has(origin)) {
+    return true;
+  }
+
+  // Allow Netlify deploy previews (deploy-preview-*.netlify.app)
+  if (NETLIFY_DEPLOY_PREVIEW_PATTERN.exec(origin)) {
+    return true;
+  }
+
+  // Allow Netlify branch deploys (branch-name--etsa-tech.netlify.app)
+  if (NETLIFY_BRANCH_DEPLOY_PATTERN.exec(origin)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Get CORS headers for a specific origin
+ * Returns appropriate headers based on origin validation
+ */
+export function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = isOriginAllowed(origin) ? origin : "null";
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin || "null",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    Vary: "Origin", // Important: tells caches that response varies by Origin
+  };
+}
+
+// Legacy CORS headers (deprecated - use getCorsHeaders instead)
+// Kept for backward compatibility but should not be used for new code
 export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -21,25 +78,40 @@ export const API_HEADERS_NO_CACHE = {
   ...NO_CACHE_HEADERS,
 };
 
-// Handle OPTIONS requests (CORS preflight)
-export function handleOptions() {
+/**
+ * Handle OPTIONS requests (CORS preflight)
+ * Now validates origin against whitelist (F-2025-22310)
+ */
+export function handleOptions(request: NextRequest) {
+  const origin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   return new NextResponse(null, {
     status: 200,
-    headers: CORS_HEADERS,
+    headers: corsHeaders,
   });
 }
 
-// Create error response with CORS headers
-export function createErrorResponse(message: string, status: number = 400) {
+/**
+ * Create error response with CORS headers
+ * Now validates origin against whitelist (F-2025-22310)
+ */
+export function createErrorResponse(
+  message: string,
+  status: number = 400,
+  origin: string | null = null,
+) {
   // Sanitize error message in production to prevent information disclosure
   const sanitizedMessage =
     process.env.NODE_ENV === "production"
       ? sanitizeErrorMessage(message, status)
       : message;
 
+  const corsHeaders = origin ? getCorsHeaders(origin) : CORS_HEADERS;
+
   return NextResponse.json(
     { error: sanitizedMessage },
-    { status, headers: CORS_HEADERS },
+    { status, headers: corsHeaders },
   );
 }
 
@@ -65,30 +137,49 @@ function sanitizeErrorMessage(_message: string, status: number): string {
   return genericMessages[status] || "An error occurred";
 }
 
-// Create success response with CORS headers
-export function createSuccessResponse(data: Record<string, unknown>) {
-  return NextResponse.json(data, { headers: CORS_HEADERS });
+/**
+ * Create success response with CORS headers
+ * Now validates origin against whitelist (F-2025-22310)
+ */
+export function createSuccessResponse(
+  data: Record<string, unknown>,
+  origin: string | null = null,
+) {
+  const corsHeaders = origin ? getCorsHeaders(origin) : CORS_HEADERS;
+  return NextResponse.json(data, { headers: corsHeaders });
 }
 
-// Create success response with no-cache headers (for sensitive data)
-export function createSuccessResponseNoCache(data: Record<string, unknown>) {
-  return NextResponse.json(data, { headers: API_HEADERS_NO_CACHE });
+/**
+ * Create success response with no-cache headers (for sensitive data)
+ * Now validates origin against whitelist (F-2025-22310)
+ */
+export function createSuccessResponseNoCache(
+  data: Record<string, unknown>,
+  origin: string | null = null,
+) {
+  const corsHeaders = origin ? getCorsHeaders(origin) : CORS_HEADERS;
+  const headers = { ...corsHeaders, ...NO_CACHE_HEADERS };
+  return NextResponse.json(data, { headers });
 }
 
-// Create error response with no-cache headers (for sensitive endpoints)
+/**
+ * Create error response with no-cache headers (for sensitive endpoints)
+ * Now validates origin against whitelist (F-2025-22310)
+ */
 export function createErrorResponseNoCache(
   message: string,
   status: number = 400,
+  origin: string | null = null,
 ) {
   const sanitizedMessage =
     process.env.NODE_ENV === "production"
       ? sanitizeErrorMessage(message, status)
       : message;
 
-  return NextResponse.json(
-    { error: sanitizedMessage },
-    { status, headers: API_HEADERS_NO_CACHE },
-  );
+  const corsHeaders = origin ? getCorsHeaders(origin) : CORS_HEADERS;
+  const headers = { ...corsHeaders, ...NO_CACHE_HEADERS };
+
+  return NextResponse.json({ error: sanitizedMessage }, { status, headers });
 }
 
 // Parse and validate request body
@@ -116,23 +207,31 @@ export async function validateCaptcha(captchaToken: string) {
   }
 }
 
-// Generic API handler wrapper
+/**
+ * Generic API handler wrapper
+ * Now validates origin against whitelist (F-2025-22310)
+ */
 export function createApiHandler(
-  handler: (request: NextRequest) => Promise<NextResponse>,
+  handler: (
+    request: NextRequest,
+    origin: string | null,
+  ) => Promise<NextResponse>,
 ) {
   return async (request: NextRequest) => {
+    const origin = request.headers.get("origin");
+
     // Handle OPTIONS requests
     if (request.method === "OPTIONS") {
-      return handleOptions();
+      return handleOptions(request);
     }
 
     // Only allow POST requests
     if (request.method !== "POST") {
-      return createErrorResponse("Method not allowed", 405);
+      return createErrorResponse("Method not allowed", 405, origin);
     }
 
     try {
-      return await handler(request);
+      return await handler(request, origin);
     } catch (error) {
       // Log detailed error server-side for debugging
       console.error("API handler error:", {
@@ -144,7 +243,7 @@ export function createApiHandler(
       // Return sanitized error to client
       const message =
         error instanceof Error ? error.message : "Internal server error";
-      return createErrorResponse(message, 500);
+      return createErrorResponse(message, 500, origin);
     }
   };
 }
