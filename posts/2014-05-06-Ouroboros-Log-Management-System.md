@@ -13,10 +13,10 @@ tags:
   - Ceph
 author: ETSA
 speakers:
-  - name: Shane Murphey
+  - name: Shane Murphy
     title: Systems Engineer III
     company: Scripps Networks
-    image: /images/speakers/shane_murphey.jpg
+    image: /images/speakers/shane_murphy.jpg
     bio: >-
       Shane started computing on a Commodore VIC-20 in the early 80s, and it was love at first keystroke. Many years later, he is happily employed as a Systems Engineer III at Scripps Networks, focusing on evaluation, analysis, tools, and automation. He loves to make, learn, and teach.
 eventDate: "2014-05-06"
