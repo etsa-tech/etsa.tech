@@ -9,7 +9,19 @@ export default function GlobalErrorPage({
   readonly error: Error & { digest?: string };
   readonly reset: () => void;
 }) {
-  console.error("Global error:", error);
+  // Log error server-side only (not in production client console)
+  if (globalThis.window === undefined) {
+    // Server-side logging
+    console.error("Global error boundary caught:", {
+      message: error.message,
+      digest: error.digest,
+      timestamp: new Date().toISOString(),
+    });
+  } else if (process.env.NODE_ENV === "development") {
+    // Client-side logging only in development
+    console.error("Global error:", error.message);
+  }
+  // In production, don't log to client console to prevent information disclosure
 
   // Global error pages automatically return 500 status in Next.js App Router
   return (

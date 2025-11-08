@@ -116,7 +116,10 @@ async function subscribeToMailchimp(data: {
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-async function handleMailchimpSubscription(request: NextRequest) {
+async function handleMailchimpSubscription(
+  request: NextRequest,
+  origin: string | null,
+) {
   // Parse and log request
   const requestData = await parseRequestBody(request);
   const { email, name } = requestData;
@@ -124,12 +127,12 @@ async function handleMailchimpSubscription(request: NextRequest) {
 
   // Basic validation
   if (!email || !name) {
-    return createErrorResponse("Email and name are required");
+    return createErrorResponse("Email and name are required", 400, origin);
   }
 
   // Validate email format
   if (!EMAIL_REGEX.test(email)) {
-    return createErrorResponse("Invalid email format");
+    return createErrorResponse("Invalid email format", 400, origin);
   }
 
   // Subscribe to Mailchimp
@@ -143,12 +146,20 @@ async function handleMailchimpSubscription(request: NextRequest) {
   }
 
   console.log("Mailchimp subscription successful");
-  return createSuccessResponse({
-    success: true,
-    message: "Successfully subscribed to mailing list",
-    member: result.member,
-  });
+  return createSuccessResponse(
+    {
+      success: true,
+      message: "Successfully subscribed to mailing list",
+      member: result.member,
+    },
+    origin,
+  );
 }
 
 export const POST = createApiHandler(handleMailchimpSubscription);
-export { handleOptions as OPTIONS } from "@/lib/api-utils";
+
+// Export OPTIONS handler with request parameter for CORS validation
+export async function OPTIONS(request: NextRequest) {
+  const { handleOptions } = await import("@/lib/api-utils");
+  return handleOptions(request);
+}

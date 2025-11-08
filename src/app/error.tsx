@@ -11,14 +11,19 @@ export default function ErrorPage({
   readonly reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
-
-    // Set 500 status code for error pages
-    if (typeof window === "undefined") {
-      // Server-side: This will be handled by Next.js error boundary
-      // The status code is automatically set to 500 for unhandled errors
+    // Log error server-side only (not in production client console)
+    if (globalThis.window === undefined) {
+      // Server-side logging
+      console.error("Error boundary caught:", {
+        message: error.message,
+        digest: error.digest,
+        timestamp: new Date().toISOString(),
+      });
+    } else if (process.env.NODE_ENV === "development") {
+      // Client-side logging only in development
+      console.error("Error:", error.message);
     }
+    // In production, don't log to client console to prevent information disclosure
   }, [error]);
 
   return (

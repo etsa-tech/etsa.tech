@@ -105,7 +105,10 @@ async function submitToGoogleSheets(
   }
 }
 
-async function handleRSVPSubmission(request: NextRequest) {
+async function handleRSVPSubmission(
+  request: NextRequest,
+  origin: string | null,
+) {
   // Parse and log request
   const requestData = await parseRequestBody(request);
   const { captchaToken, ...formData } = requestData;
@@ -118,7 +121,7 @@ async function handleRSVPSubmission(request: NextRequest) {
   const validation = validateRSVPForm(formData);
   if (!validation.success) {
     console.error("RSVP form validation failed:", validation.errors);
-    return createErrorResponse("Validation failed");
+    return createErrorResponse("Validation failed", 400, origin);
   }
 
   const validatedData = validation.data;
@@ -142,11 +145,19 @@ async function handleRSVPSubmission(request: NextRequest) {
   }
 
   console.log("RSVP submitted successfully");
-  return createSuccessResponse({
-    success: true,
-    message: "RSVP submitted successfully",
-  });
+  return createSuccessResponse(
+    {
+      success: true,
+      message: "RSVP submitted successfully",
+    },
+    origin,
+  );
 }
 
 export const POST = createApiHandler(handleRSVPSubmission);
-export { handleOptions as OPTIONS } from "@/lib/api-utils";
+
+// Export OPTIONS handler with request parameter for CORS validation
+export async function OPTIONS(request: NextRequest) {
+  const { handleOptions } = await import("@/lib/api-utils");
+  return handleOptions(request);
+}
