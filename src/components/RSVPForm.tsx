@@ -314,6 +314,7 @@ export default function RSVPForm({
         body: JSON.stringify({
           ...formData,
           meetingDate,
+          meetingTitle,
           captchaToken,
         }),
       });
