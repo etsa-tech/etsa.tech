@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       address,
       zoom: parseInt(zoom, 10),
     });
-  } catch (error) {
+  } catch {
     // Minimal, non-sensitive logging
     console.error("Error generating Google Maps embed URL");
     return NextResponse.json(
