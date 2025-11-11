@@ -1,18 +1,6 @@
-import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextConfig from "eslint-config-next/core-web-vitals";
 
 const eslintConfig = [
-  // Extend Next.js recommended configs
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-
   // Global ignores
   {
     ignores: [
@@ -28,11 +16,15 @@ const eslintConfig = [
     ],
   },
 
+  // Extend Next.js recommended configs
+  ...nextConfig,
+
   // Custom rules
   {
     rules: {
       "react/no-unescaped-entities": "off",
       "@next/next/no-img-element": "off",
+      "react-hooks/set-state-in-effect": "off", // Allow setState in effects for mounting checks and localStorage
     },
   },
 
