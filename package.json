@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.0",
@@ -18,12 +19,12 @@
     "@types/nodemailer": "^7.0.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
-    "next": "^15.5.6",
+    "next": "^16.0.1",
     "next-auth": "^4.24.11",
     "nodemailer": "^7.0.0",
     "prettier": "^3.6.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-hook-form": "^7.62.0",
     "remark": "^15.0.1",
     "remark-breaks": "^4.0.0",
@@ -44,7 +45,7 @@
     "@types/sanitize-html": "^2.16.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
-    "eslint-config-next": "15.5.6",
+    "eslint-config-next": "^16.0.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
     "typescript": "5.9.3"
