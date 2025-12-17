@@ -1,5 +1,5 @@
 ---
-title: 4th of July Social at Kerns Food Hall
+title: New Years January Social Event
 date: "2025-12-16"
 excerpt: Come join us for our annual New Years social filled with friends, beer, and food!
 tags:
