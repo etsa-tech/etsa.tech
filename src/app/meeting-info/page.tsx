@@ -162,6 +162,21 @@ export default function MeetingInfoPage() {
                     </svg>
                     RSVP on Meetup
                   </a>
+                  <a
+                    href="https://us06web.zoom.us/j/89410205410?pwd=RUFQM3JIT1kvblNpbmo0dktUaU9GUT09"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center text-etsa-primary hover:text-etsa-secondary transition-colors border border-etsa-primary hover:bg-etsa-primary hover:text-white px-4 py-2 rounded-lg font-medium"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M2 6.5C2 4.567 3.567 3 5.5 3h13C20.433 3 22 4.567 22 6.5v11c0 1.933-1.567 3.5-3.5 3.5h-13A3.5 3.5 0 012 17.5v-11zM5.5 5A1.5 1.5 0 004 6.5v11A1.5 1.5 0 005.5 19h13a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0018.5 5h-13zM8 9a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1zm0 4a1 1 0 011-1h3a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    </svg>
+                    Join on Zoom
+                  </a>
                 </div>
               </div>
             </div>
