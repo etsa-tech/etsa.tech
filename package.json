@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
-    "@hcaptcha/react-hcaptcha": "^1.12.0",
+    "@hcaptcha/react-hcaptcha": "^2.0.0",
     "@hookform/resolvers": "^5.2.1",
     "@monaco-editor/react": "^4.7.0",
     "@octokit/app": "^16.1.0",
