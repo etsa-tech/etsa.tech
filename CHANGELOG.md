@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### ✨ Features
+
+- semantic release github app ([#216](https://github.com/etsa-tech/etsa.tech/pull/216)) by @wesleykirkland
+
 ### 👷 CI/CD
 
 - Implement conventional commits workflow with PR title validation and automated changelog generation
+
+
+## [0.1.0] - 2026-01-28
+
+### ✨ Features
+
+- semantic release github app ([#216](https://github.com/etsa-tech/etsa.tech/pull/216)) by @wesleykirkland
 
 ## [0.1.0] - 2026-01-28
 
