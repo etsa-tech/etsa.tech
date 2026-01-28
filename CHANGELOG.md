@@ -7,17 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### ✨ Features
+
+- semantic release after changelog ([#219](https://github.com/etsa-tech/etsa.tech/pull/219)) by @wesleykirkland
+
 ### 🐛 Bug Fixes
 
 - **ci**: chain release workflow after changelog and add release notes ([#218](https://github.com/etsa-tech/etsa.tech/pull/218)) by @wesleykirkland
 
 ### ✨ Features
 
+- semantic release after changelog ([#219](https://github.com/etsa-tech/etsa.tech/pull/219)) by @wesleykirkland
+
 - semantic release github app ([#216](https://github.com/etsa-tech/etsa.tech/pull/216)) by @wesleykirkland
 
 ### 👷 CI/CD
 
 - Implement conventional commits workflow with PR title validation and automated changelog generation
+
+## [0.1.0] - 2026-01-28
+
+### ✨ Features
+
+- semantic release after changelog ([#219](https://github.com/etsa-tech/etsa.tech/pull/219)) by @wesleykirkland
 
 ## [0.1.0] - 2026-01-28
 
