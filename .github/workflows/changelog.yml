@@ -217,11 +217,73 @@ jobs:
           mv "$TEMP_FILE" CHANGELOG.md
 
       - name: Commit and push changelog
-        run: |
-          git add CHANGELOG.md
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore(changelog): update for PR #${{ steps.pr-info.outputs.number }}"
-            git push origin main
-          fi
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.pr-info.outputs.number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const prNumber = process.env.PR_NUMBER;
+
+            // Read updated changelog
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+
+            // Get current commit SHA
+            const { data: refData } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main'
+            });
+            const currentSha = refData.object.sha;
+
+            // Get current tree
+            const { data: commitData } = await github.rest.git.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: currentSha
+            });
+            const currentTreeSha = commitData.tree.sha;
+
+            // Create blob for updated changelog
+            const { data: changelogBlob } = await github.rest.git.createBlob({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              content: Buffer.from(changelog).toString('base64'),
+              encoding: 'base64'
+            });
+
+            // Create new tree
+            const { data: newTree } = await github.rest.git.createTree({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base_tree: currentTreeSha,
+              tree: [
+                {
+                  path: 'CHANGELOG.md',
+                  mode: '100644',
+                  type: 'blob',
+                  sha: changelogBlob.sha
+                }
+              ]
+            });
+
+            // Create commit
+            const { data: newCommit } = await github.rest.git.createCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              message: `chore(changelog): update for PR #${prNumber} [skip ci]`,
+              tree: newTree.sha,
+              parents: [currentSha]
+            });
+
+            // Update main branch reference
+            await github.rest.git.updateRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main',
+              sha: newCommit.sha,
+              force: false
+            });
+
+            console.log(`Changelog updated for PR #${prNumber}`);
