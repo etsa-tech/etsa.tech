@@ -128,14 +128,17 @@ This project follows [Semantic Versioning](https://semver.org/) (SemVer). Versio
 When a PR is merged to `main`, the version is automatically bumped according to these rules:
 
 - **Major version** (X.0.0): Breaking changes
+
   - Indicated by `BREAKING CHANGE:` in the PR description
   - Example: `1.2.3` → `2.0.0`
 
 - **Minor version** (0.X.0): New features
+
   - PR title starts with `feat:`
   - Example: `1.2.3` → `1.3.0`
 
 - **Patch version** (0.0.X): Bug fixes and performance improvements
+
   - PR title starts with `fix:` or `perf:`
   - Example: `1.2.3` → `1.2.4`
 
@@ -149,6 +152,7 @@ To indicate a breaking change, add `BREAKING CHANGE:` to your PR description:
 
 ```markdown
 ## Description
+
 This PR refactors the authentication system to use OAuth2.
 
 BREAKING CHANGE: The old API key authentication method is no longer supported.
@@ -160,6 +164,7 @@ Users must migrate to OAuth2 tokens.
 When a PR is merged to `main`:
 
 1. **Semantic Release Workflow** runs first:
+
    - Analyzes the PR title and description
    - Determines the version bump type
    - Updates `package.json` with the new version

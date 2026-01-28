@@ -270,12 +270,14 @@ Example: `feat(blog): add new post editor`
 When a PR is merged to main, the workflows execute in this order:
 
 1. **Release Workflow** (`.github/workflows/release.yml`)
+
    - Determines version bump from PR title and description
    - Updates package.json version
    - Creates Git tag
    - Creates GitHub Release with auto-generated notes
 
 2. **Changelog Workflow** (`.github/workflows/changelog.yml`)
+
    - Pulls latest changes (including version bump)
    - Creates version section in CHANGELOG.md
    - Adds PR entry under appropriate category

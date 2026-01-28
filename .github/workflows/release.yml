@@ -53,7 +53,7 @@ jobs:
           if [[ "$PR_TITLE" =~ ^([a-z]+)(\(([a-z0-9-]+)\))?:\ (.+)$ ]]; then
             TYPE="${BASH_REMATCH[1]}"
             echo "type=$TYPE" >> $GITHUB_OUTPUT
-            
+
             # Check for breaking change in PR body
             if echo "$PR_BODY" | grep -qi "BREAKING CHANGE"; then
               echo "breaking=true" >> $GITHUB_OUTPUT
@@ -192,4 +192,3 @@ jobs:
               draft: false,
               prerelease: false
             });
-
