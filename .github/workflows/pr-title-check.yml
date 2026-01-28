@@ -1,0 +1,116 @@
+name: PR Title Check
+
+permissions:
+  pull-requests: write
+  contents: read
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+    branches:
+      - main
+
+jobs:
+  validate-pr-title:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            commitlint.config.js
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install commitlint
+        run: |
+          npm install --no-save @commitlint/cli @commitlint/config-conventional
+
+      - name: Validate PR title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "$PR_TITLE" | npx commitlint --config commitlint.config.js
+
+      - name: Comment on PR if validation fails
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            const body = `## ❌ PR Title Validation Failed
+
+            The PR title does not follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+
+            **Current title:** \`${prTitle}\`
+
+            **Expected format:** \`<type>(<scope>): <subject>\`
+
+            **Valid types:**
+            - \`feat\`: A new feature
+            - \`fix\`: A bug fix
+            - \`docs\`: Documentation only changes
+            - \`style\`: Changes that do not affect the meaning of the code
+            - \`refactor\`: Code change that neither fixes a bug nor adds a feature
+            - \`perf\`: Performance improvements
+            - \`test\`: Adding missing tests or correcting existing tests
+            - \`build\`: Changes that affect the build system or external dependencies
+            - \`ci\`: Changes to CI configuration files and scripts
+            - \`chore\`: Other changes that don't modify src or test files
+            - \`revert\`: Reverts a previous commit
+
+            **Examples:**
+            - \`feat(auth): add OAuth2 login support\`
+            - \`fix(api): resolve race condition in user endpoint\`
+            - \`docs(readme): update installation instructions\`
+            - \`chore(deps): update dependencies\`
+
+            **Rules:**
+            - Type must be lowercase
+            - Scope is optional but must be lowercase if provided
+            - Subject must not be empty
+            - Subject must not end with a period
+            - Header must not exceed 100 characters
+
+            Please update your PR title to match this format.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Comment on PR if validation succeeds
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            const body = `## ✅ PR Title Validation Passed
+
+            The PR title follows the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+
+            **Title:** \`${prTitle}\`
+
+            This PR will be included in the changelog when merged to main.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

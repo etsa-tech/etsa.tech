@@ -1,0 +1,204 @@
+name: Update Changelog
+
+permissions:
+  contents: write
+  pull-requests: read
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  update-changelog:
+    name: Update Changelog
+    runs-on: ubuntu-latest
+    # Only run if PR was merged (not just closed)
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Extract PR information
+        id: pr-info
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          echo "title=$PR_TITLE" >> $GITHUB_OUTPUT
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "author=$PR_AUTHOR" >> $GITHUB_OUTPUT
+          echo "url=$PR_URL" >> $GITHUB_OUTPUT
+
+      - name: Parse conventional commit
+        id: parse-commit
+        env:
+          PR_TITLE: ${{ steps.pr-info.outputs.title }}
+        run: |
+          # Extract type, scope, and subject from PR title
+          # Format: type(scope): subject or type: subject
+
+          if [[ "$PR_TITLE" =~ ^([a-z]+)(\(([a-z0-9-]+)\))?:\ (.+)$ ]]; then
+            TYPE="${BASH_REMATCH[1]}"
+            SCOPE="${BASH_REMATCH[3]}"
+            SUBJECT="${BASH_REMATCH[4]}"
+
+            echo "type=$TYPE" >> $GITHUB_OUTPUT
+            echo "scope=$SCOPE" >> $GITHUB_OUTPUT
+            echo "subject=$SUBJECT" >> $GITHUB_OUTPUT
+            echo "valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "Error: PR title does not follow conventional commits format"
+            exit 1
+          fi
+
+      - name: Determine changelog section
+        id: changelog-section
+        env:
+          TYPE: ${{ steps.parse-commit.outputs.type }}
+        run: |
+          case "$TYPE" in
+            feat)
+              echo "section=### ✨ Features" >> $GITHUB_OUTPUT
+              ;;
+            fix)
+              echo "section=### 🐛 Bug Fixes" >> $GITHUB_OUTPUT
+              ;;
+            perf)
+              echo "section=### ⚡ Performance Improvements" >> $GITHUB_OUTPUT
+              ;;
+            revert)
+              echo "section=### ⏪ Reverts" >> $GITHUB_OUTPUT
+              ;;
+            docs)
+              echo "section=### 📚 Documentation" >> $GITHUB_OUTPUT
+              ;;
+            style)
+              echo "section=### 💄 Styles" >> $GITHUB_OUTPUT
+              ;;
+            refactor)
+              echo "section=### ♻️ Code Refactoring" >> $GITHUB_OUTPUT
+              ;;
+            test)
+              echo "section=### ✅ Tests" >> $GITHUB_OUTPUT
+              ;;
+            build)
+              echo "section=### 📦 Build System" >> $GITHUB_OUTPUT
+              ;;
+            ci)
+              echo "section=### 👷 CI/CD" >> $GITHUB_OUTPUT
+              ;;
+            chore)
+              echo "section=### 🔧 Chores" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "section=### 🔄 Other Changes" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Update CHANGELOG.md
+        env:
+          SECTION: ${{ steps.changelog-section.outputs.section }}
+          SCOPE: ${{ steps.parse-commit.outputs.scope }}
+          SUBJECT: ${{ steps.parse-commit.outputs.subject }}
+          PR_NUMBER: ${{ steps.pr-info.outputs.number }}
+          PR_AUTHOR: ${{ steps.pr-info.outputs.author }}
+          PR_URL: ${{ steps.pr-info.outputs.url }}
+        run: |
+          # Create CHANGELOG.md if it doesn't exist
+          if [ ! -f CHANGELOG.md ]; then
+            cat > CHANGELOG.md << 'EOF'
+          # Changelog
+
+          All notable changes to this project will be documented in this file.
+
+          The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+          and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+          ## [Unreleased]
+
+          EOF
+          fi
+
+          # Prepare the changelog entry
+          if [ -n "$SCOPE" ]; then
+            ENTRY="- **$SCOPE**: $SUBJECT ([#$PR_NUMBER]($PR_URL)) by @$PR_AUTHOR"
+          else
+            ENTRY="- $SUBJECT ([#$PR_NUMBER]($PR_URL)) by @$PR_AUTHOR"
+          fi
+
+          # Use a temporary file for processing
+          TEMP_FILE=$(mktemp)
+
+          # Read the changelog and insert the new entry
+          awk -v section="$SECTION" -v entry="$ENTRY" '
+          BEGIN { found_unreleased = 0; found_section = 0; inserted = 0 }
+          /^## \[Unreleased\]/ { found_unreleased = 1; print; next }
+          found_unreleased && /^### / {
+            if ($0 == section) {
+              found_section = 1
+              print
+              print ""
+              print entry
+              inserted = 1
+              next
+            } else if (!found_section && !inserted) {
+              print section
+              print ""
+              print entry
+              print ""
+              inserted = 1
+            }
+          }
+          found_unreleased && /^## / && !inserted {
+            print section
+            print ""
+            print entry
+            print ""
+            inserted = 1
+          }
+          { print }
+          END {
+            if (!inserted) {
+              print ""
+              print section
+              print ""
+              print entry
+            }
+          }
+          ' CHANGELOG.md > "$TEMP_FILE"
+
+          mv "$TEMP_FILE" CHANGELOG.md
+
+      - name: Commit and push changelog
+        run: |
+          git add CHANGELOG.md
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(changelog): update for PR #${{ steps.pr-info.outputs.number }}"
+            git push origin main
+          fi
