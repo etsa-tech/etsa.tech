@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🔧 Chores
+
+- **deps**: update actions/create-github-app-token action to v2 ([#217](https://github.com/etsa-tech/etsa.tech/pull/217)) by @renovate[bot]
+
 ### ✨ Features
 
 - semantic release after changelog ([#219](https://github.com/etsa-tech/etsa.tech/pull/219)) by @wesleykirkland
@@ -24,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 👷 CI/CD
 
 - Implement conventional commits workflow with PR title validation and automated changelog generation
+
+## [0.2.0] - 2026-01-28
+
+### 🔧 Chores
+
+- **deps**: update actions/create-github-app-token action to v2 ([#217](https://github.com/etsa-tech/etsa.tech/pull/217)) by @renovate[bot]
 
 ## [0.1.0] - 2026-01-28
 
@@ -59,5 +69,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance monitoring with Lighthouse
 - Accessibility testing with axe-core
 
-[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v0.2.0...HEAD
 [0.1.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.1.0
+[0.2.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.0
