@@ -6,9 +6,10 @@ permissions:
   issues: write
 
 on:
-  pull_request:
+  workflow_run:
+    workflows: ["Update Changelog"]
     types:
-      - closed
+      - completed
     branches:
       - main
 
@@ -16,8 +17,8 @@ jobs:
   release:
     name: Create Semantic Release
     runs-on: ubuntu-latest
-    # Only run if PR was merged (not just closed)
-    if: github.event.pull_request.merged == true
+    # Only run if changelog workflow completed successfully
+    if: github.event.workflow_run.conclusion == 'success'
     outputs:
       new_version: ${{ steps.version.outputs.new_version }}
       version_bumped: ${{ steps.version.outputs.version_bumped }}
@@ -36,6 +37,36 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
           persist-credentials: true
+          ref: main
+
+      - name: Pull latest changes from main
+        run: |
+          git pull origin main
+
+      - name: Get PR info from triggering workflow
+        id: pr-info
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            // Get the PR that triggered the changelog workflow
+            const workflowRun = context.payload.workflow_run;
+            const prNumber = workflowRun.pull_requests[0]?.number;
+
+            if (!prNumber) {
+              core.setFailed('No PR found in workflow_run event');
+              return;
+            }
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            core.setOutput('title', pr.title);
+            core.setOutput('body', pr.body || '');
+            core.setOutput('number', pr.number);
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -54,8 +85,8 @@ jobs:
       - name: Parse PR title for version bump
         id: parse-pr
         env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_TITLE: ${{ steps.pr-info.outputs.title }}
+          PR_BODY: ${{ steps.pr-info.outputs.body }}
         run: |
           # Extract type from PR title (conventional commit format)
           if [[ "$PR_TITLE" =~ ^([a-z]+)(\(([a-z0-9-]+)\))?:\ (.+)$ ]]; then
@@ -269,22 +300,42 @@ jobs:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
           CURRENT_VERSION: ${{ steps.current-version.outputs.version }}
         run: |
-          # Get all commits since last tag
-          if git describe --tags --abbrev=0 2>/dev/null; then
-            LAST_TAG=$(git describe --tags --abbrev=0)
-            COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          # Extract release notes from CHANGELOG.md for this version
+          if [ -f "CHANGELOG.md" ]; then
+            # Find the section for this version in the changelog
+            # Extract everything between ## [NEW_VERSION] and the next ## heading
+            awk "/## \[$NEW_VERSION\]/,/^## \[/ {
+              if (/^## \[/ && !/## \[$NEW_VERSION\]/) exit;
+              if (!/## \[$NEW_VERSION\]/) print
+            }" CHANGELOG.md > release_notes.md
+
+            # If we got content from changelog, use it
+            if [ -s release_notes.md ]; then
+              echo "Using release notes from CHANGELOG.md"
+            else
+              # Fallback to commit log if changelog section is empty
+              echo "## What's Changed" > release_notes.md
+              if git describe --tags --abbrev=0 2>/dev/null; then
+                LAST_TAG=$(git describe --tags --abbrev=0)
+                git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+              else
+                git log --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+              fi
+            fi
           else
-            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+            # No changelog, use commit log
+            echo "## What's Changed" > release_notes.md
+            if git describe --tags --abbrev=0 2>/dev/null; then
+              LAST_TAG=$(git describe --tags --abbrev=0)
+              git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+            else
+              git log --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+            fi
           fi
 
-          # Create release notes
-          cat > release_notes.md << EOF
-          ## What's Changed
-
-          $COMMITS
-
-          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v$CURRENT_VERSION...v$NEW_VERSION
-          EOF
+          # Add full changelog link
+          echo "" >> release_notes.md
+          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/v$CURRENT_VERSION...v$NEW_VERSION" >> release_notes.md
 
           echo "notes_file=release_notes.md" >> $GITHUB_OUTPUT
 
