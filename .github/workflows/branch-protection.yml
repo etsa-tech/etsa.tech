@@ -25,7 +25,7 @@ jobs:
         run: |
           # Get the commit message
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          
+
           # Check if this is a merge commit from a PR
           # GitHub's merge commits typically contain "Merge pull request #" or are merge commits
           if git log -1 --merges | grep -q "commit"; then
@@ -47,7 +47,7 @@ jobs:
         run: |
           # Get the commit message
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          
+
           # Check if commit follows conventional commits format
           if echo "$COMMIT_MSG" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+"; then
             echo "✅ Commit follows conventional commits format"
@@ -116,4 +116,3 @@ jobs:
               body: body,
               labels: ['branch-protection', 'needs-review']
             });
-

@@ -20,15 +20,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            commitlint.config.js
+          sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install commitlint
+        run: |
+          npm install --no-save @commitlint/cli @commitlint/config-conventional
 
       - name: Validate PR title
         env:
@@ -107,4 +111,3 @@ jobs:
               repo: context.repo.repo,
               body: body
             });
-

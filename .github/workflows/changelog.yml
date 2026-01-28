@@ -59,12 +59,12 @@ jobs:
         run: |
           # Extract type, scope, and subject from PR title
           # Format: type(scope): subject or type: subject
-          
+
           if [[ "$PR_TITLE" =~ ^([a-z]+)(\(([a-z0-9-]+)\))?:\ (.+)$ ]]; then
             TYPE="${BASH_REMATCH[1]}"
             SCOPE="${BASH_REMATCH[3]}"
             SUBJECT="${BASH_REMATCH[4]}"
-            
+
             echo "type=$TYPE" >> $GITHUB_OUTPUT
             echo "scope=$SCOPE" >> $GITHUB_OUTPUT
             echo "subject=$SUBJECT" >> $GITHUB_OUTPUT
@@ -152,7 +152,7 @@ jobs:
 
           # Use a temporary file for processing
           TEMP_FILE=$(mktemp)
-          
+
           # Read the changelog and insert the new entry
           awk -v section="$SECTION" -v entry="$ENTRY" '
           BEGIN { found_unreleased = 0; found_section = 0; inserted = 0 }
@@ -190,7 +190,7 @@ jobs:
             }
           }
           ' CHANGELOG.md > "$TEMP_FILE"
-          
+
           mv "$TEMP_FILE" CHANGELOG.md
 
       - name: Commit and push changelog
@@ -202,4 +202,3 @@ jobs:
             git commit -m "chore(changelog): update for PR #${{ steps.pr-info.outputs.number }}"
             git push origin main
           fi
-

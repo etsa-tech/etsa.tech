@@ -152,4 +152,3 @@ If you have any questions or need help, please:
 3. Reach out to the maintainers
 
 Thank you for contributing! 🎉
-

@@ -21,6 +21,7 @@ The following packages have been installed:
 #### `commitlint.config.js`
 
 Defines the conventional commits rules:
+
 - Valid commit types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 - Type must be lowercase
 - Subject must not be empty or end with a period
@@ -36,6 +37,7 @@ Defines the conventional commits rules:
 **Purpose**: Validates that PR titles follow conventional commits format
 
 **Features**:
+
 - Validates PR title using commitlint
 - Posts helpful comment on validation failure with examples
 - Posts success comment when validation passes
@@ -48,6 +50,7 @@ Defines the conventional commits rules:
 **Purpose**: Automatically updates CHANGELOG.md based on PR title
 
 **Features**:
+
 - Parses PR title to extract type, scope, and subject
 - Categorizes changes into appropriate changelog sections
 - Adds entry with PR number, link, and author
@@ -55,6 +58,7 @@ Defines the conventional commits rules:
 - Creates CHANGELOG.md if it doesn't exist
 
 **Changelog Sections**:
+
 - ✨ Features (feat)
 - 🐛 Bug Fixes (fix)
 - ⚡ Performance Improvements (perf)
@@ -74,6 +78,7 @@ Defines the conventional commits rules:
 **Purpose**: Prevents direct pushes to main (except for allowed cases)
 
 **Features**:
+
 - Detects if push is a merge commit from PR
 - Allows changelog update commits
 - Validates that direct pushes follow conventional commits format
@@ -81,6 +86,7 @@ Defines the conventional commits rules:
 - Fails the workflow for invalid direct pushes
 
 **Allowed Direct Pushes**:
+
 1. Merge commits from pull requests
 2. Automated changelog updates (commits starting with `chore(changelog):`)
 3. Emergency commits that follow conventional commits format
@@ -90,6 +96,7 @@ Defines the conventional commits rules:
 #### `CONTRIBUTING.md`
 
 Comprehensive contributing guide including:
+
 - Conventional commits specification
 - Valid commit types and examples
 - PR title format requirements
@@ -100,6 +107,7 @@ Comprehensive contributing guide including:
 #### `README.md`
 
 Updated with:
+
 - Link to CONTRIBUTING.md
 - Quick start guide for contributors
 - PR title format examples
@@ -108,6 +116,7 @@ Updated with:
 #### `CHANGELOG.md`
 
 Initialized with:
+
 - Keep a Changelog format
 - Unreleased section for upcoming changes
 - Initial release entry (v0.1.0)
@@ -134,21 +143,25 @@ Added to `package.json`:
 ### For Contributors
 
 1. **Create a feature branch**:
+
    ```bash
    git checkout -b feat/my-new-feature
    ```
 
 2. **Make your changes and commit** (commits can be informal):
+
    ```bash
    git commit -m "wip: working on feature"
    ```
 
 3. **Create a PR with a conventional commit title**:
+
    ```
    feat(auth): add OAuth2 login support
    ```
 
 4. **Wait for validation**:
+
    - The PR title check workflow will validate your title
    - Fix the title if validation fails
    - Merge when approved
@@ -201,6 +214,7 @@ To fully enforce this workflow, configure these branch protection rules on GitHu
 **Problem**: PR title doesn't follow conventional commits format
 
 **Solution**: Update your PR title to match the format:
+
 ```
 <type>(<scope>): <subject>
 ```
@@ -211,7 +225,8 @@ Example: `feat(blog): add new post editor`
 
 **Problem**: Changelog wasn't updated after PR merge
 
-**Solution**: 
+**Solution**:
+
 1. Check the changelog workflow run in Actions tab
 2. Ensure PR title followed conventional commits format
 3. Manually run: `npm run changelog` if needed
@@ -221,6 +236,7 @@ Example: `feat(blog): add new post editor`
 **Problem**: Push to main was rejected
 
 **Solution**:
+
 1. Create a feature branch
 2. Push changes to the branch
 3. Create a PR with proper title
@@ -240,4 +256,3 @@ Example: `feat(blog): add new post editor`
 - [Conventional Commits Specification](https://www.conventionalcommits.org/)
 - [Keep a Changelog](https://keepachangelog.com/)
 - [Semantic Versioning](https://semver.org/)
-

@@ -607,38 +607,38 @@ We welcome contributions to the ETSA website! Please read our [Contributing Guid
 ```mermaid
 graph TB
     Start([Developer Creates PR]) --> PRTitle{PR Title Valid?}
-    
+
     PRTitle -->|No| FailComment[❌ Bot Comments with Help]
     FailComment --> UpdateTitle[Developer Updates Title]
     UpdateTitle --> PRTitle
-    
+
     PRTitle -->|Yes| SuccessComment[✅ Bot Comments Success]
     SuccessComment --> Review[Code Review]
     Review --> Approved{Approved?}
-    
+
     Approved -->|No| Changes[Request Changes]
     Changes --> Review
-    
+
     Approved -->|Yes| Merge[Merge to Main]
     Merge --> ParseTitle[Parse PR Title]
     ParseTitle --> ExtractInfo[Extract Type, Scope, Subject]
     ExtractInfo --> DetermineSection[Determine Changelog Section]
-    
+
     DetermineSection --> UpdateChangelog[Update CHANGELOG.md]
     UpdateChangelog --> CommitChangelog[Commit: chore changelog update]
     CommitChangelog --> PushMain[Push to Main]
-    
+
     PushMain --> BranchProtection{Direct Push Check}
     BranchProtection -->|Changelog Commit| Allow[✅ Allow Push]
     BranchProtection -->|PR Merge| Allow
     BranchProtection -->|Invalid Direct Push| Block[❌ Create Issue & Fail]
-    
+
     Allow --> Done([✅ Complete])
     Block --> Revert[Revert & Use PR Process]
     Revert --> Start
-    
+
     DirectPush([Direct Push to Main]) --> BranchProtection
-    
+
     style Start fill:#e1f5ff,stroke:#0288d1,color:#000
     style Done fill:#e8f5e9,stroke:#4caf50,color:#000
     style FailComment fill:#ffebee,stroke:#f44336,color:#000
@@ -667,6 +667,7 @@ Your PR title must follow this format:
 ```
 
 **Examples:**
+
 - `feat(blog): add new blog post editor`
 - `fix(carousel): resolve image loading issue`
 - `docs(readme): update installation instructions`
