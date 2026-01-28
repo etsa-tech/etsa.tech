@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update actions/github-script action to v8 ([#213](https://github.com/etsa-tech/etsa.tech/pull/213)) by @renovate[bot]
+
 - **deps**: update actions/create-github-app-token action to v2 ([#217](https://github.com/etsa-tech/etsa.tech/pull/217)) by @renovate[bot]
 
 ### ✨ Features
@@ -28,6 +30,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 👷 CI/CD
 
 - Implement conventional commits workflow with PR title validation and automated changelog generation
+
+## [0.2.0] - 2026-01-28
+
+### 🔧 Chores
+
+- **deps**: update actions/github-script action to v8 ([#213](https://github.com/etsa-tech/etsa.tech/pull/213)) by @renovate[bot]
 
 ## [0.2.0] - 2026-01-28
 
