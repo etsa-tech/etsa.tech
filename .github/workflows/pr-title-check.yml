@@ -11,6 +11,8 @@ on:
       - edited
       - synchronize
       - reopened
+    branches:
+      - main
 
 jobs:
   validate-pr-title:
