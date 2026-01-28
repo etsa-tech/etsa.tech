@@ -238,6 +238,26 @@ jobs:
 
           mv "$TEMP_FILE" CHANGELOG.md
 
+          # Update footer reference links
+          # Get repository from GitHub context
+          REPO="${{ github.repository }}"
+
+          # Check if footer links exist
+          if grep -q "^\[Unreleased\]:" CHANGELOG.md; then
+            # Update existing Unreleased link
+            sed -i.bak "s|^\[Unreleased\]:.*|[Unreleased]: https://github.com/$REPO/compare/v$VERSION...HEAD|" CHANGELOG.md
+            rm -f CHANGELOG.md.bak
+          else
+            # Add footer links if they don't exist
+            echo "" >> CHANGELOG.md
+            echo "[Unreleased]: https://github.com/$REPO/compare/v$VERSION...HEAD" >> CHANGELOG.md
+          fi
+
+          # Add or update version link if not already present
+          if ! grep -q "^\[$VERSION\]:" CHANGELOG.md; then
+            echo "[$VERSION]: https://github.com/$REPO/releases/tag/v$VERSION" >> CHANGELOG.md
+          fi
+
       - name: Format changelog with prettier
         run: |
           npx prettier --write CHANGELOG.md
