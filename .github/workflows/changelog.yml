@@ -223,6 +223,10 @@ jobs:
 
           mv "$TEMP_FILE" CHANGELOG.md
 
+      - name: Format changelog with prettier
+        run: |
+          npx prettier --write CHANGELOG.md
+
       - name: Commit and push changelog
         uses: actions/github-script@v7
         env:
