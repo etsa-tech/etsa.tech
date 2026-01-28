@@ -50,7 +50,6 @@ push.yml (Run pre-commit on push)
   - `workflow_dispatch` (manual trigger, independent of push.yml)
 - **Jobs**: All jobs require push.yml success, PR trigger, or manual trigger
   - `security-scan`: Snyk, Trivy, Gitleaks, TruffleHog
-  - `terraform-scan`: Terraform security scanning
   - `summary`: Results summary
 
 ## Benefits
