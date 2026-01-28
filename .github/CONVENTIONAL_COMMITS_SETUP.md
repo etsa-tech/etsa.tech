@@ -30,6 +30,29 @@ Defines the conventional commits rules:
 
 ### 3. GitHub Workflows
 
+#### `.github/workflows/release.yml`
+
+**Trigger**: When PR is merged to main
+
+**Purpose**: Automatically creates semantic releases based on conventional commits
+
+**Features**:
+
+- Analyzes PR title to determine version bump type
+- Checks PR description for breaking changes
+- Calculates new version following semantic versioning
+- Updates package.json and package-lock.json
+- Creates Git tag for the new version
+- Generates release notes from commits
+- Creates GitHub Release
+
+**Version Bump Logic**:
+
+- `BREAKING CHANGE` in PR body → Major version (1.0.0 → 2.0.0)
+- `feat:` PR title → Minor version (1.0.0 → 1.1.0)
+- `fix:` or `perf:` PR title → Patch version (1.0.0 → 1.0.1)
+- Other types → No version bump
+
 #### `.github/workflows/pr-title-check.yml`
 
 **Trigger**: On PR opened, edited, synchronize, or reopened
@@ -242,14 +265,38 @@ Example: `feat(blog): add new post editor`
 3. Create a PR with proper title
 4. Merge through PR process
 
+## Workflow Execution Order
+
+When a PR is merged to main, the workflows execute in this order:
+
+1. **Release Workflow** (`.github/workflows/release.yml`)
+
+   - Determines version bump from PR title and description
+   - Updates package.json version
+   - Creates Git tag
+   - Creates GitHub Release with auto-generated notes
+
+2. **Changelog Workflow** (`.github/workflows/changelog.yml`)
+
+   - Pulls latest changes (including version bump)
+   - Creates version section in CHANGELOG.md
+   - Adds PR entry under appropriate category
+   - Commits changelog update
+
+3. **Branch Protection Workflow** (`.github/workflows/branch-protection.yml`)
+   - Monitors the changelog commit
+   - Allows it because it matches the allowed pattern
+
 ## Benefits
 
-1. **Automated Changelog**: No manual changelog maintenance
-2. **Consistent History**: All changes follow the same format
-3. **Better Collaboration**: Clear, semantic commit messages
-4. **Automated Versioning**: Ready for semantic versioning
-5. **Better Release Notes**: Automatically categorized changes
-6. **Protected Main Branch**: Prevents accidental direct pushes
+1. **Automated Releases**: Semantic versions created automatically
+2. **Automated Changelog**: No manual changelog maintenance
+3. **Consistent History**: All changes follow the same format
+4. **Better Collaboration**: Clear, semantic commit messages
+5. **Automated Versioning**: Full semantic versioning support
+6. **Better Release Notes**: Automatically categorized changes
+7. **Protected Main Branch**: Prevents accidental direct pushes
+8. **GitHub Releases**: Automatic release creation with notes
 
 ## References
 

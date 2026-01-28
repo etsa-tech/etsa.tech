@@ -1,0 +1,194 @@
+name: Semantic Release
+
+permissions:
+  contents: write
+  pull-requests: read
+  issues: write
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Create Semantic Release
+    runs-on: ubuntu-latest
+    # Only run if PR was merged (not just closed)
+    if: github.event.pull_request.merged == true
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+      version_bumped: ${{ steps.version.outputs.version_bumped }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Parse PR title for version bump
+        id: parse-pr
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Extract type from PR title (conventional commit format)
+          if [[ "$PR_TITLE" =~ ^([a-z]+)(\(([a-z0-9-]+)\))?:\ (.+)$ ]]; then
+            TYPE="${BASH_REMATCH[1]}"
+            echo "type=$TYPE" >> $GITHUB_OUTPUT
+
+            # Check for breaking change in PR body
+            if echo "$PR_BODY" | grep -qi "BREAKING CHANGE"; then
+              echo "breaking=true" >> $GITHUB_OUTPUT
+            else
+              echo "breaking=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Error: PR title does not follow conventional commits format"
+            exit 1
+          fi
+
+      - name: Determine version bump
+        id: bump-type
+        env:
+          TYPE: ${{ steps.parse-pr.outputs.type }}
+          BREAKING: ${{ steps.parse-pr.outputs.breaking }}
+        run: |
+          if [ "$BREAKING" = "true" ]; then
+            echo "bump=major" >> $GITHUB_OUTPUT
+          elif [ "$TYPE" = "feat" ]; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          elif [ "$TYPE" = "fix" ] || [ "$TYPE" = "perf" ]; then
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          else
+            echo "bump=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get current version
+        id: current-version
+        run: |
+          # Get version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: version
+        env:
+          CURRENT_VERSION: ${{ steps.current-version.outputs.version }}
+          BUMP_TYPE: ${{ steps.bump-type.outputs.bump }}
+        run: |
+          if [ "$BUMP_TYPE" = "none" ]; then
+            echo "No version bump needed for this change type"
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "version_bumped=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Parse current version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+
+          # Bump version based on type
+          case "$BUMP_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "version_bumped=true" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION (was $CURRENT_VERSION)"
+
+      - name: Update package.json version
+        if: steps.version.outputs.version_bumped == 'true'
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        run: |
+          npm version $NEW_VERSION --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore(release): bump version to $NEW_VERSION"
+          git push origin main
+
+      - name: Create Git tag
+        if: steps.version.outputs.version_bumped == 'true'
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        run: |
+          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+          git push origin "v$NEW_VERSION"
+
+      - name: Generate release notes
+        if: steps.version.outputs.version_bumped == 'true'
+        id: release-notes
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          CURRENT_VERSION: ${{ steps.current-version.outputs.version }}
+        run: |
+          # Get all commits since last tag
+          if git describe --tags --abbrev=0 2>/dev/null; then
+            LAST_TAG=$(git describe --tags --abbrev=0)
+            COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          else
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          fi
+
+          # Create release notes
+          cat > release_notes.md << EOF
+          ## What's Changed
+
+          $COMMITS
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v$CURRENT_VERSION...v$NEW_VERSION
+          EOF
+
+          echo "notes_file=release_notes.md" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.version_bumped == 'true'
+        uses: actions/github-script@v7
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          BUMP_TYPE: ${{ steps.bump-type.outputs.bump }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const newVersion = process.env.NEW_VERSION;
+            const bumpType = process.env.BUMP_TYPE;
+            const releaseNotes = fs.readFileSync('release_notes.md', 'utf8');
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${newVersion}`,
+              name: `v${newVersion}`,
+              body: releaseNotes,
+              draft: false,
+              prerelease: false
+            });
