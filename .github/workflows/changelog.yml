@@ -119,6 +119,14 @@ jobs:
               ;;
           esac
 
+      - name: Get latest version
+        id: get-version
+        run: |
+          # Pull latest changes (in case release workflow updated version)
+          git pull origin main
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Update CHANGELOG.md
         env:
           SECTION: ${{ steps.changelog-section.outputs.section }}
@@ -127,6 +135,7 @@ jobs:
           PR_NUMBER: ${{ steps.pr-info.outputs.number }}
           PR_AUTHOR: ${{ steps.pr-info.outputs.author }}
           PR_URL: ${{ steps.pr-info.outputs.url }}
+          VERSION: ${{ steps.get-version.outputs.version }}
         run: |
           # Create CHANGELOG.md if it doesn't exist
           if [ ! -f CHANGELOG.md ]; then
@@ -153,11 +162,30 @@ jobs:
           # Use a temporary file for processing
           TEMP_FILE=$(mktemp)
 
+          # Check if we need to create a new version section
+          TODAY=$(date +%Y-%m-%d)
+
           # Read the changelog and insert the new entry
-          awk -v section="$SECTION" -v entry="$ENTRY" '
-          BEGIN { found_unreleased = 0; found_section = 0; inserted = 0 }
-          /^## \[Unreleased\]/ { found_unreleased = 1; print; next }
-          found_unreleased && /^### / {
+          awk -v section="$SECTION" -v entry="$ENTRY" -v version="$VERSION" -v today="$TODAY" '
+          BEGIN { found_unreleased = 0; found_section = 0; inserted = 0; version_created = 0 }
+          /^## \[Unreleased\]/ {
+            found_unreleased = 1
+            print
+            next
+          }
+          found_unreleased && /^## \[/ && !version_created {
+            # Insert version section before next version
+            print ""
+            print "## [" version "] - " today
+            print ""
+            print section
+            print ""
+            print entry
+            print ""
+            inserted = 1
+            version_created = 1
+          }
+          found_unreleased && /^### / && !version_created {
             if ($0 == section) {
               found_section = 1
               print
@@ -173,16 +201,11 @@ jobs:
               inserted = 1
             }
           }
-          found_unreleased && /^## / && !inserted {
-            print section
-            print ""
-            print entry
-            print ""
-            inserted = 1
-          }
           { print }
           END {
-            if (!inserted) {
+            if (!inserted && !version_created) {
+              print ""
+              print "## [" version "] - " today
               print ""
               print section
               print ""

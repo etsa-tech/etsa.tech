@@ -9,6 +9,7 @@ Thank you for your interest in contributing to etsa.tech! This document provides
 - [Development Workflow](#development-workflow)
 - [Conventional Commits](#conventional-commits)
 - [Pull Request Process](#pull-request-process)
+- [Semantic Versioning & Releases](#semantic-versioning--releases)
 - [Changelog](#changelog)
 
 ## Code of Conduct
@@ -117,6 +118,66 @@ chore(config): update eslint rules
   - Merge commits from approved pull requests
   - Automated changelog updates
   - Emergency hotfixes (must still follow Conventional Commits format)
+
+## Semantic Versioning & Releases
+
+This project follows [Semantic Versioning](https://semver.org/) (SemVer). Versions are automatically determined based on the type of changes in your PR.
+
+### Version Bump Rules
+
+When a PR is merged to `main`, the version is automatically bumped according to these rules:
+
+- **Major version** (X.0.0): Breaking changes
+  - Indicated by `BREAKING CHANGE:` in the PR description
+  - Example: `1.2.3` → `2.0.0`
+
+- **Minor version** (0.X.0): New features
+  - PR title starts with `feat:`
+  - Example: `1.2.3` → `1.3.0`
+
+- **Patch version** (0.0.X): Bug fixes and performance improvements
+  - PR title starts with `fix:` or `perf:`
+  - Example: `1.2.3` → `1.2.4`
+
+- **No version bump**: Other changes
+  - PR titles with `docs:`, `style:`, `refactor:`, `test:`, `build:`, `ci:`, `chore:`
+  - These are included in the changelog but don't trigger a version bump
+
+### Breaking Changes
+
+To indicate a breaking change, add `BREAKING CHANGE:` to your PR description:
+
+```markdown
+## Description
+This PR refactors the authentication system to use OAuth2.
+
+BREAKING CHANGE: The old API key authentication method is no longer supported.
+Users must migrate to OAuth2 tokens.
+```
+
+### Release Process
+
+When a PR is merged to `main`:
+
+1. **Semantic Release Workflow** runs first:
+   - Analyzes the PR title and description
+   - Determines the version bump type
+   - Updates `package.json` with the new version
+   - Creates a Git tag (e.g., `v1.2.3`)
+   - Creates a GitHub Release with auto-generated release notes
+
+2. **Changelog Workflow** runs after:
+   - Updates `CHANGELOG.md` with the new version section
+   - Adds the PR details under the appropriate category
+   - Commits the changelog update to `main`
+
+### Manual Version Check
+
+You can check the current version:
+
+```bash
+node -p "require('./package.json').version"
+```
 
 ## Changelog
 
