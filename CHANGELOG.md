@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Bug Fixes
 
+- move unreleased from changelog to released once semantic release processes ([#220](https://github.com/etsa-tech/etsa.tech/pull/220)) by @wesleykirkland
+
 - security upgrade next from 16.1.4 to 16.1.5 ([#209](https://github.com/etsa-tech/etsa.tech/pull/209)) by @wesleykirkland
 
 ### 🔧 Chores
@@ -23,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Bug Fixes
 
+- move unreleased from changelog to released once semantic release processes ([#220](https://github.com/etsa-tech/etsa.tech/pull/220)) by @wesleykirkland
+
 - security upgrade next from 16.1.4 to 16.1.5 ([#209](https://github.com/etsa-tech/etsa.tech/pull/209)) by @wesleykirkland
 
 - **ci**: chain release workflow after changelog and add release notes ([#218](https://github.com/etsa-tech/etsa.tech/pull/218)) by @wesleykirkland
@@ -36,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 👷 CI/CD
 
 - Implement conventional commits workflow with PR title validation and automated changelog generation
+
+## [0.2.1] - 2026-01-28
+
+### 🐛 Bug Fixes
+
+- move unreleased from changelog to released once semantic release processes ([#220](https://github.com/etsa-tech/etsa.tech/pull/220)) by @wesleykirkland
 
 ## [0.2.0] - 2026-01-28
 
@@ -89,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance monitoring with Lighthouse
 - Accessibility testing with axe-core
 
-[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v0.2.1...HEAD
 [0.1.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.1.0
 [0.2.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.0
+[0.2.1]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.1
