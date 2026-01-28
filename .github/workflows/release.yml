@@ -23,12 +23,18 @@ jobs:
       version_bumped: ${{ steps.version.outputs.version_bumped }}
 
     steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          # Use default token - we'll push with --force-with-lease to bypass protection
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           persist-credentials: true
 
       - name: Setup Node.js
@@ -133,7 +139,7 @@ jobs:
         env:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const fs = require('fs');
             const { execSync } = require('child_process');
@@ -225,7 +231,7 @@ jobs:
         env:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const newVersion = process.env.NEW_VERSION;
 
@@ -289,7 +295,7 @@ jobs:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
           BUMP_TYPE: ${{ steps.bump-type.outputs.bump }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const fs = require('fs');
             const newVersion = process.env.NEW_VERSION;
