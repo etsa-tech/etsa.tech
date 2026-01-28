@@ -1,5 +1,7 @@
 [build]
   command = "npm run build"
+  # Only build when actual website code changes, not CI/workflow changes
+  ignore = "bash scripts/netlify-ignore.sh"
 
 [build.environment]
   NODE_VERSION = "22"
