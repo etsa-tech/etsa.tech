@@ -437,6 +437,82 @@ jobs:
           echo "version_bumped=true" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION (was $CURRENT_VERSION)"
 
+      - name: Move unreleased entries to new version
+        if: steps.version.outputs.version_bumped == 'true'
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        run: |
+          # Pull latest changes to get the changelog updates from the previous job
+          git pull origin main
+
+          TODAY=$(date +%Y-%m-%d)
+
+          # Create a temporary file
+          TEMP_FILE=$(mktemp)
+
+          # Process the changelog to move unreleased entries to the new version
+          awk -v new_version="$NEW_VERSION" -v today="$TODAY" '
+          BEGIN { in_unreleased = 0; unreleased_content = ""; found_unreleased = 0 }
+
+          # Found the Unreleased header
+          /^## \[Unreleased\]/ {
+            found_unreleased = 1
+            in_unreleased = 1
+            print  # Print the Unreleased header
+            next
+          }
+
+          # If we are in unreleased section and hit another ## heading
+          in_unreleased && /^## \[/ {
+            # Insert the new version section with the unreleased content
+            if (unreleased_content != "") {
+              print ""
+              print "## [" new_version "] - " today
+              print unreleased_content
+            }
+            in_unreleased = 0
+            print  # Print the current line (next version header)
+            next
+          }
+
+          # Collect unreleased content (skip empty lines right after Unreleased header)
+          in_unreleased {
+            if (NF > 0 || unreleased_content != "") {
+              unreleased_content = unreleased_content $0 "\n"
+            }
+            next
+          }
+
+          # Print all other lines
+          { print }
+
+          # If we reached end of file and still have unreleased content
+          END {
+            if (in_unreleased && unreleased_content != "") {
+              print ""
+              print "## [" new_version "] - " today
+              print unreleased_content
+            }
+          }
+          ' CHANGELOG.md > "$TEMP_FILE"
+
+          mv "$TEMP_FILE" CHANGELOG.md
+
+          # Update footer reference links
+          REPO="${{ github.repository }}"
+
+          # Update Unreleased link to compare against new version
+          sed -i.bak "s|^\[Unreleased\]:.*|[Unreleased]: https://github.com/$REPO/compare/v$NEW_VERSION...HEAD|" CHANGELOG.md
+          rm -f CHANGELOG.md.bak
+
+          # Add new version link if not already present
+          if ! grep -q "^\[$NEW_VERSION\]:" CHANGELOG.md; then
+            echo "[$NEW_VERSION]: https://github.com/$REPO/releases/tag/v$NEW_VERSION" >> CHANGELOG.md
+          fi
+
+          # Format with prettier
+          npx prettier --write CHANGELOG.md
+
       - name: Update package.json version
         if: steps.version.outputs.version_bumped == 'true'
         uses: actions/github-script@v8
@@ -455,6 +531,7 @@ jobs:
             // Read updated files
             const packageJson = fs.readFileSync('package.json', 'utf8');
             const packageLock = fs.readFileSync('package-lock.json', 'utf8');
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
 
             // Get current commit SHA
             const { data: refData } = await github.rest.git.getRef({
@@ -487,6 +564,13 @@ jobs:
               encoding: 'base64'
             });
 
+            const { data: changelogBlob } = await github.rest.git.createBlob({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              content: Buffer.from(changelog).toString('base64'),
+              encoding: 'base64'
+            });
+
             // Create new tree
             const { data: newTree } = await github.rest.git.createTree({
               owner: context.repo.owner,
@@ -504,6 +588,12 @@ jobs:
                   mode: '100644',
                   type: 'blob',
                   sha: packageLockBlob.sha
+                },
+                {
+                  path: 'CHANGELOG.md',
+                  mode: '100644',
+                  type: 'blob',
+                  sha: changelogBlob.sha
                 }
               ]
             });
