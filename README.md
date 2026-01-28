@@ -596,11 +596,83 @@ The CSS file also includes SonarCloud suppression comments for these directives:
 
 ## Contributing
 
+We welcome contributions to the ETSA website! Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information about:
+
+- **Conventional Commits**: All PR titles must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification
+- **Development Workflow**: How to set up your development environment and submit changes
+- **Pull Request Process**: Guidelines for creating and submitting pull requests
+- **Branch Protection**: Direct pushes to `main` are not allowed - all changes must go through pull requests
+- **Changelog**: How changes are automatically documented
+
+```mermaid
+graph TB
+    Start([Developer Creates PR]) --> PRTitle{PR Title Valid?}
+
+    PRTitle -->|No| FailComment[❌ Bot Comments with Help]
+    FailComment --> UpdateTitle[Developer Updates Title]
+    UpdateTitle --> PRTitle
+
+    PRTitle -->|Yes| SuccessComment[✅ Bot Comments Success]
+    SuccessComment --> Review[Code Review]
+    Review --> Approved{Approved?}
+
+    Approved -->|No| Changes[Request Changes]
+    Changes --> Review
+
+    Approved -->|Yes| Merge[Merge to Main]
+    Merge --> ParseTitle[Parse PR Title]
+    ParseTitle --> ExtractInfo[Extract Type, Scope, Subject]
+    ExtractInfo --> DetermineSection[Determine Changelog Section]
+
+    DetermineSection --> UpdateChangelog[Update CHANGELOG.md]
+    UpdateChangelog --> CommitChangelog[Commit: chore changelog update]
+    CommitChangelog --> PushMain[Push to Main]
+
+    PushMain --> BranchProtection{Direct Push Check}
+    BranchProtection -->|Changelog Commit| Allow[✅ Allow Push]
+    BranchProtection -->|PR Merge| Allow
+    BranchProtection -->|Invalid Direct Push| Block[❌ Create Issue & Fail]
+
+    Allow --> Done([✅ Complete])
+    Block --> Revert[Revert & Use PR Process]
+    Revert --> Start
+
+    DirectPush([Direct Push to Main]) --> BranchProtection
+
+    style Start fill:#e1f5ff,stroke:#0288d1,color:#000
+    style Done fill:#e8f5e9,stroke:#4caf50,color:#000
+    style FailComment fill:#ffebee,stroke:#f44336,color:#000
+    style SuccessComment fill:#e8f5e9,stroke:#4caf50,color:#000
+    style Block fill:#ffebee,stroke:#f44336,color:#000
+    style Allow fill:#e8f5e9,stroke:#4caf50,color:#000
+    style UpdateChangelog fill:#fff3e0,stroke:#ff9800,color:#000
+    style DirectPush fill:#fff3e0,stroke:#ff9800,color:#000
+```
+
+### Quick Start
+
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch: `git checkout -b your-feature-branch`
 3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+4. Test thoroughly: `npm run build && npm run lint`
+5. Commit with conventional commits format: `git commit -m "feat(component): add new feature"`
+6. Submit a pull request with a title following conventional commits format
+
+### PR Title Format
+
+Your PR title must follow this format:
+
+```
+<type>(<scope>): <subject>
+```
+
+**Examples:**
+
+- `feat(blog): add new blog post editor`
+- `fix(carousel): resolve image loading issue`
+- `docs(readme): update installation instructions`
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete list of valid types and detailed guidelines.
 
 ### Content Contributions
 

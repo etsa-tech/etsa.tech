@@ -1,0 +1,639 @@
+name: Update Changelog and Release
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  update-changelog:
+    name: Update Changelog
+    runs-on: ubuntu-latest
+    # Only run if PR was merged (not just closed)
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: write
+      pull-requests: read
+    outputs:
+      pr_type: ${{ steps.parse-commit.outputs.type }}
+      pr_breaking: ${{ steps.check-breaking.outputs.breaking }}
+
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Extract PR information
+        id: pr-info
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          echo "title=$PR_TITLE" >> $GITHUB_OUTPUT
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "author=$PR_AUTHOR" >> $GITHUB_OUTPUT
+          echo "url=$PR_URL" >> $GITHUB_OUTPUT
+
+      - name: Parse conventional commit
+        id: parse-commit
+        env:
+          PR_TITLE: ${{ steps.pr-info.outputs.title }}
+        run: |
+          # Extract type, scope, and subject from PR title
+          # Format: type(scope): subject or type: subject
+
+          if [[ "$PR_TITLE" =~ ^([a-z]+)(\(([a-z0-9-]+)\))?:\ (.+)$ ]]; then
+            TYPE="${BASH_REMATCH[1]}"
+            SCOPE="${BASH_REMATCH[3]}"
+            SUBJECT="${BASH_REMATCH[4]}"
+
+            echo "type=$TYPE" >> $GITHUB_OUTPUT
+            echo "scope=$SCOPE" >> $GITHUB_OUTPUT
+            echo "subject=$SUBJECT" >> $GITHUB_OUTPUT
+            echo "valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "Error: PR title does not follow conventional commits format"
+            exit 1
+          fi
+
+      - name: Check for breaking changes
+        id: check-breaking
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if echo "$PR_BODY" | grep -qi "BREAKING CHANGE"; then
+            echo "breaking=true" >> $GITHUB_OUTPUT
+          else
+            echo "breaking=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine changelog section
+        id: changelog-section
+        env:
+          TYPE: ${{ steps.parse-commit.outputs.type }}
+        run: |
+          case "$TYPE" in
+            feat)
+              echo "section=### ✨ Features" >> $GITHUB_OUTPUT
+              ;;
+            fix)
+              echo "section=### 🐛 Bug Fixes" >> $GITHUB_OUTPUT
+              ;;
+            perf)
+              echo "section=### ⚡ Performance Improvements" >> $GITHUB_OUTPUT
+              ;;
+            revert)
+              echo "section=### ⏪ Reverts" >> $GITHUB_OUTPUT
+              ;;
+            docs)
+              echo "section=### 📚 Documentation" >> $GITHUB_OUTPUT
+              ;;
+            style)
+              echo "section=### 💄 Styles" >> $GITHUB_OUTPUT
+              ;;
+            refactor)
+              echo "section=### ♻️ Code Refactoring" >> $GITHUB_OUTPUT
+              ;;
+            test)
+              echo "section=### ✅ Tests" >> $GITHUB_OUTPUT
+              ;;
+            build)
+              echo "section=### 📦 Build System" >> $GITHUB_OUTPUT
+              ;;
+            ci)
+              echo "section=### 👷 CI/CD" >> $GITHUB_OUTPUT
+              ;;
+            chore)
+              echo "section=### 🔧 Chores" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "section=### 🔄 Other Changes" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Get latest version
+        id: get-version
+        run: |
+          # Pull latest changes (in case release workflow updated version)
+          git pull origin main
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update CHANGELOG.md
+        env:
+          SECTION: ${{ steps.changelog-section.outputs.section }}
+          SCOPE: ${{ steps.parse-commit.outputs.scope }}
+          SUBJECT: ${{ steps.parse-commit.outputs.subject }}
+          PR_NUMBER: ${{ steps.pr-info.outputs.number }}
+          PR_AUTHOR: ${{ steps.pr-info.outputs.author }}
+          PR_URL: ${{ steps.pr-info.outputs.url }}
+          VERSION: ${{ steps.get-version.outputs.version }}
+        run: |
+          # Create CHANGELOG.md if it doesn't exist
+          if [ ! -f CHANGELOG.md ]; then
+            cat > CHANGELOG.md << 'EOF'
+          # Changelog
+
+          All notable changes to this project will be documented in this file.
+
+          The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+          and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+          ## [Unreleased]
+
+          EOF
+          fi
+
+          # Prepare the changelog entry
+          if [ -n "$SCOPE" ]; then
+            ENTRY="- **$SCOPE**: $SUBJECT ([#$PR_NUMBER]($PR_URL)) by @$PR_AUTHOR"
+          else
+            ENTRY="- $SUBJECT ([#$PR_NUMBER]($PR_URL)) by @$PR_AUTHOR"
+          fi
+
+          # Use a temporary file for processing
+          TEMP_FILE=$(mktemp)
+
+          # Check if we need to create a new version section
+          TODAY=$(date +%Y-%m-%d)
+
+          # Read the changelog and insert the new entry
+          awk -v section="$SECTION" -v entry="$ENTRY" -v version="$VERSION" -v today="$TODAY" '
+          BEGIN { found_unreleased = 0; found_section = 0; inserted = 0; version_created = 0 }
+          /^## \[Unreleased\]/ {
+            found_unreleased = 1
+            print
+            next
+          }
+          found_unreleased && /^## \[/ && !version_created {
+            # Insert version section before next version
+            print ""
+            print "## [" version "] - " today
+            print ""
+            print section
+            print ""
+            print entry
+            print ""
+            inserted = 1
+            version_created = 1
+          }
+          found_unreleased && /^### / && !version_created {
+            if ($0 == section) {
+              found_section = 1
+              print
+              print ""
+              print entry
+              inserted = 1
+              next
+            } else if (!found_section && !inserted) {
+              print section
+              print ""
+              print entry
+              print ""
+              inserted = 1
+            }
+          }
+          { print }
+          END {
+            if (!inserted && !version_created) {
+              print ""
+              print "## [" version "] - " today
+              print ""
+              print section
+              print ""
+              print entry
+            }
+          }
+          ' CHANGELOG.md > "$TEMP_FILE"
+
+          mv "$TEMP_FILE" CHANGELOG.md
+
+          # Update footer reference links
+          # Get repository from GitHub context
+          REPO="${{ github.repository }}"
+
+          # Check if footer links exist
+          if grep -q "^\[Unreleased\]:" CHANGELOG.md; then
+            # Update existing Unreleased link
+            sed -i.bak "s|^\[Unreleased\]:.*|[Unreleased]: https://github.com/$REPO/compare/v$VERSION...HEAD|" CHANGELOG.md
+            rm -f CHANGELOG.md.bak
+          else
+            # Add footer links if they don't exist
+            echo "" >> CHANGELOG.md
+            echo "[Unreleased]: https://github.com/$REPO/compare/v$VERSION...HEAD" >> CHANGELOG.md
+          fi
+
+          # Add or update version link if not already present
+          if ! grep -q "^\[$VERSION\]:" CHANGELOG.md; then
+            echo "[$VERSION]: https://github.com/$REPO/releases/tag/v$VERSION" >> CHANGELOG.md
+          fi
+
+      - name: Format changelog with prettier
+        run: |
+          npx prettier --write CHANGELOG.md
+
+      - name: Commit and push changelog
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.pr-info.outputs.number }}
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const fs = require('fs');
+            const prNumber = process.env.PR_NUMBER;
+
+            // Read updated changelog
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+
+            // Get current commit SHA
+            const { data: refData } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main'
+            });
+            const currentSha = refData.object.sha;
+
+            // Get current tree
+            const { data: commitData } = await github.rest.git.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: currentSha
+            });
+            const currentTreeSha = commitData.tree.sha;
+
+            // Create blob for updated changelog
+            const { data: changelogBlob } = await github.rest.git.createBlob({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              content: Buffer.from(changelog).toString('base64'),
+              encoding: 'base64'
+            });
+
+            // Create new tree
+            const { data: newTree } = await github.rest.git.createTree({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base_tree: currentTreeSha,
+              tree: [
+                {
+                  path: 'CHANGELOG.md',
+                  mode: '100644',
+                  type: 'blob',
+                  sha: changelogBlob.sha
+                }
+              ]
+            });
+
+            // Create commit
+            const { data: newCommit } = await github.rest.git.createCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              message: `chore(changelog): update for PR #${prNumber} [skip ci]`,
+              tree: newTree.sha,
+              parents: [currentSha]
+            });
+
+            // Update main branch reference
+            await github.rest.git.updateRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main',
+              sha: newCommit.sha,
+              force: false
+            });
+
+            console.log(`Changelog updated for PR #${prNumber}`);
+
+  semantic-release:
+    name: Create Semantic Release
+    runs-on: ubuntu-latest
+    needs: update-changelog
+    permissions:
+      contents: write
+      issues: write
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+      version_bumped: ${{ steps.version.outputs.version_bumped }}
+
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: true
+          ref: main
+
+      - name: Pull latest changes from main
+        run: |
+          git pull origin main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine version bump
+        id: bump-type
+        env:
+          TYPE: ${{ needs.update-changelog.outputs.pr_type }}
+          BREAKING: ${{ needs.update-changelog.outputs.pr_breaking }}
+        run: |
+          if [ "$BREAKING" = "true" ]; then
+            echo "bump=major" >> $GITHUB_OUTPUT
+          elif [ "$TYPE" = "feat" ]; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          elif [ "$TYPE" = "fix" ] || [ "$TYPE" = "perf" ]; then
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          else
+            echo "bump=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get current version
+        id: current-version
+        run: |
+          # Get version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: version
+        env:
+          CURRENT_VERSION: ${{ steps.current-version.outputs.version }}
+          BUMP_TYPE: ${{ steps.bump-type.outputs.bump }}
+        run: |
+          if [ "$BUMP_TYPE" = "none" ]; then
+            echo "No version bump needed for this change type"
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "version_bumped=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Parse current version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+
+          # Bump version based on type
+          case "$BUMP_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "version_bumped=true" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION (was $CURRENT_VERSION)"
+
+      - name: Update package.json version
+        if: steps.version.outputs.version_bumped == 'true'
+        uses: actions/github-script@v7
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+            const newVersion = process.env.NEW_VERSION;
+
+            // Update package.json version
+            execSync(`npm version ${newVersion} --no-git-tag-version`);
+
+            // Read updated files
+            const packageJson = fs.readFileSync('package.json', 'utf8');
+            const packageLock = fs.readFileSync('package-lock.json', 'utf8');
+
+            // Get current commit SHA
+            const { data: refData } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main'
+            });
+            const currentSha = refData.object.sha;
+
+            // Get current tree
+            const { data: commitData } = await github.rest.git.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: currentSha
+            });
+            const currentTreeSha = commitData.tree.sha;
+
+            // Create blobs for updated files
+            const { data: packageBlob } = await github.rest.git.createBlob({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              content: Buffer.from(packageJson).toString('base64'),
+              encoding: 'base64'
+            });
+
+            const { data: packageLockBlob } = await github.rest.git.createBlob({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              content: Buffer.from(packageLock).toString('base64'),
+              encoding: 'base64'
+            });
+
+            // Create new tree
+            const { data: newTree } = await github.rest.git.createTree({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base_tree: currentTreeSha,
+              tree: [
+                {
+                  path: 'package.json',
+                  mode: '100644',
+                  type: 'blob',
+                  sha: packageBlob.sha
+                },
+                {
+                  path: 'package-lock.json',
+                  mode: '100644',
+                  type: 'blob',
+                  sha: packageLockBlob.sha
+                }
+              ]
+            });
+
+            // Create commit
+            const { data: newCommit } = await github.rest.git.createCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              message: `chore(release): bump version to ${newVersion} [skip ci]`,
+              tree: newTree.sha,
+              parents: [currentSha]
+            });
+
+            // Update main branch reference
+            await github.rest.git.updateRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main',
+              sha: newCommit.sha,
+              force: false
+            });
+
+            console.log(`Version bumped to ${newVersion}`);
+            core.setOutput('commit_sha', newCommit.sha);
+
+      - name: Create Git tag
+        if: steps.version.outputs.version_bumped == 'true'
+        uses: actions/github-script@v7
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const newVersion = process.env.NEW_VERSION;
+
+            // Get the commit SHA from previous step or current main
+            const { data: refData } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main'
+            });
+
+            // Create tag object
+            const { data: tag } = await github.rest.git.createTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: `v${newVersion}`,
+              message: `Release v${newVersion}`,
+              object: refData.object.sha,
+              type: 'commit'
+            });
+
+            // Create tag reference
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/v${newVersion}`,
+              sha: tag.sha
+            });
+
+            console.log(`Created tag v${newVersion}`);
+
+      - name: Generate release notes
+        if: steps.version.outputs.version_bumped == 'true'
+        id: release-notes
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          CURRENT_VERSION: ${{ steps.current-version.outputs.version }}
+        run: |
+          # Extract release notes from CHANGELOG.md for this version
+          if [ -f "CHANGELOG.md" ]; then
+            # Find the section for this version in the changelog
+            # Extract everything between ## [NEW_VERSION] and the next ## heading
+            awk "/## \[$NEW_VERSION\]/,/^## \[/ {
+              if (/^## \[/ && !/## \[$NEW_VERSION\]/) exit;
+              if (!/## \[$NEW_VERSION\]/) print
+            }" CHANGELOG.md > release_notes.md
+
+            # If we got content from changelog, use it
+            if [ -s release_notes.md ]; then
+              echo "Using release notes from CHANGELOG.md"
+            else
+              # Fallback to commit log if changelog section is empty
+              echo "## What's Changed" > release_notes.md
+              if git describe --tags --abbrev=0 2>/dev/null; then
+                LAST_TAG=$(git describe --tags --abbrev=0)
+                git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+              else
+                git log --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+              fi
+            fi
+          else
+            # No changelog, use commit log
+            echo "## What's Changed" > release_notes.md
+            if git describe --tags --abbrev=0 2>/dev/null; then
+              LAST_TAG=$(git describe --tags --abbrev=0)
+              git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+            else
+              git log --pretty=format:"- %s (%h)" --no-merges >> release_notes.md
+            fi
+          fi
+
+          # Add full changelog link
+          echo "" >> release_notes.md
+          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/v$CURRENT_VERSION...v$NEW_VERSION" >> release_notes.md
+
+          echo "notes_file=release_notes.md" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.version_bumped == 'true'
+        uses: actions/github-script@v7
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          BUMP_TYPE: ${{ steps.bump-type.outputs.bump }}
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const fs = require('fs');
+            const newVersion = process.env.NEW_VERSION;
+            const bumpType = process.env.BUMP_TYPE;
+            const releaseNotes = fs.readFileSync('release_notes.md', 'utf8');
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${newVersion}`,
+              name: `v${newVersion}`,
+              body: releaseNotes,
+              draft: false,
+              prerelease: false
+            });
+
+            console.log(`Created release v${newVersion}`);

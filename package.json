@@ -1,13 +1,15 @@
 {
   "name": "etsa.tech",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "changelog:all": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.0",
@@ -35,6 +37,8 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@eslint/eslintrc": "^3",
     "@netlify/plugin-nextjs": "^5.11.6",
     "@tailwindcss/postcss": "^4.1.11",
@@ -44,6 +48,7 @@
     "@types/react-dom": "^19",
     "@types/sanitize-html": "^2.16.0",
     "autoprefixer": "^10.4.21",
+    "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9",
     "eslint-config-next": "^16.0.1",
     "postcss": "^8.5.6",
