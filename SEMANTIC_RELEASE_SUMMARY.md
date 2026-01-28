@@ -7,6 +7,7 @@ I've added **automatic semantic versioning and GitHub releases** to your convent
 ### Workflow Execution Order
 
 1. **Semantic Release Workflow** (runs first)
+
    - Analyzes PR title and description
    - Determines version bump type
    - Updates `package.json` version
@@ -21,12 +22,12 @@ I've added **automatic semantic versioning and GitHub releases** to your convent
 
 ## Version Bump Rules
 
-| PR Type | Version Bump | Example |
-|---------|--------------|---------|
-| `BREAKING CHANGE:` in PR body | **Major** (X.0.0) | `1.2.3` → `2.0.0` |
-| `feat:` PR title | **Minor** (0.X.0) | `1.2.3` → `1.3.0` |
-| `fix:` or `perf:` PR title | **Patch** (0.0.X) | `1.2.3` → `1.2.4` |
-| Other types (`docs:`, `chore:`, etc.) | **No bump** | `1.2.3` → `1.2.3` |
+| PR Type                               | Version Bump      | Example           |
+| ------------------------------------- | ----------------- | ----------------- |
+| `BREAKING CHANGE:` in PR body         | **Major** (X.0.0) | `1.2.3` → `2.0.0` |
+| `feat:` PR title                      | **Minor** (0.X.0) | `1.2.3` → `1.3.0` |
+| `fix:` or `perf:` PR title            | **Patch** (0.0.X) | `1.2.3` → `1.2.4` |
+| Other types (`docs:`, `chore:`, etc.) | **No bump**       | `1.2.3` → `1.2.3` |
 
 ## Breaking Changes
 
@@ -34,6 +35,7 @@ To trigger a major version bump, add `BREAKING CHANGE:` to your PR description:
 
 ```markdown
 ## Description
+
 This PR refactors the authentication system.
 
 BREAKING CHANGE: The old API key authentication is no longer supported.
@@ -43,9 +45,11 @@ Users must migrate to OAuth2 tokens.
 ## Files Created/Modified
 
 ### New Files
+
 - `.github/workflows/release.yml` - Semantic release automation
 
 ### Modified Files
+
 - `.github/workflows/changelog.yml` - Updated to create version sections
 - `CONTRIBUTING.md` - Added semantic versioning documentation
 - `.github/CONVENTIONAL_COMMITS_SETUP.md` - Updated with release workflow info
@@ -108,7 +112,7 @@ Users must migrate to OAuth2 tokens.
 ✅ **GitHub Releases**: Auto-created with release notes  
 ✅ **Changelog**: Always up-to-date with versions  
 ✅ **Git Tags**: Automatically created for each version  
-✅ **Release Notes**: Generated from commit history  
+✅ **Release Notes**: Generated from commit history
 
 ## Next Steps
 
@@ -142,6 +146,6 @@ git push origin main --tags
 ## Documentation
 
 Full documentation is available in:
+
 - `CONTRIBUTING.md` - Contributor guide with semantic versioning
 - `.github/CONVENTIONAL_COMMITS_SETUP.md` - Technical implementation details
-
