@@ -176,6 +176,8 @@ When a PR is merged to `main`:
    - Adds the PR details under the appropriate category
    - Commits the changelog update to `main`
 
+**Note:** These workflows require the GitHub Actions bot to bypass branch protection. See [`.github/BRANCH_PROTECTION_SETUP.md`](.github/BRANCH_PROTECTION_SETUP.md) for configuration instructions.
+
 ### Manual Version Check
 
 You can check the current version:
