@@ -31,7 +31,7 @@ SHOULD_BUILD=false
 while IFS= read -r file; do
   # Skip empty lines
   [ -z "$file" ] && continue
-  
+
   # Check if file matches any ignore pattern
   SHOULD_IGNORE=false
   for pattern in "${IGNORE_PATTERNS[@]}"; do
@@ -41,7 +41,7 @@ while IFS= read -r file; do
       break
     fi
   done
-  
+
   # If file doesn't match ignore patterns, we should build
   if [ "$SHOULD_IGNORE" = false ]; then
     echo "Build triggered by: $file"
@@ -57,4 +57,3 @@ else
   echo "Only CI/documentation files changed, skipping build"
   exit 1
 fi
-
