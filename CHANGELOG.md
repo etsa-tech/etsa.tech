@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🐛 Bug Fixes
+
+- security upgrade next from 16.1.4 to 16.1.5 ([#209](https://github.com/etsa-tech/etsa.tech/pull/209)) by @wesleykirkland
+
 ### 🔧 Chores
 
 - **deps**: update actions/github-script action to v8 ([#213](https://github.com/etsa-tech/etsa.tech/pull/213)) by @renovate[bot]
@@ -19,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Bug Fixes
 
+- security upgrade next from 16.1.4 to 16.1.5 ([#209](https://github.com/etsa-tech/etsa.tech/pull/209)) by @wesleykirkland
+
 - **ci**: chain release workflow after changelog and add release notes ([#218](https://github.com/etsa-tech/etsa.tech/pull/218)) by @wesleykirkland
 
 ### ✨ Features
@@ -30,6 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 👷 CI/CD
 
 - Implement conventional commits workflow with PR title validation and automated changelog generation
+
+## [0.2.0] - 2026-01-28
+
+### 🐛 Bug Fixes
+
+- security upgrade next from 16.1.4 to 16.1.5 ([#209](https://github.com/etsa-tech/etsa.tech/pull/209)) by @wesleykirkland
 
 ## [0.2.0] - 2026-01-28
 
