@@ -16,7 +16,12 @@ fi
 # Files/directories that should NOT trigger a build
 IGNORE_PATTERNS=(
   "^\.github/"
-  "^.*\.md$"           # All markdown files
+  "^README\.md$"                      # Only ignore README
+  "^CHANGELOG\.md$"                   # Only ignore CHANGELOG
+  "^CONTRIBUTING\.md$"                # Only ignore CONTRIBUTING
+  "^SECURITY\.md$"                    # Only ignore SECURITY
+  "^SEMANTIC_RELEASE_SUMMARY\.md$"   # Only ignore semantic release summary
+  "^docs/.*\.md$"                     # Ignore docs directory markdown
   "^LICENSE$"
   "^commitlint\.config\.js$"
   "^renovate\.json$"
