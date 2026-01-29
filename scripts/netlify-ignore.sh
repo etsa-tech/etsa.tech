@@ -6,9 +6,11 @@ set -e
 # Exit code 1 = BUILD (proceed with deployment)
 # Exit code 0 = SKIP BUILD (ignore changes, no deployment)
 
-echo "========================================="
+SEPARATOR="========================================="
+
+echo "$SEPARATOR"
 echo "Netlify Build Ignore Script"
-echo "========================================="
+echo "$SEPARATOR"
 
 # Print environment for debugging
 echo "Environment:"
@@ -110,11 +112,11 @@ fi
 # Make decision
 if [[ "$BUILD_REQUIRED" == true ]]; then
   echo "Decision: BUILD"
-  echo "========================================="
+  echo "$SEPARATOR"
   exit 1  # Exit 1 = BUILD
 else
   echo "Decision: SKIP BUILD"
   echo "Reason: Only documentation/CI files changed"
-  echo "========================================="
+  echo "$SEPARATOR"
   exit 0  # Exit 0 = SKIP
 fi
