@@ -1,48 +1,32 @@
 #!/bin/bash
+set -e
 
 # Netlify build ignore script
-# This script determines whether Netlify should build based on what files changed
-# Exit code 0 = build, Exit code 1 = skip build
+# Exit code 0 = BUILD (proceed with deployment)
+# Exit code 1 = SKIP BUILD (no deployment needed)
 
-# Debug: Print environment variables
-echo "CONTEXT: $CONTEXT"
-echo "CACHED_COMMIT_REF: $CACHED_COMMIT_REF"
-echo "COMMIT_REF: $COMMIT_REF"
-echo "HEAD: $HEAD"
-echo "BRANCH: $BRANCH"
+echo "========================================="
+echo "Netlify Build Ignore Script"
+echo "========================================="
 
-# For deploy previews, compare against the base branch (usually main)
-# For production builds, compare against the previous deploy
-if [ "$CONTEXT" = "deploy-preview" ] || [ "$CONTEXT" = "branch-deploy" ]; then
-  # Get the base branch (default to main if not set)
-  BASE_BRANCH=${BASE:-main}
-  echo "Deploy preview detected, comparing against base branch: $BASE_BRANCH"
+# Print environment for debugging
+echo "Environment:"
+echo "  CONTEXT: $CONTEXT"
+echo "  BRANCH: $BRANCH"
+echo "  HEAD: $HEAD"
+echo "  COMMIT_REF: $COMMIT_REF"
+echo "  CACHED_COMMIT_REF: $CACHED_COMMIT_REF"
+echo ""
 
-  # Fetch the base branch to ensure we have the latest
-  git fetch origin "$BASE_BRANCH" --depth=100
-
-  # Get the list of changed files compared to base branch
-  CHANGED_FILES=$(git diff --name-only "origin/$BASE_BRANCH"...HEAD)
-else
-  # For production builds, compare against the previous deploy
-  CHANGED_FILES=$(git diff --name-only $CACHED_COMMIT_REF $COMMIT_REF)
-
-  # If no cached commit (first build), always build
-  if [ -z "$CACHED_COMMIT_REF" ]; then
-    echo "First build detected, proceeding with build"
-    exit 0
-  fi
-fi
-
-# Files/directories that should NOT trigger a build
+# Define files/patterns that should NOT trigger a build
 IGNORE_PATTERNS=(
   "^\.github/"
-  "^README\.md$"                      # Only ignore README
-  "^CHANGELOG\.md$"                   # Only ignore CHANGELOG
-  "^CONTRIBUTING\.md$"                # Only ignore CONTRIBUTING
-  "^SECURITY\.md$"                    # Only ignore SECURITY
-  "^SEMANTIC_RELEASE_SUMMARY\.md$"   # Only ignore semantic release summary
-  "^docs/.*\.md$"                     # Ignore docs directory markdown
+  "^README\.md$"
+  "^CHANGELOG\.md$"
+  "^CONTRIBUTING\.md$"
+  "^SECURITY\.md$"
+  "^SEMANTIC_RELEASE_SUMMARY\.md$"
+  "^docs/.*\.md$"
   "^LICENSE$"
   "^commitlint\.config\.js$"
   "^renovate\.json$"
@@ -51,35 +35,85 @@ IGNORE_PATTERNS=(
   "^\.editorconfig$"
 )
 
-# Check if any changed file should trigger a build
-SHOULD_BUILD=false
-
-while IFS= read -r file; do
-  # Skip empty lines
-  [ -z "$file" ] && continue
-
-  # Check if file matches any ignore pattern
-  SHOULD_IGNORE=false
+# Function to check if a file should be ignored
+should_ignore_file() {
+  local file="$1"
   for pattern in "${IGNORE_PATTERNS[@]}"; do
     if echo "$file" | grep -qE "$pattern"; then
-      SHOULD_IGNORE=true
-      echo "Ignoring: $file"
-      break
+      return 0  # true - should ignore
     fi
   done
+  return 1  # false - should not ignore
+}
 
-  # If file doesn't match ignore patterns, we should build
-  if [ "$SHOULD_IGNORE" = false ]; then
-    echo "Build triggered by: $file"
-    SHOULD_BUILD=true
+# Determine which commits to compare
+echo "Determining commit range..."
+
+if [ -z "$CACHED_COMMIT_REF" ]; then
+  # First build - always build
+  echo "First build detected (no CACHED_COMMIT_REF)"
+  echo "Decision: BUILD"
+  exit 0
+fi
+
+# Get changed files between commits
+echo "Comparing: $CACHED_COMMIT_REF...$COMMIT_REF"
+CHANGED_FILES=$(git diff --name-only "$CACHED_COMMIT_REF" "$COMMIT_REF" 2>/dev/null || echo "")
+
+if [ -z "$CHANGED_FILES" ]; then
+  echo "No changed files detected"
+  echo "Decision: BUILD (safety default)"
+  exit 0
+fi
+
+echo ""
+echo "Changed files:"
+echo "$CHANGED_FILES"
+echo ""
+
+# Check each changed file
+BUILD_REQUIRED=false
+IGNORED_FILES=()
+TRIGGER_FILES=()
+
+while IFS= read -r file; do
+  [ -z "$file" ] && continue
+
+  if should_ignore_file "$file"; then
+    IGNORED_FILES+=("$file")
+  else
+    TRIGGER_FILES+=("$file")
+    BUILD_REQUIRED=true
   fi
 done <<< "$CHANGED_FILES"
 
-# Exit based on whether we should build
-if [ "$SHOULD_BUILD" = true ]; then
-  echo "Changes detected that require a build"
+# Print summary
+echo "Summary:"
+echo "  Total changed files: $(echo "$CHANGED_FILES" | wc -l | tr -d ' ')"
+echo "  Ignored files: ${#IGNORED_FILES[@]}"
+echo "  Files triggering build: ${#TRIGGER_FILES[@]}"
+echo ""
+
+if [ ${#IGNORED_FILES[@]} -gt 0 ]; then
+  echo "Ignored files:"
+  printf '  - %s\n' "${IGNORED_FILES[@]}"
+  echo ""
+fi
+
+if [ ${#TRIGGER_FILES[@]} -gt 0 ]; then
+  echo "Files triggering build:"
+  printf '  - %s\n' "${TRIGGER_FILES[@]}"
+  echo ""
+fi
+
+# Make decision
+if [ "$BUILD_REQUIRED" = true ]; then
+  echo "Decision: BUILD"
+  echo "========================================="
   exit 0
 else
-  echo "Only CI/documentation files changed, skipping build"
+  echo "Decision: SKIP BUILD"
+  echo "Reason: Only documentation/CI files changed"
+  echo "========================================="
   exit 1
 fi
