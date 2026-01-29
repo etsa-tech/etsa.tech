@@ -4,13 +4,27 @@
 # This script determines whether Netlify should build based on what files changed
 # Exit code 0 = build, Exit code 1 = skip build
 
-# Get the list of changed files
-CHANGED_FILES=$(git diff --name-only $CACHED_COMMIT_REF $COMMIT_REF)
+# For deploy previews, compare against the base branch (usually main)
+# For production builds, compare against the previous deploy
+if [ "$CONTEXT" = "deploy-preview" ] || [ "$CONTEXT" = "branch-deploy" ]; then
+  # Get the base branch (default to main if not set)
+  BASE_BRANCH=${BASE:-main}
+  echo "Deploy preview detected, comparing against base branch: $BASE_BRANCH"
 
-# If no cached commit (first build), always build
-if [ -z "$CACHED_COMMIT_REF" ]; then
-  echo "First build detected, proceeding with build"
-  exit 0
+  # Fetch the base branch to ensure we have the latest
+  git fetch origin "$BASE_BRANCH" --depth=100
+
+  # Get the list of changed files compared to base branch
+  CHANGED_FILES=$(git diff --name-only "origin/$BASE_BRANCH"...HEAD)
+else
+  # For production builds, compare against the previous deploy
+  CHANGED_FILES=$(git diff --name-only $CACHED_COMMIT_REF $COMMIT_REF)
+
+  # If no cached commit (first build), always build
+  if [ -z "$CACHED_COMMIT_REF" ]; then
+    echo "First build detected, proceeding with build"
+    exit 0
+  fi
 fi
 
 # Files/directories that should NOT trigger a build
