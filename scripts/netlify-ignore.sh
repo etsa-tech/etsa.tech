@@ -4,6 +4,13 @@
 # This script determines whether Netlify should build based on what files changed
 # Exit code 0 = build, Exit code 1 = skip build
 
+# Debug: Print environment variables
+echo "CONTEXT: $CONTEXT"
+echo "CACHED_COMMIT_REF: $CACHED_COMMIT_REF"
+echo "COMMIT_REF: $COMMIT_REF"
+echo "HEAD: $HEAD"
+echo "BRANCH: $BRANCH"
+
 # For deploy previews, compare against the base branch (usually main)
 # For production builds, compare against the previous deploy
 if [ "$CONTEXT" = "deploy-preview" ] || [ "$CONTEXT" = "branch-deploy" ]; then

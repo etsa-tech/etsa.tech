@@ -1,6 +1,6 @@
 ---
 title: "AI For Good: Rebranding and Building our Community Website"
-date: "2026-02-03"
+date: "2026-01-28"
 excerpt: >-
   See how AI-assisted development transformed a legacy website into a modern, secure, serverless platform—without sacrificing code quality or security.
 tags:
@@ -15,8 +15,6 @@ tags:
   - DevOps
   - CI/CD
   - Security
-  - Netlify
-  - Open Source
 author: ETSA
 speakers:
   - name: Wesley Kirkland
