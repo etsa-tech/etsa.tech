@@ -50,7 +50,7 @@ should_ignore_file() {
 # Determine which commits to compare
 echo "Determining commit range..."
 
-if [ -z "$CACHED_COMMIT_REF" ]; then
+if [[ -z "$CACHED_COMMIT_REF" ]]; then
   # First build - always build
   echo "First build detected (no CACHED_COMMIT_REF)"
   echo "Decision: BUILD"
@@ -61,7 +61,7 @@ fi
 echo "Comparing: $CACHED_COMMIT_REF...$COMMIT_REF"
 CHANGED_FILES=$(git diff --name-only "$CACHED_COMMIT_REF" "$COMMIT_REF" 2>/dev/null || echo "")
 
-if [ -z "$CHANGED_FILES" ]; then
+if [[ -z "$CHANGED_FILES" ]]; then
   echo "No changed files detected"
   echo "Decision: BUILD (safety default)"
   exit 1  # Exit 1 = BUILD
@@ -78,7 +78,7 @@ IGNORED_FILES=()
 TRIGGER_FILES=()
 
 while IFS= read -r file; do
-  [ -z "$file" ] && continue
+  [[ -z "$file" ]] && continue
 
   if should_ignore_file "$file"; then
     IGNORED_FILES+=("$file")
@@ -95,20 +95,20 @@ echo "  Ignored files: ${#IGNORED_FILES[@]}"
 echo "  Files triggering build: ${#TRIGGER_FILES[@]}"
 echo ""
 
-if [ ${#IGNORED_FILES[@]} -gt 0 ]; then
+if [[ ${#IGNORED_FILES[@]} -gt 0 ]]; then
   echo "Ignored files:"
   printf '  - %s\n' "${IGNORED_FILES[@]}"
   echo ""
 fi
 
-if [ ${#TRIGGER_FILES[@]} -gt 0 ]; then
+if [[ ${#TRIGGER_FILES[@]} -gt 0 ]]; then
   echo "Files triggering build:"
   printf '  - %s\n' "${TRIGGER_FILES[@]}"
   echo ""
 fi
 
 # Make decision
-if [ "$BUILD_REQUIRED" = true ]; then
+if [[ "$BUILD_REQUIRED" == true ]]; then
   echo "Decision: BUILD"
   echo "========================================="
   exit 1  # Exit 1 = BUILD
