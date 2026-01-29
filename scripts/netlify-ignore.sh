@@ -2,8 +2,9 @@
 set -e
 
 # Netlify build ignore script
-# Exit code 0 = BUILD (proceed with deployment)
-# Exit code 1 = SKIP BUILD (no deployment needed)
+# IMPORTANT: Netlify's ignore command works OPPOSITE to typical conventions:
+# Exit code 1 = BUILD (proceed with deployment)
+# Exit code 0 = SKIP BUILD (ignore changes, no deployment)
 
 echo "========================================="
 echo "Netlify Build Ignore Script"
@@ -53,7 +54,7 @@ if [ -z "$CACHED_COMMIT_REF" ]; then
   # First build - always build
   echo "First build detected (no CACHED_COMMIT_REF)"
   echo "Decision: BUILD"
-  exit 0
+  exit 1  # Exit 1 = BUILD
 fi
 
 # Get changed files between commits
@@ -63,7 +64,7 @@ CHANGED_FILES=$(git diff --name-only "$CACHED_COMMIT_REF" "$COMMIT_REF" 2>/dev/n
 if [ -z "$CHANGED_FILES" ]; then
   echo "No changed files detected"
   echo "Decision: BUILD (safety default)"
-  exit 0
+  exit 1  # Exit 1 = BUILD
 fi
 
 echo ""
@@ -110,10 +111,10 @@ fi
 if [ "$BUILD_REQUIRED" = true ]; then
   echo "Decision: BUILD"
   echo "========================================="
-  exit 0
+  exit 1  # Exit 1 = BUILD
 else
   echo "Decision: SKIP BUILD"
   echo "Reason: Only documentation/CI files changed"
   echo "========================================="
-  exit 1
+  exit 0  # Exit 0 = SKIP
 fi
