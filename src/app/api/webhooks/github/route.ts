@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
+// Force dynamic rendering - this is a serverless function
+export const dynamic = "force-dynamic";
+
 // Verify GitHub webhook signature
 function verifySignature(
   payload: string,

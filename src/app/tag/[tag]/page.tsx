@@ -7,29 +7,50 @@ interface PageProps {
   params: Promise<{ tag: string }>;
 }
 
+// Force static generation at build time - reduces Netlify function count
+export const dynamic = "force-static";
+// Allow dynamic params to handle URL encoding variations
+// This ensures tags with spaces/special chars work in both dev and production
+export const dynamicParams = true;
+export const revalidate = false; // Never revalidate (pure static)
+
 export async function generateStaticParams() {
   const tags = getAllTags();
-  return tags.map((tag) => ({ tag: encodeURIComponent(tag.toLowerCase()) }));
+  // Convert tags to URL-safe slugs
+  // Replace slashes with hyphens to avoid double-encoding issues
+  // Then encode spaces and other special chars
+  // e.g., "CI/CD" → "ci-cd", "Web Development" → "web%20development"
+  return tags.map((tag) => ({
+    tag: encodeURIComponent(tag.toLowerCase().replaceAll("/", "-")),
+  }));
 }
 
 export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { tag } = await params;
-  const decodedTag = decodeURIComponent(tag);
+  // Decode and normalize: "web%20development" → "web development", "ci-cd" → "ci/cd"
+  const normalizedTag = decodeURIComponent(tag).replaceAll("-", "/");
+
+  // Find the actual tag with original casing
+  const allTags = getAllTags();
+  const actualTag =
+    allTags.find((t) => t.toLowerCase() === normalizedTag.toLowerCase()) ||
+    normalizedTag;
 
   return {
-    title: `${decodedTag} Posts - ETSA`,
-    description: `Browse all ETSA presentations and content tagged with "${decodedTag}".`,
+    title: `${actualTag} Posts - ETSA`,
+    description: `Browse all ETSA presentations and content tagged with "${actualTag}".`,
   };
 }
 
 export default async function TagPage({ params }: Readonly<PageProps>) {
   const { tag } = await params;
-  const decodedTag = decodeURIComponent(tag);
+  // Decode and normalize: "web%20development" → "web development", "ci-cd" → "ci/cd"
+  const normalizedTag = decodeURIComponent(tag).replaceAll("-", "/");
 
   // Find the actual tag (case-insensitive)
   const allTags = getAllTags();
   const actualTag = allTags.find(
-    (t) => t.toLowerCase() === decodedTag.toLowerCase(),
+    (t) => t.toLowerCase() === normalizedTag.toLowerCase(),
   );
 
   if (!actualTag) {

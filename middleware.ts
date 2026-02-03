@@ -124,14 +124,10 @@ export default withAuth(
 );
 
 export const config = {
-  // Apply middleware to all routes
+  // Only apply middleware to routes that need authentication or security checks
+  // This reduces function invocations for static pages (blog, presentations, speakers, tags)
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/admin/:path*", // Admin pages require authentication
+    "/api/:path*", // API routes need security checks
   ],
 };
