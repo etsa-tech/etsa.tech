@@ -10,7 +10,8 @@ import {
 } from "@/lib/github";
 import matter from "gray-matter";
 
-export { dynamic } from "../../route-config";
+// Force dynamic rendering - don't try to statically analyze this route
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
