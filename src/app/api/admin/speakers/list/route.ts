@@ -5,6 +5,9 @@ import { isAuthorizedUser } from "@/lib/auth-utils";
 import fs from "fs";
 import path from "path";
 
+// Force dynamic rendering - this is a serverless function
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

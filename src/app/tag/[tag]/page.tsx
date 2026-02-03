@@ -7,6 +7,11 @@ interface PageProps {
   params: Promise<{ tag: string }>;
 }
 
+// Force static generation at build time - reduces Netlify function count
+export const dynamic = "force-static";
+export const dynamicParams = false; // Only generate pages for known tags
+export const revalidate = false; // Never revalidate (pure static)
+
 export async function generateStaticParams() {
   const tags = getAllTags();
   return tags.map((tag) => ({ tag: encodeURIComponent(tag.toLowerCase()) }));

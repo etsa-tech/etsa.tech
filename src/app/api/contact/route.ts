@@ -10,6 +10,9 @@ import {
   logRequestData,
 } from "@/lib/api-utils";
 
+// Force dynamic rendering - this is a serverless function
+export const dynamic = "force-dynamic";
+
 async function handleContactSubmission(
   request: NextRequest,
   origin: string | null,

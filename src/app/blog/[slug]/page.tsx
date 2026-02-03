@@ -13,6 +13,11 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Force static generation at build time - reduces Netlify function count
+export const dynamic = "force-static";
+export const dynamicParams = false; // Only generate pages for known slugs
+export const revalidate = false; // Never revalidate (pure static)
+
 export async function generateStaticParams() {
   const slugs = getBlogPostSlugs();
   return slugs.map((slug) => ({ slug: encodeURIComponent(slug) }));

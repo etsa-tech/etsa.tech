@@ -7,6 +7,11 @@ interface PageProps {
   params: Promise<{ speaker: string }>;
 }
 
+// Force static generation at build time - reduces Netlify function count
+export const dynamic = "force-static";
+export const dynamicParams = false; // Only generate pages for known speakers
+export const revalidate = false; // Never revalidate (pure static)
+
 export async function generateStaticParams() {
   const speakers = getAllSpeakers();
   return speakers.map((speaker) => ({
