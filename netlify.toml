@@ -7,14 +7,9 @@
   NODE_VERSION = "22"
 
 # Next.js with API routes - uses Netlify's Next.js runtime
-# Optimized for static generation with minimal serverless functions
+# Pages with force-static will be pre-rendered, API routes remain serverless
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Plugin configuration to optimize for static generation
-[plugins.inputs]
-  # Disable on-demand builders for unknown routes (we pre-generate all pages)
-  generateStaticFallback = false
 
 [context.production]
   command = "npm run build"

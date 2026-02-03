@@ -36,7 +36,10 @@ export function getBlogUrl(slug: string): string {
 
 // Generate tag URL
 export function getTagUrl(tag: string): string {
-  return `/tag/${encodeURIComponent(tag.toLowerCase())}`;
+  // Convert slashes to hyphens to avoid double-encoding issues
+  // Then encode the result for URL safety
+  // e.g., "CI/CD" → "/tag/ci-cd", "Web Development" → "/tag/web%20development"
+  return `/tag/${encodeURIComponent(tag.toLowerCase().replace(/\//g, "-"))}`;
 }
 
 // Calculate reading time
