@@ -39,7 +39,7 @@ export function getTagUrl(tag: string): string {
   // Convert slashes to hyphens to avoid double-encoding issues
   // Then encode the result for URL safety
   // e.g., "CI/CD" → "/tag/ci-cd", "Web Development" → "/tag/web%20development"
-  return `/tag/${encodeURIComponent(tag.toLowerCase().replace(/\//g, "-"))}`;
+  return `/tag/${encodeURIComponent(tag.toLowerCase().replaceAll("/", "-"))}`;
 }
 
 // Calculate reading time

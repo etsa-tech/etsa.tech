@@ -21,14 +21,14 @@ export async function generateStaticParams() {
   // Then encode spaces and other special chars
   // e.g., "CI/CD" → "ci-cd", "Web Development" → "web%20development"
   return tags.map((tag) => ({
-    tag: encodeURIComponent(tag.toLowerCase().replace(/\//g, "-")),
+    tag: encodeURIComponent(tag.toLowerCase().replaceAll("/", "-")),
   }));
 }
 
 export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { tag } = await params;
   // Decode and normalize: "web%20development" → "web development", "ci-cd" → "ci/cd"
-  const normalizedTag = decodeURIComponent(tag).replace(/-/g, "/");
+  const normalizedTag = decodeURIComponent(tag).replaceAll("-", "/");
 
   // Find the actual tag with original casing
   const allTags = getAllTags();
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Readonly<PageProps>) {
 export default async function TagPage({ params }: Readonly<PageProps>) {
   const { tag } = await params;
   // Decode and normalize: "web%20development" → "web development", "ci-cd" → "ci/cd"
-  const normalizedTag = decodeURIComponent(tag).replace(/-/g, "/");
+  const normalizedTag = decodeURIComponent(tag).replaceAll("-", "/");
 
   // Find the actual tag (case-insensitive)
   const allTags = getAllTags();
