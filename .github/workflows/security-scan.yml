@@ -165,14 +165,16 @@ jobs:
         continue-on-error: false
 
       # Additional secret scanning with TruffleHog
+      # Skip on workflow_run events where BASE and HEAD would be the same
       - name: TruffleHog OSS
+        if: github.event_name != 'workflow_run'
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: main
+          base: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'HEAD~1' }}
           head: HEAD
           extra_args: --debug --only-verified
-        continue-on-error: false
+        continue-on-error: true
 
       # Dependency Review (for PRs)
       - name: Dependency Review

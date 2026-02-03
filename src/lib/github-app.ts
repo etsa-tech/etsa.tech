@@ -1,12 +1,6 @@
 import { App } from "@octokit/app";
 import { Octokit } from "@octokit/rest";
 
-// GitHub App configuration
-const app = new App({
-  appId: process.env.GITHUB_APP_ID!,
-  privateKey: process.env.GITHUB_APP_PRIVATE_KEY!,
-});
-
 // Repository configuration
 const REPO_OWNER = process.env.GITHUB_OWNER || "etsa";
 const REPO_NAME = process.env.GITHUB_REPO || "etsa.tech";
@@ -19,7 +13,29 @@ interface TokenCache {
 }
 
 let tokenCache: TokenCache | null = null;
+let appInstance: App | null = null;
 const TOKEN_REFRESH_BUFFER = 5 * 60 * 1000; // Refresh 5 minutes before expiry
+
+/**
+ * Lazily initialize the GitHub App instance
+ * This prevents errors during build time when env vars might not be set
+ */
+function getAppInstance(): App {
+  if (!appInstance) {
+    if (!process.env.GITHUB_APP_ID) {
+      throw new Error("GITHUB_APP_ID environment variable is not set");
+    }
+    if (!process.env.GITHUB_APP_PRIVATE_KEY) {
+      throw new Error("GITHUB_APP_PRIVATE_KEY environment variable is not set");
+    }
+
+    appInstance = new App({
+      appId: process.env.GITHUB_APP_ID,
+      privateKey: process.env.GITHUB_APP_PRIVATE_KEY,
+    });
+  }
+  return appInstance;
+}
 
 /**
  * Check if the current token is valid and not expired
@@ -65,7 +81,8 @@ async function createInstallationToken(): Promise<TokenCache> {
     );
   }
 
-  // Create installation access token
+  // Get the app instance and create installation access token
+  const app = getAppInstance();
   const { data: installationToken } = await app.octokit.request(
     "POST /app/installations/{installation_id}/access_tokens",
     {
