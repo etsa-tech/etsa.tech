@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { isAuthorizedUser } from "@/lib/auth-utils";
 import { getBranches } from "@/lib/github";
 
+// Force dynamic rendering - don't try to statically analyze this route
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

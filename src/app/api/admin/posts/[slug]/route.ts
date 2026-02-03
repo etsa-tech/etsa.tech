@@ -13,6 +13,9 @@ import {
 import matter from "gray-matter";
 import { formatBlogPostContent } from "@/lib/server-only-formatter";
 
+// Force dynamic rendering - don't try to statically analyze this route
+export const dynamic = "force-dynamic";
+
 interface RouteParams {
   params: Promise<{ slug: string }>;
 }

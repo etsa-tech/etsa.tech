@@ -9,6 +9,9 @@ import {
   getRepoInfo,
 } from "@/lib/github-app";
 
+// Force dynamic rendering - don't try to statically analyze this route
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
