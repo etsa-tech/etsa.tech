@@ -10,6 +10,9 @@ import {
 import matter from "gray-matter";
 import { formatBlogPostContent } from "@/lib/server-only-formatter";
 
+// Force dynamic rendering - don't try to statically analyze this route
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

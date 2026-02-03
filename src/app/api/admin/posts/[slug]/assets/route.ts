@@ -10,6 +10,9 @@ import {
 } from "@/lib/github";
 import matter from "gray-matter";
 
+// Force dynamic rendering - don't try to statically analyze this route
+export const dynamic = "force-dynamic";
+
 interface RouteParams {
   params: Promise<{ slug: string }>;
 }

@@ -10,6 +10,9 @@ import {
 } from "@/lib/github";
 import matter from "gray-matter";
 
+// Force dynamic rendering - don't try to statically analyze this route
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
