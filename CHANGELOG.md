@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.2] - 2026-02-03
 
+### 🐛 Bug Fixes
+
+- ci/cd and npm build ([#225](https://github.com/etsa-tech/etsa.tech/pull/225)) by @wesleykirkland
+
+## [0.2.2] - 2026-02-03
+
 ### 🔧 Chores
 
 - 2026-02-03 correct speaker bio ([#224](https://github.com/etsa-tech/etsa.tech/pull/224)) by @wesleykirkland
