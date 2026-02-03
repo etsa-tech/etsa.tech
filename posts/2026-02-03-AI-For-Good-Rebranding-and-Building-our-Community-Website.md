@@ -22,7 +22,7 @@ speakers:
     company: Coupe Health
     image: /images/speakers/wesley_kirkland.jpeg
     bio: >-
-      Wesley Kirkland is a DevOps/Cloud Engineer at Coupe Health. He is passionate about various tech fields, including Home Automation, Email, Internet Presence, AWS, and DevOps. Wesley is also a dedicated cat dad to his two adorable tuxedo kitties. Outside of tech, he enjoys baking and cooking, finding that food fuels the soul and provides a delightful break from the desk.
+      Wesley Kirkland is a Principal Solutions Architect at Coupe Health. He is passionate about a wide range of technology fields, including home automation, email, internet presence, AWS, and DevOps. Wesley is also a dedicated cat dad to four cats—two adorable tuxedo kitties, a gray boy, and a black void. Outside of tech, he enjoys baking and cooking, finding that food fuels the soul and provides a delightful break from the desk.
     linkedIn: https://www.linkedin.com/in/wesleykirkland/
 eventDate: "2026-02-03"
 published: true
