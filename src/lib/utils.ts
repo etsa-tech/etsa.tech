@@ -34,6 +34,11 @@ export function getBlogUrl(slug: string): string {
   return `/blog/${encodeURIComponent(slug)}`;
 }
 
+// Generate announcement URL
+export function getAnnouncementUrl(slug: string): string {
+  return `/announcement/${encodeURIComponent(slug)}`;
+}
+
 // Generate tag URL
 export function getTagUrl(tag: string): string {
   // Convert slashes to hyphens to avoid double-encoding issues
