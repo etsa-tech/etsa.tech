@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-02-04
+
+### 🔧 Chores
+
+- **deps**: update dependency @types/node to v24.10.10 ([#227](https://github.com/etsa-tech/etsa.tech/pull/227)) by @renovate[bot]
+
 ## [0.2.3] - 2026-02-03
 
 ### ♻️ Code Refactoring
