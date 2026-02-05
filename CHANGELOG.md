@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.3] - 2026-02-05
 
+### 🔧 Chores
+
+- **deps**: update dependency @types/react to v19.2.11 ([#229](https://github.com/etsa-tech/etsa.tech/pull/229)) by @renovate[bot]
+
+## [0.2.3] - 2026-02-05
+
 ### 🐛 Bug Fixes
 
 - **deps**: update dependency nodemailer to v8 ([#230](https://github.com/etsa-tech/etsa.tech/pull/230)) by @renovate[bot]
