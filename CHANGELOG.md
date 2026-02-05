@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update commitlint monorepo to v20.4.1 ([#222](https://github.com/etsa-tech/etsa.tech/pull/222)) by @renovate[bot]
+
+## [1.0.0] - 2026-02-05
+
+### 🔧 Chores
+
 - **deps**: update dependency autoprefixer to v10.4.24 ([#223](https://github.com/etsa-tech/etsa.tech/pull/223)) by @renovate[bot]
 
 ## [0.2.3] - 2026-02-05
