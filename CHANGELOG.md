@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-02-07
+
+### 🔧 Chores
+
+- **deps**: update dependency @netlify/plugin-nextjs to v5.15.8 ([#233](https://github.com/etsa-tech/etsa.tech/pull/233)) by @renovate[bot]
+
 ## [1.0.0] - 2026-02-05
 
 ### 🔧 Chores
