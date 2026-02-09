@@ -30,7 +30,7 @@ export default function TagCloud({ nodes, edges }: TagCloudProps) {
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [hoveredTag, setHoveredTag] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
   const nodesRef = useRef<TagNode[]>([]);
 
   // Handle window resize
