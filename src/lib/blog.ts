@@ -226,6 +226,144 @@ export function getPopularTags(limit: number = 25): string[] {
     .map(({ tag }) => tag);
 }
 
+// Tag relationship types
+export interface TagRelationship {
+  tag: string;
+  count: number;
+  cooccurrenceCount: number;
+}
+
+export interface TagNode {
+  tag: string;
+  count: number;
+  relatedTags: TagRelationship[];
+}
+
+export interface TagGraph {
+  nodes: Map<string, TagNode>;
+  edges: Array<{ source: string; target: string; weight: number }>;
+}
+
+// Get tag co-occurrence data (tags that appear together in posts)
+export function getTagCooccurrences(): Map<string, Map<string, number>> {
+  const allPosts = getAllPosts();
+  const cooccurrences = new Map<string, Map<string, number>>();
+
+  allPosts.forEach((post) => {
+    const tags = post.frontmatter.tags;
+
+    // For each pair of tags in the post, increment their co-occurrence count
+    for (let i = 0; i < tags.length; i++) {
+      const tag1 = tags[i];
+
+      if (!cooccurrences.has(tag1)) {
+        cooccurrences.set(tag1, new Map<string, number>());
+      }
+
+      for (let j = 0; j < tags.length; j++) {
+        if (i !== j) {
+          const tag2 = tags[j];
+          const tag1Map = cooccurrences.get(tag1)!;
+          tag1Map.set(tag2, (tag1Map.get(tag2) || 0) + 1);
+        }
+      }
+    }
+  });
+
+  return cooccurrences;
+}
+
+// Build a tag relationship graph with depth limit
+export function getTagGraph(maxDepth: number = 3): TagGraph {
+  const tagsWithCount = getTagsWithCount();
+  const cooccurrences = getTagCooccurrences();
+  const nodes = new Map<string, TagNode>();
+  const edges: Array<{ source: string; target: string; weight: number }> = [];
+
+  // Create nodes with their related tags
+  tagsWithCount.forEach(({ tag, count }) => {
+    const relatedTagsMap = cooccurrences.get(tag) || new Map();
+    const relatedTags: TagRelationship[] = Array.from(
+      relatedTagsMap.entries(),
+    ).map(([relatedTag, cooccurrenceCount]) => ({
+      tag: relatedTag,
+      count:
+        tagsWithCount.find((t) => t.tag === relatedTag)?.count ||
+        cooccurrenceCount,
+      cooccurrenceCount,
+    }));
+
+    // Sort by co-occurrence count descending
+    relatedTags.sort((a, b) => b.cooccurrenceCount - a.cooccurrenceCount);
+
+    nodes.set(tag, {
+      tag,
+      count,
+      relatedTags,
+    });
+  });
+
+  // Build edges from co-occurrences
+  cooccurrences.forEach((relatedTags, sourceTag) => {
+    relatedTags.forEach((weight, targetTag) => {
+      // Only add edge once (avoid duplicates)
+      if (sourceTag < targetTag) {
+        edges.push({
+          source: sourceTag,
+          target: targetTag,
+          weight,
+        });
+      }
+    });
+  });
+
+  return { nodes, edges };
+}
+
+// Get related tags up to N levels deep from a starting tag
+export function getRelatedTagsDeep(
+  startTag: string,
+  maxDepth: number = 3,
+  minCooccurrence: number = 1,
+): Map<string, { depth: number; cooccurrence: number }> {
+  const cooccurrences = getTagCooccurrences();
+  const visited = new Map<string, { depth: number; cooccurrence: number }>();
+  const queue: Array<{ tag: string; depth: number }> = [
+    { tag: startTag, depth: 0 },
+  ];
+
+  visited.set(startTag, { depth: 0, cooccurrence: 0 });
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+
+    if (current.depth >= maxDepth) {
+      continue;
+    }
+
+    const relatedTags = cooccurrences.get(current.tag);
+    if (!relatedTags) {
+      continue;
+    }
+
+    relatedTags.forEach((cooccurrence, relatedTag) => {
+      if (cooccurrence < minCooccurrence) {
+        return;
+      }
+
+      if (!visited.has(relatedTag)) {
+        visited.set(relatedTag, {
+          depth: current.depth + 1,
+          cooccurrence,
+        });
+        queue.push({ tag: relatedTag, depth: current.depth + 1 });
+      }
+    });
+  }
+
+  return visited;
+}
+
 // Get blog posts only (from /posts_blog directory)
 export function getBlogPosts(): PostSummary[] {
   const blogSlugs = getBlogPostSlugs();
