@@ -45,7 +45,7 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Run TypeScript check
         run: npx tsc --noEmit
@@ -53,7 +53,7 @@ jobs:
 
       - name: Build project
         run: npm run build
-        continue-on-error: true
+        continue-on-error: false
 
       # Snyk Security Scanning
       - name: Run Snyk to check for vulnerabilities
@@ -155,13 +155,11 @@ jobs:
         continue-on-error: true
 
       # Audit npm packages
-      - name: Run npm audit
+      - name: Run npm audit (prod, high+ only)
         run: |
-          npm audit --audit-level=moderate --json > npm-audit.json || true
-          if [ -s npm-audit.json ]; then
-            echo "NPM audit found vulnerabilities"
-            cat npm-audit.json
-          fi
+          set -e
+          npm audit --omit=dev --audit-level=high --json > npm-audit.json
+          echo "npm audit passed: no high/critical vulnerabilities in production deps"
         continue-on-error: false
 
       # Additional secret scanning with TruffleHog
