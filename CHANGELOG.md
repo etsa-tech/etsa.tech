@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-02-14
+
+### 🔧 Chores
+
+- **deps**: update dependency @types/react to v19.2.14 ([#239](https://github.com/etsa-tech/etsa.tech/pull/239)) by @renovate[bot]
+
 ## [1.0.0] - 2026-02-08
 
 ### 🔧 Chores
