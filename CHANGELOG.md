@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update tailwindcss monorepo to v4.2.0 ([#241](https://github.com/etsa-tech/etsa.tech/pull/241)) by @renovate[bot]
+
+## [1.0.0] - 2026-02-19
+
+### 🔧 Chores
+
 - **deps**: update dependency sanitize-html to v2.17.1 ([#242](https://github.com/etsa-tech/etsa.tech/pull/242)) by @renovate[bot]
 
 ## [1.0.0] - 2026-02-19
