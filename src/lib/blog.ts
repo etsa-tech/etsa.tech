@@ -7,6 +7,7 @@ import { Post, PostSummary, PostFrontmatter, Speaker } from "@/types/post";
 
 const postsDirectory = path.join(process.cwd(), "posts");
 const blogPostsDirectory = path.join(process.cwd(), "posts_blog");
+const announcementsDirectory = path.join(process.cwd(), "posts_announcements");
 
 // Calculate reading time (average 200 words per minute)
 function calculateReadingTime(content: string): number {
@@ -31,6 +32,7 @@ function readPostsFromDirectory(
   directory: string,
   slugs: string[],
   isBlogPost: boolean = false,
+  isAnnouncement: boolean = false,
 ): PostSummary[] {
   return slugs
     .map((slug) => {
@@ -41,16 +43,27 @@ function readPostsFromDirectory(
 
         const readingTime = calculateReadingTime(content);
 
+        let frontmatter = data as PostFrontmatter;
+        if (isBlogPost) {
+          frontmatter = { ...data, blogpost: true } as PostFrontmatter;
+        } else if (isAnnouncement) {
+          frontmatter = { ...data, announcement: true } as PostFrontmatter;
+        }
+
         return {
           slug,
-          frontmatter: isBlogPost
-            ? ({ ...data, blogpost: true } as PostFrontmatter)
-            : (data as PostFrontmatter),
+          frontmatter,
           readingTime,
         };
       } catch (error) {
         console.error(
-          `Error reading ${isBlogPost ? "blog" : "presentation"} post ${slug}:`,
+          `Error reading ${
+            isAnnouncement
+              ? "announcement"
+              : isBlogPost
+                ? "blog"
+                : "presentation"
+          } post ${slug}:`,
           error,
         );
         return null;
@@ -170,8 +183,17 @@ export function getAllPosts(): PostSummary[] {
   const blogSlugs = getBlogPostSlugs();
   const blogPosts = readPostsFromDirectory(blogPostsDirectory, blogSlugs, true);
 
+  // Get announcements from /posts_announcements
+  const announcementSlugs = getAnnouncementSlugs();
+  const announcementPosts = readPostsFromDirectory(
+    announcementsDirectory,
+    announcementSlugs,
+    false,
+    true,
+  );
+
   // Combine all posts
-  posts.push(...presentationPosts, ...blogPosts);
+  posts.push(...presentationPosts, ...blogPosts, ...announcementPosts);
 
   // Filter and sort
   return sortPostsByDate(
@@ -395,4 +417,79 @@ export function getPostSpeakers(frontmatter: PostFrontmatter): Speaker[] {
   }
 
   return speakers;
+}
+
+// ============================================================================
+// ANNOUNCEMENTS FUNCTIONS
+// ============================================================================
+
+// Get announcement slugs only
+export function getAnnouncementSlugs(): string[] {
+  if (!fs.existsSync(announcementsDirectory)) {
+    return [];
+  }
+
+  const fileNames = fs.readdirSync(announcementsDirectory);
+  return fileNames
+    .filter((fileName) => fileName.endsWith(".md"))
+    .map((fileName) => fileName.replace(/\.md$/, ""));
+}
+
+// Get announcements (from /posts_announcements directory)
+export function getAnnouncements(): PostSummary[] {
+  const announcementSlugs = getAnnouncementSlugs();
+  const posts = readPostsFromDirectory(
+    announcementsDirectory,
+    announcementSlugs,
+    false,
+    true,
+  );
+
+  return sortPostsByDate(
+    posts.filter((post) => post.frontmatter.published !== false),
+  );
+}
+
+// Get recent announcements
+export function getRecentAnnouncements(limit: number = 3): PostSummary[] {
+  const announcements = getAnnouncements();
+  return announcements.slice(0, limit);
+}
+
+// Get the latest announcement
+export function getLatestAnnouncement(): PostSummary | null {
+  const announcements = getAnnouncements();
+  return announcements.length > 0 ? announcements[0] : null;
+}
+
+// Get announcement by slug
+export async function getAnnouncementBySlug(
+  slug: string,
+): Promise<Post | null> {
+  try {
+    const fullPath = path.join(announcementsDirectory, `${slug}.md`);
+    if (!fs.existsSync(fullPath)) {
+      return null;
+    }
+
+    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const { data, content } = matter(fileContents);
+
+    // Process markdown to HTML
+    const processedContent = await remark().use(html).process(content);
+    const contentHtml = processedContent.toString();
+
+    // Calculate reading time
+    const readingTime = calculateReadingTime(content);
+
+    return {
+      slug,
+      frontmatter: data as PostFrontmatter,
+      content: contentHtml,
+      readingTime,
+    };
+  } catch (error) {
+    console.error(`Error reading announcement ${slug}:`, error);
+    return null;
+  }
 }
