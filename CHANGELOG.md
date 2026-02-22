@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency react-hook-form to v7.71.2 ([#246](https://github.com/etsa-tech/etsa.tech/pull/246)) by @renovate[bot]
+
+## [1.0.0] - 2026-02-22
+
+### 🔧 Chores
+
 - **deps**: update dependency @types/nodemailer to v7.0.11 ([#245](https://github.com/etsa-tech/etsa.tech/pull/245)) by @renovate[bot]
 
 ## [1.0.0] - 2026-02-22
