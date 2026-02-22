@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import sanitizeHtml from "sanitize-html";
 import {
-  getPostBySlug,
+  getAnnouncementBySlug,
   getAnnouncementSlugs,
   getRecentAnnouncements,
 } from "@/lib/blog";
-import { formatDate, getTagUrl } from "@/lib/utils";
+import { formatDate, getTagUrl, getAnnouncementUrl } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -26,7 +26,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Readonly<PageProps>) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const post = await getPostBySlug(decodedSlug);
+  const post = await getAnnouncementBySlug(decodedSlug);
 
   if (!post) {
     return {
@@ -52,7 +52,7 @@ export default async function AnnouncementPage({
 }: Readonly<PageProps>) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const post = await getPostBySlug(decodedSlug);
+  const post = await getAnnouncementBySlug(decodedSlug);
 
   if (!post) {
     notFound();
@@ -193,7 +193,7 @@ export default async function AnnouncementPage({
                       className="border-b border-light-border dark:border-dark-border last:border-b-0 pb-4 last:pb-0"
                     >
                       <Link
-                        href={`/announcement/${encodeURIComponent(post.slug)}`}
+                        href={getAnnouncementUrl(post.slug)}
                         className="block group"
                       >
                         <h4 className="font-medium text-light-text dark:text-dark-text group-hover:text-primary-500 transition-colors mb-1">

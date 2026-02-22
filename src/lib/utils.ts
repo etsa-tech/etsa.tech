@@ -18,6 +18,9 @@ export function getPostUrl(
   slug: string,
   frontmatter?: PostFrontmatter,
 ): string {
+  if (frontmatter?.announcement === true) {
+    return `/announcement/${encodeURIComponent(slug)}`;
+  }
   if (frontmatter?.blogpost === true) {
     return `/blog/${encodeURIComponent(slug)}`;
   }

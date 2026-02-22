@@ -22,12 +22,7 @@ The announcements system allows us to:
 
 ## How It Works
 
-Announcements are stored as markdown files in the `posts_announcements` directory, just like our blog posts and presentations. They support:
-
-- Full markdown formatting
-- Tags for categorization
-- Date-based sorting
-- Static site generation for optimal performance
+We will use this announcement system for job postings
 
 ## Try It Out!
 
