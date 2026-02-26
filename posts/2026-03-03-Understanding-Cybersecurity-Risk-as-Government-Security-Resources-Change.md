@@ -4,17 +4,13 @@ date: "2026-02-21"
 excerpt: >-
   See how AI-assisted development transformed a legacy website into a modern, secure, serverless platform—without sacrificing code quality or security.
 tags:
-  - AI
-  - Agentic AIchat
-  - Web Development
-  - Next.js
-  - TypeScript
-  - React
-  - Tailwind CSS
-  - Serverless
-  - DevOps
-  - CI/CD
-  - Security
+  - Cybersecurity
+  - Risk Management
+  - Government
+  - Threat Landscape
+  - Ransomware
+  - Vulnerability Management
+  - Security Operations
 author: ETSA
 speakers:
   - name: Mike Williams
