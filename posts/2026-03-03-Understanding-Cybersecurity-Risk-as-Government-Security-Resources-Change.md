@@ -2,7 +2,7 @@
 title: "Understanding Cybersecurity Risk as Government Security Resources Change"
 date: "2026-02-21"
 excerpt: >-
-  See how AI-assisted development transformed a legacy website into a modern, secure, serverless platform—without sacrificing code quality or security.
+  What happens to the nation’s cyber risk posture when government security resources shrink? This presentation analyzes current threat trends, ransomware growth, and increased vulnerability exploitation, offering practical guidance for organizations adapting to a more exposed landscape.
 tags:
   - Cybersecurity
   - Risk Management
