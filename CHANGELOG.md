@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- removed last month's presentation excerpt and replaced it with correct ([#252](https://github.com/etsa-tech/etsa.tech/pull/252)) by @bataylor976
+
+## [1.0.0] - 2026-02-26
+
+### 🔧 Chores
+
 - 2026-02-25 updated tags for Mike Williams talk ([#251](https://github.com/etsa-tech/etsa.tech/pull/251)) by @bataylor976
 
 ## [1.0.0] - 2026-02-22
