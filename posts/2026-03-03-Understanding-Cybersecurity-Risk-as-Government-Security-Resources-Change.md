@@ -2,19 +2,15 @@
 title: "Understanding Cybersecurity Risk as Government Security Resources Change"
 date: "2026-02-21"
 excerpt: >-
-  See how AI-assisted development transformed a legacy website into a modern, secure, serverless platform—without sacrificing code quality or security.
+  What happens to the nation’s cyber risk posture when government security resources shrink? This presentation analyzes current threat trends, ransomware growth, and increased vulnerability exploitation, offering practical guidance for organizations adapting to a more exposed landscape.
 tags:
-  - AI
-  - Agentic AIchat
-  - Web Development
-  - Next.js
-  - TypeScript
-  - React
-  - Tailwind CSS
-  - Serverless
-  - DevOps
-  - CI/CD
-  - Security
+  - Cybersecurity
+  - Risk Management
+  - Government
+  - Threat Landscape
+  - Ransomware
+  - Vulnerability Management
+  - Security Operations
 author: ETSA
 speakers:
   - name: Mike Williams
