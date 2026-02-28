@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency @eslint/eslintrc to v3.3.4 ([#249](https://github.com/etsa-tech/etsa.tech/pull/249)) by @renovate[bot]
+
+## [1.0.0] - 2026-02-28
+
+### 🔧 Chores
+
 - **deps**: update dependency @types/node to v24.11.0 ([#253](https://github.com/etsa-tech/etsa.tech/pull/253)) by @renovate[bot]
 
 ## [1.0.0] - 2026-02-26
