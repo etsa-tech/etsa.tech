@@ -18,6 +18,9 @@ export function getPostUrl(
   slug: string,
   frontmatter?: PostFrontmatter,
 ): string {
+  if (frontmatter?.announcement === true) {
+    return `/announcement/${encodeURIComponent(slug)}`;
+  }
   if (frontmatter?.blogpost === true) {
     return `/blog/${encodeURIComponent(slug)}`;
   }
@@ -32,6 +35,11 @@ export function getPresentationUrl(slug: string): string {
 // Generate blog post URL
 export function getBlogUrl(slug: string): string {
   return `/blog/${encodeURIComponent(slug)}`;
+}
+
+// Generate announcement URL
+export function getAnnouncementUrl(slug: string): string {
+  return `/announcement/${encodeURIComponent(slug)}`;
 }
 
 // Generate tag URL
