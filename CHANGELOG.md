@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-17
+
+### 🔧 Chores
+
+- **deps**: update nextjs monorepo to v16.1.7 ([#266](https://github.com/etsa-tech/etsa.tech/pull/266)) by @renovate[bot]
+
 ## [1.0.0] - 2026-03-17
 
 ### ✨ Features
