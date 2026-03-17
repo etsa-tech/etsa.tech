@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update commitlint monorepo to v20.5.0 ([#265](https://github.com/etsa-tech/etsa.tech/pull/265)) by @renovate[bot]
+
+## [1.1.0] - 2026-03-17
+
+### 🔧 Chores
+
 - **deps**: update actions/create-github-app-token action to v3 ([#264](https://github.com/etsa-tech/etsa.tech/pull/264)) by @renovate[bot]
 
 ## [1.1.0] - 2026-03-17
