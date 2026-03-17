@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-03-17
+
+### ✨ Features
+
+- add veronica 2026-04-06 ([#268](https://github.com/etsa-tech/etsa.tech/pull/268)) by @wesleykirkland
+
 ## [1.0.0] - 2026-03-12
 
 ### 🔧 Chores
