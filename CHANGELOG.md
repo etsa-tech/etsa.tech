@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update nextjs monorepo to v16.2.1 ([#272](https://github.com/etsa-tech/etsa.tech/pull/272)) by @renovate[bot]
+
+## [1.1.0] - 2026-03-21
+
+### 🔧 Chores
+
 - **deps**: update tailwindcss monorepo to v4.2.2 ([#271](https://github.com/etsa-tech/etsa.tech/pull/271)) by @renovate[bot]
 
 ## [1.1.0] - 2026-03-21
