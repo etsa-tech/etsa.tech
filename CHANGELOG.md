@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency sanitize-html to v2.17.2 ([#273](https://github.com/etsa-tech/etsa.tech/pull/273)) by @renovate[bot]
+
+## [1.1.0] - 2026-03-21
+
+### 🔧 Chores
+
 - **deps**: update nextjs monorepo to v16.2.1 ([#272](https://github.com/etsa-tech/etsa.tech/pull/272)) by @renovate[bot]
 
 ## [1.1.0] - 2026-03-21
