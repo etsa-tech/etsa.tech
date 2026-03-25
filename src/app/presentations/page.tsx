@@ -8,6 +8,7 @@ import { ContentPageLayout } from "@/components/ContentPageLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { TagsCard } from "@/components/TagsCard";
 import SearchComponent from "@/components/SearchComponent";
+import { PresentationCalendar } from "@/components/PresentationCalendar";
 
 export const metadata = {
   title: "Presentations - ETSA",
@@ -23,6 +24,7 @@ export default function PresentationsPage() {
 
   const sidebar = (
     <>
+      <PresentationCalendar posts={posts} />
       <TagsCard title="Browse by Topic" limit={25} showViewAll={true} />
       <StatsCard
         title="Statistics"
