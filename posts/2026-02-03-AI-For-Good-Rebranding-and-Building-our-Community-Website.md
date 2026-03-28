@@ -24,8 +24,11 @@ speakers:
     bio: >-
       Wesley Kirkland is a Principal Solutions Architect at Coupe Health. He is passionate about a wide range of technology fields, including home automation, email, internet presence, AWS, and DevOps. Wesley is also a dedicated cat dad to four cats—two adorable tuxedo kitties, a gray boy, and a black void. Outside of tech, he enjoys baking and cooking, finding that food fuels the soul and provides a delightful break from the desk.
     linkedIn: https://www.linkedin.com/in/wesleykirkland/
+recordingUrl: "https://youtu.be/0tpKQ71a_G4"
 eventDate: "2026-02-03"
 published: true
 ---
 
 This presentation demonstrates the practical application of AI-assisted development in rebuilding our organization's web presence. We will share how agentic AI tools transformed our 14-year-old, non-responsive website into a modern, secure, serverless application using Next.js with modern libraries. We will cover the complete development journey, from initial requirements gathering to deployment on Netlify, highlighting how AI coding assistants enabled a DevOps engineer to accomplish web development tasks traditionally requiring specialized frontend expertise. Key topics include modern web architecture, security best practices with comprehensive CI/CD scanning, third-party integrations and the benefits of open-source development. You will learn how AI tools can accelerate development while maintaining code quality and security standards, and not generate "AI Slop" ultimately delivering a cost-effective, maintainable solution that serves our community's needs.
+
+Note: The recording is from a later presentation at DC865 as the event night we forgot to record
