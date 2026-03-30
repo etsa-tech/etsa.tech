@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-30
+
+### 🐛 Bug Fixes
+
+- **posts**: correct JavaScript in ASP.NET MVC event date to April 7 ([#279](https://github.com/etsa-tech/etsa.tech/pull/279)) by @bataylor976
+
 ## [1.1.0] - 2026-03-28
 
 ### 🔧 Chores
