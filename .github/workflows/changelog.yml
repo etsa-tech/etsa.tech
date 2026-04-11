@@ -261,7 +261,7 @@ jobs:
           npx prettier --write CHANGELOG.md
 
       - name: Commit and push changelog
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           PR_NUMBER: ${{ steps.pr-info.outputs.number }}
         with:
@@ -515,7 +515,7 @@ jobs:
 
       - name: Update package.json version
         if: steps.version.outputs.version_bumped == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
         with:
@@ -621,7 +621,7 @@ jobs:
 
       - name: Create Git tag
         if: steps.version.outputs.version_bumped == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
         with:
@@ -704,7 +704,7 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.version.outputs.version_bumped == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           NEW_VERSION: ${{ steps.version.outputs.new_version }}
           BUMP_TYPE: ${{ steps.bump-type.outputs.bump }}
