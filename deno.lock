@@ -1,0 +1,57 @@
+{
+  "version": "5",
+  "remote": {
+    "https://edge.netlify.com/": "fd941d61d88673d5f28aab283fb86fcc50f08a3bc80ee5470498fcfa88c65cfb",
+    "https://edge.netlify.com/bootstrap/config.ts": "6a2ce0e544e15e8f8883a5c18da5948e37fd0f2619f68cb31f3af53c51817025",
+    "https://edge.netlify.com/bootstrap/context.ts": "e97240232121e2f369f6546ce961490f34d961ea1ea54be3ff09633e3f08373f",
+    "https://edge.netlify.com/bootstrap/cookie.ts": "8b0baae708989ca183c6f3b4ab3d029e6abcbc2e43f93edeb0ff447b3bbc3a05",
+    "https://edge.netlify.com/bootstrap/edge_function.ts": "b8253e86aa83c67341f5cfedeba5049d77fbf84dcab7eceff7566b7728ae9b39",
+    "https://edge.netlify.com/bootstrap/globals/types.ts": "eaa6148ded3121d8dee62dd91c86e7fe76601df0f3ca8d7962243a30f4c8935f"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@commitlint/cli@^20.3.1",
+        "npm:@commitlint/config-conventional@^20.3.1",
+        "npm:@eslint/eslintrc@3",
+        "npm:@hcaptcha/react-hcaptcha@2",
+        "npm:@hookform/resolvers@^5.2.1",
+        "npm:@monaco-editor/react@^4.7.0",
+        "npm:@netlify/plugin-nextjs@^5.11.6",
+        "npm:@octokit/app@^16.1.0",
+        "npm:@octokit/rest@22",
+        "npm:@tailwindcss/postcss@^4.1.11",
+        "npm:@tailwindcss/typography@~0.5.0-alpha.3",
+        "npm:@types/js-yaml@^4.0.9",
+        "npm:@types/node@24",
+        "npm:@types/nodemailer@7",
+        "npm:@types/react-dom@19",
+        "npm:@types/react@19",
+        "npm:@types/sanitize-html@^2.16.0",
+        "npm:autoprefixer@^10.4.21",
+        "npm:conventional-changelog-cli@5",
+        "npm:eslint-config-next@^16.0.1",
+        "npm:eslint@9",
+        "npm:gray-matter@^4.0.3",
+        "npm:js-yaml@^4.1.1",
+        "npm:next-auth@^4.24.11",
+        "npm:next@^16.1.5",
+        "npm:nodemailer@8",
+        "npm:postcss@^8.5.6",
+        "npm:prettier@^3.6.2",
+        "npm:react-dom@^19.2.0",
+        "npm:react-hook-form@^7.62.0",
+        "npm:react@^19.2.0",
+        "npm:remark-breaks@4",
+        "npm:remark-gfm@^4.0.1",
+        "npm:remark-html@^16.0.1",
+        "npm:remark@^15.0.1",
+        "npm:sanitize-html@^2.17.0",
+        "npm:server-only@^0.0.1",
+        "npm:tailwindcss@^4.1.11",
+        "npm:typescript@5.9.3",
+        "npm:zod@4"
+      ]
+    }
+  }
+}
