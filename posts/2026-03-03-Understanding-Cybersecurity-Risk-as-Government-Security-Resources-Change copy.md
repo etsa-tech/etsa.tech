@@ -21,6 +21,7 @@ speakers:
       Mike Williams is a cybersecurity professional and 10-year United States Marine Corps veteran specializing in security engineering, threat detection, and operational defense at scale. He has supported complex government and enterprise environments, advising leadership on data strategy, security tooling, and measurable risk reduction. Mike has experience bridging the gap between technical teams and decision-makers, translating complex security challenges into practical, mission-focused solutions. His work includes building detection capabilities, developing security metrics, and improving processes that increase visibility and actionable outcomes across organizations. As a speaker, Mike focuses on practical defense, real-world lessons learned, and how security teams can operate more effectively in modern threat environments. He is passionate about strengthening security operations, mentoring others in the field, and helping organizations move from reactive to proactive defense.
     linkedIn: https://www.linkedin.com/in/mwilliams-infosec/
 eventDate: "2026-03-03"
+recordingUrl: "https://youtu.be/ONm2DV49JMA"
 published: true
 ---
 
