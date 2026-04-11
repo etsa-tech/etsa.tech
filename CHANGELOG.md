@@ -473,7 +473,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance monitoring with Lighthouse
 - Accessibility testing with axe-core
 
-[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v1.1.4...HEAD
+[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v1.1.5...HEAD
 [0.1.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.1.0
 [0.2.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.0
 [0.2.1]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.1
@@ -485,3 +485,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.1.2]: https://github.com/etsa-tech/etsa.tech/releases/tag/v1.1.2
 [1.1.3]: https://github.com/etsa-tech/etsa.tech/releases/tag/v1.1.3
 [1.1.4]: https://github.com/etsa-tech/etsa.tech/releases/tag/v1.1.4
+[1.1.5]: https://github.com/etsa-tech/etsa.tech/releases/tag/v1.1.5
