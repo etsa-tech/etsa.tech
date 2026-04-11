@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.4] - 2026-04-11
 
+### 🐛 Bug Fixes
+
+- **posts**: rename Mike Williams post and add recording URL ([#296](https://github.com/etsa-tech/etsa.tech/pull/296)) by @bataylor976
+
+## [1.1.4] - 2026-04-11
+
 ### 🔧 Chores
 
 - 2026-04-07 recording ([#289](https://github.com/etsa-tech/etsa.tech/pull/289)) by @wesleykirkland
