@@ -1,6 +1,7 @@
 ---
 title: "Understanding Cybersecurity Risk as Government Security Resources Change"
 date: "2026-02-21"
+recordingUrl: "https://youtu.be/ONm2DV49JMA"
 excerpt: >-
   What happens to the nation’s cyber risk posture when government security resources shrink? This presentation analyzes current threat trends, ransomware growth, and increased vulnerability exploitation, offering practical guidance for organizations adapting to a more exposed landscape.
 tags:
