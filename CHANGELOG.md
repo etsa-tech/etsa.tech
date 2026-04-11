@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency eslint to v10 ([#234](https://github.com/etsa-tech/etsa.tech/pull/234)) by @renovate[bot]
+
+## [1.1.6] - 2026-04-11
+
+### 🔧 Chores
+
 - **deps**: upgrade package lock ([#299](https://github.com/etsa-tech/etsa.tech/pull/299)) by @wesleykirkland
 
 ## [1.1.5] - 2026-04-11
