@@ -1,0 +1,54 @@
+name: Format Snyk PR Titles
+
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - main
+
+jobs:
+  format-title:
+    name: Reformat Snyk PR title to conventional commits
+    runs-on: ubuntu-latest
+    if: github.actor == 'snyk-bot'
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Reformat PR title
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            let newTitle = title;
+
+            // "[Snyk] Security upgrade X from Y to Z"
+            // "[Snyk] Upgrade X from Y to Z"
+            const upgradeMatch = title.match(/^\[Snyk\]\s+(?:Security\s+)?[Uu]pgrade\s+(.+?)\s+from\s+(\S+)\s+to\s+(\S+)/);
+            if (upgradeMatch) {
+              newTitle = `fix(deps): upgrade ${upgradeMatch[1]} from ${upgradeMatch[2]} to ${upgradeMatch[3]}`;
+            }
+
+            // "[Snyk] Fix for N vulnerabilities"
+            const fixMatch = title.match(/^\[Snyk\]\s+Fix for\s+(.+)/);
+            if (fixMatch) {
+              newTitle = `fix(deps): ${fixMatch[1].toLowerCase()}`;
+            }
+
+            if (newTitle === title) {
+              // Fallback: strip "[Snyk] " prefix and lowercase first char
+              const fallback = title.replace(/^\[Snyk\]\s+/, '');
+              newTitle = `fix(deps): ${fallback.charAt(0).toLowerCase()}${fallback.slice(1)}`;
+            }
+
+            console.log(`Original: "${title}"`);
+            console.log(`Formatted: "${newTitle}"`);
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              title: newTitle,
+            });
