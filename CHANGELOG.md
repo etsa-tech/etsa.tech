@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-04-11
+
+### 🐛 Bug Fixes
+
+- **posts**: again add recording URL for Mike Williams cybersecurity talk ([#295](https://github.com/etsa-tech/etsa.tech/pull/295)) by @bataylor976
+
 ## [1.1.2] - 2026-04-11
 
 ### 🐛 Bug Fixes
