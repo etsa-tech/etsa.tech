@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency react-hook-form to v7.72.1 ([#282](https://github.com/etsa-tech/etsa.tech/pull/282)) by @renovate[bot]
+
+## [1.1.1] - 2026-04-11
+
+### 🔧 Chores
+
 - **deps**: update nextjs monorepo to v16.2.3 ([#280](https://github.com/etsa-tech/etsa.tech/pull/280)) by @renovate[bot]
 
 ## [1.1.1] - 2026-04-11
