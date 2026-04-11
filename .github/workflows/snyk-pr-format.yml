@@ -10,7 +10,7 @@ jobs:
   format-title:
     name: Reformat Snyk PR title to conventional commits
     runs-on: ubuntu-latest
-    if: github.actor == 'snyk-bot'
+    if: startsWith(github.event.pull_request.title, '[Snyk]')
 
     permissions:
       pull-requests: write
