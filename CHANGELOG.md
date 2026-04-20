@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update tailwindcss monorepo to v4.2.3 ([#308](https://github.com/etsa-tech/etsa.tech/pull/308)) by @renovate[bot]
+
+## [1.1.6] - 2026-04-20
+
+### 🔧 Chores
+
 - **deps**: update dependency typescript to v6.0.3 ([#307](https://github.com/etsa-tech/etsa.tech/pull/307)) by @renovate[bot]
 
 ## [1.1.6] - 2026-04-20
