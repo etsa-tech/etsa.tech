@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update nextjs monorepo to v16.2.4 ([#306](https://github.com/etsa-tech/etsa.tech/pull/306)) by @renovate[bot]
+
+## [1.1.6] - 2026-04-20
+
+### 🔧 Chores
+
 - **deps**: update dependency postcss to v8.5.10 ([#304](https://github.com/etsa-tech/etsa.tech/pull/304)) by @renovate[bot]
 
 ## [1.1.6] - 2026-04-20
