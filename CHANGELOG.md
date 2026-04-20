@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency next-auth to v4.24.14 ([#302](https://github.com/etsa-tech/etsa.tech/pull/302)) by @renovate[bot]
+
+## [1.1.6] - 2026-04-20
+
+### 🔧 Chores
+
 - **deps**: update dependency autoprefixer to v10.5.0 ([#301](https://github.com/etsa-tech/etsa.tech/pull/301)) by @renovate[bot]
 
 ## [1.1.6] - 2026-04-11
