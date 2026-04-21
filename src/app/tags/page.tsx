@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { getTagsWithCount } from "@/lib/blog";
+import { getTagsWithCount, getTagGraph } from "@/lib/blog";
 import { getTagUrl } from "@/lib/utils";
+import TagCloud from "@/components/TagCloud";
 
 export const metadata: Metadata = {
   title: "All Tags - ETSA",
@@ -16,6 +17,11 @@ export const metadata: Metadata = {
 
 export default function TagsPage() {
   const tagsWithCount = getTagsWithCount();
+  const tagGraph = getTagGraph(3); // Get relationships up to 3 levels deep
+
+  // Convert graph data to format expected by TagCloud component
+  const nodes = tagsWithCount.map(({ tag, count }) => ({ tag, count }));
+  const edges = tagGraph.edges;
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -23,48 +29,115 @@ export default function TagsPage() {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-            All Tags
+            Interactive Tag Cloud
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-            Browse all topics and technologies covered in ETSA presentations.
-            Click any tag to see related presentations.
+            Explore how topics and technologies interconnect across ETSA presentations.
+            Larger nodes represent more popular tags, and lines show relationships up to 3 levels deep.
           </p>
         </div>
 
         {/* Stats */}
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center space-x-4">
           <div className="inline-flex items-center rounded-full bg-etsa-primary/10 dark:bg-etsa-primary/20 px-4 py-2 text-sm font-medium text-etsa-primary">
             {tagsWithCount.length} total tags
           </div>
+          <div className="inline-flex items-center rounded-full bg-blue-500/10 dark:bg-blue-500/20 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400">
+            {edges.length} connections
+          </div>
         </div>
 
-        {/* Tags Grid */}
+        {/* Interactive Tag Cloud */}
         <div className="mt-12">
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {tagsWithCount.map(({ tag, count }) => (
-              <Link
-                key={tag}
-                href={getTagUrl(tag)}
-                className="group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-etsa-primary dark:hover:border-etsa-primary"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-sm font-medium text-gray-900 dark:text-white group-hover:text-etsa-primary transition-colors">
-                      {tag}
-                    </h3>
-                  </div>
-                  <div className="ml-2 flex-shrink-0">
-                    <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-200">
-                      {count}
-                    </span>
-                  </div>
-                </div>
+          <TagCloud nodes={nodes} edges={edges} />
+        </div>
 
-                {/* Hover effect */}
-                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-etsa-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-              </Link>
-            ))}
+        {/* Legend */}
+        <div className="mt-8 bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            How to use the tag cloud
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-gray-400 dark:bg-gray-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">1</span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Node Size
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Larger nodes = more presentations with that tag
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-gray-400 dark:bg-gray-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">2</span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Connections
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Lines show tags that appear together in presentations
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-gray-400 dark:bg-gray-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">3</span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Interaction
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Hover to highlight, click to view presentations
+                </p>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Tag List (fallback/alternative view) */}
+        <div className="mt-12">
+          <details className="group">
+            <summary className="cursor-pointer text-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-etsa-primary transition-colors">
+              View as list
+            </summary>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {tagsWithCount.map(({ tag, count }) => (
+                <Link
+                  key={tag}
+                  href={getTagUrl(tag)}
+                  className="group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-etsa-primary dark:hover:border-etsa-primary"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-medium text-gray-900 dark:text-white group-hover:text-etsa-primary transition-colors">
+                        {tag}
+                      </h3>
+                    </div>
+                    <div className="ml-2 flex-shrink-0">
+                      <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-200">
+                        {count}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Hover effect */}
+                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-etsa-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
+                </Link>
+              ))}
+            </div>
+          </details>
         </div>
 
         {/* Back to Presentations */}
