@@ -1,10 +1,11 @@
 import { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/blog";
-import { getPostUrl } from "@/lib/utils";
+import { getAllPosts, getAnnouncements } from "@/lib/blog";
+import { getPostUrl, getAnnouncementUrl } from "@/lib/utils";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://etsa.tech";
   const posts = getAllPosts();
+  const announcements = getAnnouncements();
 
   // Static pages
   const staticPages = [
@@ -25,6 +26,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/announcements`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
     },
     {
       url: `${siteUrl}/tags`,
@@ -84,5 +91,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...postPages];
+  // Dynamic pages for announcements
+  const announcementPages = announcements.map((announcement) => ({
+    url: `${siteUrl}${getAnnouncementUrl(announcement.slug)}`,
+    lastModified: new Date(announcement.frontmatter.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...postPages, ...announcementPages];
 }
