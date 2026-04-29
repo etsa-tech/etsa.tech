@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.6] - 2026-04-29
+
+### 🐛 Bug Fixes
+
+- **posts**: aaron andersen may 2026 ([#317](https://github.com/etsa-tech/etsa.tech/pull/317)) by @bataylor976
+
 ## [1.1.6] - 2026-04-20
 
 ### 🔧 Chores
