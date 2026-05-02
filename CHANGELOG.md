@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update commitlint monorepo to v20.5.3 ([#313](https://github.com/etsa-tech/etsa.tech/pull/313)) by @renovate[bot]
+
+## [1.1.7] - 2026-05-02
+
+### 🔧 Chores
+
 - **deps**: update dependency react-hook-form to v7.75.0 ([#314](https://github.com/etsa-tech/etsa.tech/pull/314)) by @renovate[bot]
 
 ## [1.1.7] - 2026-05-02
