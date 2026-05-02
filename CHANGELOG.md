@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.7] - 2026-05-02
 
+### 🐛 Bug Fixes
+
+- **deps**: upgrade sanitize-html from 2.17.2 to 2.17.3 ([#310](https://github.com/etsa-tech/etsa.tech/pull/310)) by @wesleykirkland
+
+## [1.1.7] - 2026-05-02
+
 ### 🔧 Chores
 
 - **deps**: update tailwindcss monorepo to v4.2.4 ([#311](https://github.com/etsa-tech/etsa.tech/pull/311)) by @renovate[bot]
