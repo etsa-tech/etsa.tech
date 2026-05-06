@@ -21,7 +21,7 @@ speakers:
       Aaron Andersen oversees NLRs Advanced Computing Operations group within the Computational Sciences Center, providing highly energy-efficient, high-performance computing (HPC) and artificial intelligence (AI) resources, on-prem cloud, and cloud technologies for researchers across the laboratory. He has crosscutting expertise in data center design, system architecture, engineering, and operations. Andersen has research interests in data centers, thermal management and optimization.
     linkedIn: https://www.linkedin.com/in/aaron-h-andersen/
 eventDate: "2026-05-05"
-recordingUrl:
+recordingUrl: https://youtu.be/i749lMjDkvY
 published: true
 ---
 
