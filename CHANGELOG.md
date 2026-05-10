@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update react monorepo to v19.2.6 ([#322](https://github.com/etsa-tech/etsa.tech/pull/322)) by @renovate[bot]
+
+## [1.1.8] - 2026-05-10
+
+### 🔧 Chores
+
 - **deps**: update dependency zod to v4.4.3 ([#320](https://github.com/etsa-tech/etsa.tech/pull/320)) by @renovate[bot]
 
 ## [1.1.8] - 2026-05-06
