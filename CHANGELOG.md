@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency @netlify/plugin-nextjs to v5.15.11 ([#325](https://github.com/etsa-tech/etsa.tech/pull/325)) by @renovate[bot]
+
+## [1.1.8] - 2026-05-10
+
+### 🔧 Chores
+
 - **deps**: update dependency @types/node to v24.12.3 ([#326](https://github.com/etsa-tech/etsa.tech/pull/326)) by @renovate[bot]
 
 ## [1.1.8] - 2026-05-10
