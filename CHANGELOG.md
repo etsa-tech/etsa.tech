@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
-- **deps**: update react monorepo to v19.2.6 ([#322](https://github.com/etsa-tech/etsa.tech/pull/322)) by @renovate[bot]
+- **deps**: update nextjs monorepo to v16.2.6 ([#323](https://github.com/etsa-tech/etsa.tech/pull/323)) by @renovate[bot]
 
 ## [1.1.8] - 2026-05-10
 
