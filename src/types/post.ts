@@ -49,6 +49,7 @@ export interface PostFrontmatter {
     contact?: string;
   };
   blogpost?: boolean; // Whether this is a blog post (true) or presentation (false/undefined)
+  announcement?: boolean; // Whether this is an announcement (true) or not (false/undefined)
   published?: boolean;
 }
 
