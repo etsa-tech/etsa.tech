@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-05-23
+
+### 🔧 Chores
+
+- **deps**: update dependency @hookform/resolvers to v5.4.0 ([#337](https://github.com/etsa-tech/etsa.tech/pull/337)) by @renovate[bot]
+
 ## [2.0.0] - 2026-05-10
 
 ### 🔧 Chores
