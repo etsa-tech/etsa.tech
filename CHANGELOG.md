@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update commitlint monorepo to v21.0.1 ([#332](https://github.com/etsa-tech/etsa.tech/pull/332)) by @renovate[bot]
+
+## [2.0.0] - 2026-05-23
+
+### 🔧 Chores
+
 - **deps**: update dependency sanitize-html to v2.17.4 ([#333](https://github.com/etsa-tech/etsa.tech/pull/333)) by @renovate[bot]
 
 ## [2.0.0] - 2026-05-23
