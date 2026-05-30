@@ -87,11 +87,18 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       const featureBranchPattern = `feature/${datePrefix}-`;
 
       // Sanitize title for branch name matching
-      const sanitizedTitle = String(title)
+      // Using non-backtracking approach to prevent ReDoS
+      let sanitizedTitle = String(title)
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+/, "") // Remove leading hyphens
-        .replace(/-+$/, ""); // Remove trailing hyphens
+        .replace(/[^a-z0-9]+/g, "-");
+
+      // Trim leading and trailing hyphens safely
+      while (sanitizedTitle.startsWith("-")) {
+        sanitizedTitle = sanitizedTitle.slice(1);
+      }
+      while (sanitizedTitle.endsWith("-")) {
+        sanitizedTitle = sanitizedTitle.slice(0, -1);
+      }
 
       // New patterns - fix/ and chore/
       const fixBranchPattern = `fix/${sanitizedTitle}`;

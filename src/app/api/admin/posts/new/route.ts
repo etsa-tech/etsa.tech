@@ -49,11 +49,19 @@ export async function POST(request: NextRequest) {
 
       // Create branch name in format: feature/EVENTDATE-EVENTTITLE
       // Sanitize title for branch name (replace spaces and special chars with hyphens)
-      const sanitizedTitle = String(title)
+      // Using non-backtracking approach to prevent ReDoS
+      let sanitizedTitle = String(title)
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+/, "") // Remove leading hyphens
-        .replace(/-+$/, ""); // Remove trailing hyphens
+        .replace(/[^a-z0-9]+/g, "-");
+
+      // Trim leading and trailing hyphens safely
+      while (sanitizedTitle.startsWith("-")) {
+        sanitizedTitle = sanitizedTitle.slice(1);
+      }
+      while (sanitizedTitle.endsWith("-")) {
+        sanitizedTitle = sanitizedTitle.slice(0, -1);
+      }
+
       const branchName = `feature/${eventDate}-${sanitizedTitle}`;
 
       await createBranch(branchName);

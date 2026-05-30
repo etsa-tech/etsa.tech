@@ -250,11 +250,18 @@ export async function getOpenPRForPost(
     }
 
     // Sanitize title for branch name matching
-    const sanitizedTitle = String(postTitle)
+    // Using non-backtracking patterns to prevent ReDoS
+    let sanitizedTitle = String(postTitle)
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+/, "") // Remove leading hyphens
-      .replace(/-+$/, ""); // Remove trailing hyphens
+      .replace(/[^a-z0-9]+/g, "-");
+
+    // Trim leading and trailing hyphens safely
+    while (sanitizedTitle.startsWith("-")) {
+      sanitizedTitle = sanitizedTitle.slice(1);
+    }
+    while (sanitizedTitle.endsWith("-")) {
+      sanitizedTitle = sanitizedTitle.slice(0, -1);
+    }
 
     // Look for PRs with branches that match the post pattern
     // Old patterns for backward compatibility
