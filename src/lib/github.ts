@@ -238,22 +238,44 @@ export async function getOpenPRForPost(
       state: "open",
     });
 
+    // Get post title for matching fix/ and chore/ branches
+    let postTitle = slug;
+    try {
+      const postContent = await getBlogPost(slug);
+      const matter = (await import("gray-matter")).default;
+      const parsed = matter(postContent);
+      postTitle = parsed.data.title || slug;
+    } catch {
+      // If we can't get the post, use the slug
+    }
+
+    // Sanitize title for branch name matching
+    const sanitizedTitle = String(postTitle)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
     // Look for PRs with branches that match the post pattern
-    // Support both old pattern (update-post-{slug}-) and new pattern (feature/{date}-)
-    // Also support new-post- pattern for newly created posts
+    // Old patterns for backward compatibility
     const updateBranchPattern = `update-post-${slug}-`;
     const newPostBranchPattern = `new-post-${slug}-`;
 
-    // Extract date prefix from slug (YYYY-MM-DD format)
+    // Old feature pattern
     const datePrefix = slug.split("-").slice(0, 3).join("-");
     const featureBranchPattern = `feature/${datePrefix}-`;
+
+    // New patterns - fix/ and chore/
+    const fixBranchPattern = `fix/${sanitizedTitle}`;
+    const choreBranchPattern = `chore/${sanitizedTitle}`;
 
     const matchingPR = response.data.find((pr) => {
       const branchName = pr.head.ref;
       return (
         branchName.startsWith(updateBranchPattern) ||
         branchName.startsWith(newPostBranchPattern) ||
-        branchName.startsWith(featureBranchPattern)
+        branchName.startsWith(featureBranchPattern) ||
+        branchName === fixBranchPattern ||
+        branchName === choreBranchPattern
       );
     });
 

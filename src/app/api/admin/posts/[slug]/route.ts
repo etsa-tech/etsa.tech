@@ -72,11 +72,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const fullContent = await formatBlogPostContent(rawContent);
 
     if (createPR) {
-      // Extract event date and title for branch name and PR title
-      const eventDate =
-        frontmatter.eventDate ||
-        frontmatter.date ||
-        slug.split("-").slice(0, 3).join("-");
+      // Extract title for branch name and PR title
       const title = frontmatter.title || slug;
 
       // Check if there's already a branch for this post (support both old and new patterns)
@@ -86,15 +82,27 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       const updateBranchPattern = `update-post-${slug}-`;
       const newPostBranchPattern = `new-post-${slug}-`;
 
-      // New pattern
+      // Old feature pattern
       const datePrefix = slug.split("-").slice(0, 3).join("-");
       const featureBranchPattern = `feature/${datePrefix}-`;
+
+      // Sanitize title for branch name matching
+      const sanitizedTitle = String(title)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+      // New patterns - fix/ and chore/
+      const fixBranchPattern = `fix/${sanitizedTitle}`;
+      const choreBranchPattern = `chore/${sanitizedTitle}`;
 
       const existingBranch = allBranches.find(
         (branch) =>
           branch.startsWith(updateBranchPattern) ||
           branch.startsWith(newPostBranchPattern) ||
-          branch.startsWith(featureBranchPattern),
+          branch.startsWith(featureBranchPattern) ||
+          branch === fixBranchPattern ||
+          branch === choreBranchPattern,
       );
 
       let branchName: string;
@@ -121,13 +129,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           fileSha = fileData.sha;
         }
       } else {
-        // Create a new branch in the new format: feature/EVENTDATE-EVENTTITLE
-        const sanitizedTitle = String(title)
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
-        branchName = `feature/${eventDate}-${sanitizedTitle}`;
-        console.log(`Creating new feature branch: ${branchName}`);
+        // Create a new branch in the format: fix/posttitle
+        // Use 'fix' for content corrections/updates
+        branchName = `fix/${sanitizedTitle}`;
+        console.log(`Creating new fix branch: ${branchName}`);
         await createBranch(branchName);
 
         // Get the current file SHA from main branch for the update
@@ -148,7 +153,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
 
       // Create or get existing pull request with conventional commit format
-      const prTitle = `chore(blog): update ${eventDate}-${title}`;
+      // Subject is just the title, following conventional commits format
+      const prTitle = `fix(blog): ${sanitizedTitle}`;
       const { prNumber, isNew } = await createOrGetPullRequest(
         branchName,
         prTitle,

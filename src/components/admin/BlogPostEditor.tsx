@@ -221,6 +221,23 @@ async function searchGoogleMaps(query: string): Promise<{
   }
 }
 
+// Helper function to properly escape YAML string values
+function escapeYamlString(value: string): string {
+  // If the string contains special characters, wrap in quotes and escape internal quotes
+  if (
+    value.includes(":") ||
+    value.includes("#") ||
+    value.includes('"') ||
+    value.includes("'") ||
+    value.includes("\n") ||
+    value.trim() !== value
+  ) {
+    // Use double quotes and escape any internal double quotes
+    return `"${value.replace(/"/g, '\\"')}"`;
+  }
+  return value;
+}
+
 // Helper function to generate default YAML template with live data (ETSA format)
 function generateDefaultYamlTemplate(formData: BlogPostFormData): string {
   const tagsArray = formData.tags
@@ -232,13 +249,20 @@ function generateDefaultYamlTemplate(formData: BlogPostFormData): string {
   - Tag 2
   - Tag 3`;
 
-  const yaml = `title: ${formData.title || "Your Post Title"}
-date: ${formData.date || new Date().toISOString().split("T")[0]}
-excerpt: >-
-  ${
+  // Prepare single-line values with proper escaping
+  const title = escapeYamlString(formData.title || "Your Post Title");
+  const excerpt = escapeYamlString(
     formData.excerpt ||
-    "Brief description of your post content and what attendees will learn."
-  }
+      "Brief description of your post content and what attendees will learn.",
+  );
+  const speakerBio = escapeYamlString(
+    formData.speakerBio ||
+      "Brief speaker biography highlighting their experience and expertise.",
+  );
+
+  const yaml = `title: ${title}
+date: ${formData.date || new Date().toISOString().split("T")[0]}
+excerpt: ${excerpt}
 tags:
 ${tagsArray}
 author: ${formData.author || "ETSA"}
@@ -254,11 +278,7 @@ speakers:
           : "speaker_name"
       }.jpeg`
     }
-    bio: >-
-      ${
-        formData.speakerBio ||
-        "Brief speaker biography highlighting their experience and expertise."
-      }
+    bio: ${speakerBio}
     linkedIn: https://www.linkedin.com/in/speaker-profile/
 presentationSlides: ${formData.presentationSlides || "slides.pdf"}
 eventDate: ${formData.eventDate || getFirstTuesdayOfNextMonth()}

@@ -52,13 +52,9 @@ export async function POST(request: NextRequest) {
     // If we're on main branch, check for existing update branch or create new one
     if (currentBranch === "main") {
       try {
-        // Get the blog post to extract event date and title for branch naming
+        // Get the blog post to extract title for branch naming
         const blogPostContent = await getBlogPost(slug);
         const parsed = matter(blogPostContent);
-        const eventDate =
-          parsed.data.eventDate ||
-          parsed.data.date ||
-          slug.split("-").slice(0, 3).join("-");
         const title = parsed.data.title || slug;
 
         // Check if there's already a branch for this post (support both old and new patterns)
@@ -71,15 +67,27 @@ export async function POST(request: NextRequest) {
         const updateBranchPattern = `update-post-${slug}-`;
         const newPostBranchPattern = `new-post-${slug}-`;
 
-        // New pattern
+        // Old feature pattern
         const datePrefix = slug.split("-").slice(0, 3).join("-");
         const featureBranchPattern = `feature/${datePrefix}-`;
+
+        // Sanitize title for branch name matching
+        const sanitizedTitle = String(title)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+        // New patterns - fix/ and chore/
+        const fixBranchPattern = `fix/${sanitizedTitle}`;
+        const choreBranchPattern = `chore/${sanitizedTitle}`;
 
         const existingBranch = branches.find(
           (branch) =>
             branch.name.startsWith(updateBranchPattern) ||
             branch.name.startsWith(newPostBranchPattern) ||
-            branch.name.startsWith(featureBranchPattern),
+            branch.name.startsWith(featureBranchPattern) ||
+            branch.name === fixBranchPattern ||
+            branch.name === choreBranchPattern,
         );
 
         if (existingBranch) {
@@ -87,14 +95,10 @@ export async function POST(request: NextRequest) {
           targetBranch = existingBranch.name;
           console.log(`Using existing branch: ${targetBranch}`);
         } else {
-          // Create new branch in the new format: feature/EVENTDATE-EVENTTITLE
-          const sanitizedTitle = String(title)
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
-          const updateBranchName = `feature/${eventDate}-${sanitizedTitle}`;
+          // Create new branch in the format: fix/posttitle
+          const updateBranchName = `fix/${sanitizedTitle}`;
           console.log(
-            `Creating new feature branch for asset upload: ${updateBranchName}`,
+            `Creating new fix branch for asset upload: ${updateBranchName}`,
           );
           await createBranch(updateBranchName);
           targetBranch = updateBranchName;
@@ -156,18 +160,23 @@ Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
       try {
         // Get the blog post info for the PR title
         let postTitle = slug;
-        let eventDate = slug.split("-").slice(0, 3).join("-");
         try {
           const blogPostContent = await getBlogPost(slug);
           const parsed = matter(blogPostContent);
           postTitle = parsed.data.title || slug;
-          eventDate = parsed.data.eventDate || parsed.data.date || eventDate;
         } catch {
           // If we can't get the post info, use the slug
         }
 
+        // Sanitize title for PR subject
+        const sanitizedTitle = String(postTitle)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
         // Use conventional commit format for PR title
-        const prTitle = `chore(blog): update ${eventDate}-${postTitle}`;
+        // Subject is just the title, following conventional commits format
+        const prTitle = `fix(blog): ${sanitizedTitle}`;
         const { prNumber, isNew } = await createOrGetPullRequest(
           targetBranch,
           prTitle,
