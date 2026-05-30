@@ -1100,7 +1100,7 @@ export default function BlogPostEditor({
   const handleAssetDelete = async (assetName: string) => {
     if (!slug) return;
 
-    const confirmDelete = window.confirm(
+    const confirmDelete = globalThis.confirm(
       `Are you sure you want to delete "${assetName}"? This action cannot be undone.`,
     );
 

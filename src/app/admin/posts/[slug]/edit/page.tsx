@@ -233,7 +233,7 @@ export default function EditPostPage() {
         // After creating PR, navigate to the same page with branch parameter
         // This will trigger a full reload with the correct branch context
         if (result.branchName) {
-          const url = new URL(window.location.href);
+          const url = new URL(globalThis.location.href);
           url.searchParams.set("branch", result.branchName);
 
           setMessage({
