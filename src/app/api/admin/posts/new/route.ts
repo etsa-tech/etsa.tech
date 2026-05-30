@@ -39,27 +39,41 @@ export async function POST(request: NextRequest) {
     const fullContent = await formatBlogPostContent(rawContent);
 
     if (createPR) {
-      // Create a new branch for the changes
-      const branchName = `new-post-${slug}-${Date.now()}`;
+      // Extract event date and title for branch name and PR title
+      // Event date priority: eventDate > date > slug prefix (YYYY-MM-DD)
+      const eventDate =
+        frontmatter.eventDate ||
+        frontmatter.date ||
+        slug.split("-").slice(0, 3).join("-");
+      const title = frontmatter.title || slug;
+
+      // Create branch name in format: feature/EVENTDATE-EVENTTITLE
+      // Sanitize title for branch name (replace spaces and special chars with hyphens)
+      const sanitizedTitle = String(title)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+      const branchName = `feature/${eventDate}-${sanitizedTitle}`;
+
       await createBranch(branchName);
 
       // Create the file in the new branch
       await createOrUpdateFile(
         `posts/${slug}.md`,
         fullContent,
-        `Add new blog post: ${frontmatter.title || slug}`,
+        `Add new blog post: ${title}`,
         undefined,
         branchName,
       );
 
-      // Create pull request (new posts shouldn't have existing PRs, but use consistent function)
+      // Create pull request with conventional commit format: feat(blog): EVENTDATE-EVENTTITLE
+      const prTitle = `feat(blog): ${eventDate}-${title}`;
+
       const { prNumber, isNew } = await createOrGetPullRequest(
         branchName,
-        `Add new blog post: ${frontmatter.title || slug}`,
-        `This PR adds a new blog post "${
-          frontmatter.title || slug
-        }".\n\nCreated via ETSA Admin interface by ${session!.user
-          ?.name} (${session!.user?.email}).`,
+        prTitle,
+        `This PR adds a new blog post "${title}".\n\nCreated via ETSA Admin interface by ${session!
+          .user?.name} (${session!.user?.email}).`,
       );
 
       return NextResponse.json({

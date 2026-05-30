@@ -51,28 +51,50 @@ export async function POST(request: NextRequest) {
 
     // If we're on main branch, check for existing update branch or create new one
     if (currentBranch === "main") {
-      // Check if there's already an update branch for this post
-      const existingBranchPattern = `update-post-${slug}-`;
-
       try {
+        // Get the blog post to extract event date and title for branch naming
+        const blogPostContent = await getBlogPost(slug);
+        const parsed = matter(blogPostContent);
+        const eventDate =
+          parsed.data.eventDate ||
+          parsed.data.date ||
+          slug.split("-").slice(0, 3).join("-");
+        const title = parsed.data.title || slug;
+
+        // Check if there's already a branch for this post (support both old and new patterns)
         const { data: branches } = await octokit.rest.repos.listBranches({
           owner,
           repo,
         });
 
-        const existingBranch = branches.find((branch) =>
-          branch.name.startsWith(existingBranchPattern),
+        // Old patterns for backward compatibility
+        const updateBranchPattern = `update-post-${slug}-`;
+        const newPostBranchPattern = `new-post-${slug}-`;
+
+        // New pattern
+        const datePrefix = slug.split("-").slice(0, 3).join("-");
+        const featureBranchPattern = `feature/${datePrefix}-`;
+
+        const existingBranch = branches.find(
+          (branch) =>
+            branch.name.startsWith(updateBranchPattern) ||
+            branch.name.startsWith(newPostBranchPattern) ||
+            branch.name.startsWith(featureBranchPattern),
         );
 
         if (existingBranch) {
           // Use existing branch
           targetBranch = existingBranch.name;
-          console.log(`Using existing update branch: ${targetBranch}`);
+          console.log(`Using existing branch: ${targetBranch}`);
         } else {
-          // Create new branch
-          const updateBranchName = `update-post-${slug}-${Date.now()}`;
+          // Create new branch in the new format: feature/EVENTDATE-EVENTTITLE
+          const sanitizedTitle = String(title)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+          const updateBranchName = `feature/${eventDate}-${sanitizedTitle}`;
           console.log(
-            `Creating new update branch for asset upload: ${updateBranchName}`,
+            `Creating new feature branch for asset upload: ${updateBranchName}`,
           );
           await createBranch(updateBranchName);
           targetBranch = updateBranchName;
@@ -132,19 +154,23 @@ Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
     let prInfo = null;
     if (shouldCreatePR) {
       try {
-        // Get the blog post title for the PR
+        // Get the blog post info for the PR title
         let postTitle = slug;
+        let eventDate = slug.split("-").slice(0, 3).join("-");
         try {
           const blogPostContent = await getBlogPost(slug);
           const parsed = matter(blogPostContent);
           postTitle = parsed.data.title || slug;
+          eventDate = parsed.data.eventDate || parsed.data.date || eventDate;
         } catch {
-          // If we can't get the post title, use the slug
+          // If we can't get the post info, use the slug
         }
 
+        // Use conventional commit format for PR title
+        const prTitle = `chore(blog): update ${eventDate}-${postTitle}`;
         const { prNumber, isNew } = await createOrGetPullRequest(
           targetBranch,
-          `Update blog post: ${postTitle}`,
+          prTitle,
           `This PR updates the blog post "${postTitle}" by uploading the asset "${
             file.name
           }".\n\nChanges made via ETSA Admin interface by ${session!.user

@@ -72,20 +72,38 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const fullContent = await formatBlogPostContent(rawContent);
 
     if (createPR) {
-      // Check if there's already an update branch for this post
+      // Extract event date and title for branch name and PR title
+      const eventDate =
+        frontmatter.eventDate ||
+        frontmatter.date ||
+        slug.split("-").slice(0, 3).join("-");
+      const title = frontmatter.title || slug;
+
+      // Check if there's already a branch for this post (support both old and new patterns)
       const allBranches = await getBranches();
+
+      // Old patterns for backward compatibility
       const updateBranchPattern = `update-post-${slug}-`;
-      const existingUpdateBranch = allBranches.find((branch) =>
-        branch.startsWith(updateBranchPattern),
+      const newPostBranchPattern = `new-post-${slug}-`;
+
+      // New pattern
+      const datePrefix = slug.split("-").slice(0, 3).join("-");
+      const featureBranchPattern = `feature/${datePrefix}-`;
+
+      const existingBranch = allBranches.find(
+        (branch) =>
+          branch.startsWith(updateBranchPattern) ||
+          branch.startsWith(newPostBranchPattern) ||
+          branch.startsWith(featureBranchPattern),
       );
 
       let branchName: string;
       let fileSha: string;
 
-      if (existingUpdateBranch) {
-        // Use existing update branch
-        branchName = existingUpdateBranch;
-        console.log(`Using existing update branch: ${branchName}`);
+      if (existingBranch) {
+        // Use existing branch
+        branchName = existingBranch;
+        console.log(`Using existing branch: ${branchName}`);
 
         // Get the file SHA from the existing branch
         try {
@@ -103,9 +121,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           fileSha = fileData.sha;
         }
       } else {
-        // Create a new branch for this post
-        branchName = `update-post-${slug}-${Date.now()}`;
-        console.log(`Creating new update branch: ${branchName}`);
+        // Create a new branch in the new format: feature/EVENTDATE-EVENTTITLE
+        const sanitizedTitle = String(title)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+        branchName = `feature/${eventDate}-${sanitizedTitle}`;
+        console.log(`Creating new feature branch: ${branchName}`);
         await createBranch(branchName);
 
         // Get the current file SHA from main branch for the update
@@ -120,18 +142,18 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       await createOrUpdateFile(
         `posts/${slug}.md`,
         fullContent,
-        `Update blog post: ${frontmatter.title || slug}`,
+        `Update blog post: ${title}`,
         fileSha,
         branchName,
       );
 
-      // Create or get existing pull request
+      // Create or get existing pull request with conventional commit format
+      const prTitle = `chore(blog): update ${eventDate}-${title}`;
       const { prNumber, isNew } = await createOrGetPullRequest(
         branchName,
-        `Update blog post: ${frontmatter.title || slug}`,
-        `This PR updates the blog post "${
-          frontmatter.title || slug
-        }".\n\nChanges made by ${session!.user?.name}.`,
+        prTitle,
+        `This PR updates the blog post "${title}".\n\nChanges made by ${session!
+          .user?.name}.`,
       );
 
       return NextResponse.json({

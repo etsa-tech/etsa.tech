@@ -239,10 +239,23 @@ export async function getOpenPRForPost(
     });
 
     // Look for PRs with branches that match the post pattern
+    // Support both old pattern (update-post-{slug}-) and new pattern (feature/{date}-)
+    // Also support new-post- pattern for newly created posts
     const updateBranchPattern = `update-post-${slug}-`;
-    const matchingPR = response.data.find((pr) =>
-      pr.head.ref.startsWith(updateBranchPattern),
-    );
+    const newPostBranchPattern = `new-post-${slug}-`;
+
+    // Extract date prefix from slug (YYYY-MM-DD format)
+    const datePrefix = slug.split("-").slice(0, 3).join("-");
+    const featureBranchPattern = `feature/${datePrefix}-`;
+
+    const matchingPR = response.data.find((pr) => {
+      const branchName = pr.head.ref;
+      return (
+        branchName.startsWith(updateBranchPattern) ||
+        branchName.startsWith(newPostBranchPattern) ||
+        branchName.startsWith(featureBranchPattern)
+      );
+    });
 
     if (matchingPR) {
       return {
