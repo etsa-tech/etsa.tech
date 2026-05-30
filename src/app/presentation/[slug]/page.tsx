@@ -6,7 +6,7 @@ import sanitizeHtml from "sanitize-html";
 import {
   getPostBySlug,
   getPresentationPostSlugs,
-  getRecentPosts,
+  getRecentPresentationPosts,
 } from "@/lib/blog";
 import { formatDate, getTagUrl, getPostSpeakers } from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
@@ -75,7 +75,9 @@ export default async function PresentationPage({
 
   const speakers = getPostSpeakers(frontmatter);
 
-  const recentPosts = getRecentPosts(3).filter((p) => p.slug !== decodedSlug);
+  const recentPosts = getRecentPresentationPosts(3).filter(
+    (p) => p.slug !== decodedSlug,
+  );
 
   return (
     <div className="container py-12">

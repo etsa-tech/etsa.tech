@@ -67,7 +67,23 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const branch = searchParams.get("branch") || "main";
 
     // Combine frontmatter and content
-    const rawContent = matter.stringify(content, frontmatter);
+    // Configure YAML options to force single-line strings (no block scalars)
+    const yaml = require("js-yaml");
+    const rawContent = matter.stringify(content, frontmatter, {
+      engines: {
+        yaml: {
+          parse: (input: string) => yaml.load(input),
+          stringify: (data: unknown) => {
+            return yaml.dump(data, {
+              lineWidth: -1, // Disable line wrapping
+              forceQuotes: true, // Always use quotes for strings
+              quotingType: '"', // Use double quotes
+              flowLevel: -1, // Use block style for collections, but not scalars
+            });
+          },
+        },
+      },
+    });
 
     // Format the content using Prettier for consistent formatting
     const fullContent = await formatBlogPostContent(rawContent);
