@@ -223,17 +223,19 @@ async function searchGoogleMaps(query: string): Promise<{
 
 // Helper function to properly escape YAML string values
 function escapeYamlString(value: string): string {
-  // If the string contains special characters, wrap in quotes and escape internal quotes
+  // If the string contains special characters, wrap in quotes and escape properly
   if (
     value.includes(":") ||
     value.includes("#") ||
     value.includes('"') ||
     value.includes("'") ||
+    value.includes("\\") ||
     value.includes("\n") ||
     value.trim() !== value
   ) {
-    // Use double quotes and escape any internal double quotes
-    return `"${value.replace(/"/g, '\\"')}"`;
+    // Use double quotes and escape backslashes first, then double quotes
+    // This prevents injection vulnerabilities
+    return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
   }
   return value;
 }
