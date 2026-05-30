@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.0] - 2026-05-30
 
+### 🐛 Bug Fixes
+
+- admin console ([#345](https://github.com/etsa-tech/etsa.tech/pull/345)) by @wesleykirkland
+
+## [2.1.0] - 2026-05-30
+
 ### 🔧 Chores
 
 - **deps**: update dependency nodemailer to v8.0.10 ([#340](https://github.com/etsa-tech/etsa.tech/pull/340)) by @renovate[bot]
