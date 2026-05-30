@@ -9,6 +9,7 @@ import { remark } from "remark";
 import html from "remark-html";
 import yaml from "js-yaml";
 import Image from "next/image";
+import { sanitizeForBranchName } from "@/lib/utils";
 
 // Dynamically import Monaco Editor to avoid SSR issues
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
@@ -937,11 +938,21 @@ export default function BlogPostEditor({
   }, [content]);
 
   // Determine if we're on an update branch for THIS specific post
-  const isUpdateBranchForThisPost = currentBranch.startsWith(
-    `update-post-${slug}-`,
-  );
+  // Check both old pattern (update-post-${slug}-) and new pattern (fix/${sanitized-title})
+  const postTitle = title || initialData?.frontmatter?.title || "";
+  const sanitizedTitle = sanitizeForBranchName(postTitle);
+
+  const isUpdateBranchForThisPost =
+    currentBranch.startsWith(`update-post-${slug}-`) || // Old pattern
+    currentBranch === `fix/${sanitizedTitle}` || // New pattern (exact match)
+    (currentBranch.startsWith("feature/") &&
+      currentBranch.includes(sanitizedTitle)); // New post pattern
+
   const isUpdateBranchForOtherPost =
-    currentBranch.startsWith("update-post-") && !isUpdateBranchForThisPost;
+    (currentBranch.startsWith("update-post-") ||
+      currentBranch.startsWith("fix/")) &&
+    !isUpdateBranchForThisPost;
+
   const isMainBranch = currentBranch === "main";
 
   // Function to fetch existing assets for the current slug
@@ -1089,7 +1100,7 @@ export default function BlogPostEditor({
   const handleAssetDelete = async (assetName: string) => {
     if (!slug) return;
 
-    const confirmDelete = window.confirm(
+    const confirmDelete = globalThis.confirm(
       `Are you sure you want to delete "${assetName}"? This action cannot be undone.`,
     );
 
