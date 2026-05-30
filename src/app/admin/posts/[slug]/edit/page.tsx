@@ -230,16 +230,21 @@ export default function EditPostPage() {
       });
 
       if (data.createPR) {
-        // After creating PR, refresh the page to show the update branch UI
-        setTimeout(() => {
+        // After creating PR, navigate to the same page with branch parameter
+        // This will trigger a full reload with the correct branch context
+        if (result.branchName) {
+          const url = new URL(window.location.href);
+          url.searchParams.set("branch", result.branchName);
+
           setMessage({
             type: "success",
-            text: "Refreshing to show update branch interface...",
+            text: `${successMessage} Switching to PR branch...`,
           });
+
           setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        }, 1500);
+            router.push(url.pathname + url.search);
+          }, 1000);
+        }
       } else {
         // For direct saves, redirect to posts list
         setTimeout(() => {

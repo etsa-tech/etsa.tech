@@ -11,8 +11,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@commitlint/cli@^20.3.1",
-        "npm:@commitlint/config-conventional@^20.3.1",
+        "npm:@commitlint/cli@21",
+        "npm:@commitlint/config-conventional@21",
         "npm:@eslint/eslintrc@3",
         "npm:@hcaptcha/react-hcaptcha@2",
         "npm:@hookform/resolvers@^5.2.1",
@@ -24,12 +24,12 @@
         "npm:@tailwindcss/typography@~0.5.0-alpha.3",
         "npm:@types/js-yaml@^4.0.9",
         "npm:@types/node@24",
-        "npm:@types/nodemailer@7",
+        "npm:@types/nodemailer@8",
         "npm:@types/react-dom@19",
         "npm:@types/react@19",
         "npm:@types/sanitize-html@^2.16.0",
         "npm:autoprefixer@^10.4.21",
-        "npm:conventional-changelog-cli@5",
+        "npm:conventional-changelog@^7.2.0",
         "npm:eslint-config-next@^16.0.1",
         "npm:eslint@9",
         "npm:gray-matter@^4.0.3",
@@ -46,10 +46,10 @@
         "npm:remark-gfm@^4.0.1",
         "npm:remark-html@^16.0.1",
         "npm:remark@^15.0.1",
-        "npm:sanitize-html@^2.17.0",
+        "npm:sanitize-html@^2.17.3",
         "npm:server-only@^0.0.1",
         "npm:tailwindcss@^4.1.11",
-        "npm:typescript@5.9.3",
+        "npm:typescript@6.0.3",
         "npm:zod@4"
       ]
     }

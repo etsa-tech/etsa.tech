@@ -126,7 +126,11 @@ export default async function PresentationPage({
                 {eventLocation && (
                   <>
                     <span>•</span>
-                    <span>{eventLocation}</span>
+                    <span>
+                      {typeof eventLocation === "string"
+                        ? eventLocation
+                        : eventLocation.name}
+                    </span>
                   </>
                 )}
               </div>

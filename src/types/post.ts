@@ -34,7 +34,16 @@ export interface PostFrontmatter {
   presentationSlides?: string;
   recordingUrl?: string;
   eventDate?: string;
-  eventLocation?: string;
+  eventLocation?:
+    | string
+    | {
+        name: string;
+        address?: string;
+        coordinates?: {
+          lat: string;
+          lng: string;
+        };
+      };
   meetingDate?: string;
   meetingLocation?: {
     name: string;
