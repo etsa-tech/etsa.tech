@@ -55,6 +55,11 @@ interface BlogPostFrontmatter {
     title?: string;
     company?: string;
     bio?: string;
+    image?: string;
+    linkedIn?: string;
+    twitter?: string;
+    github?: string;
+    website?: string;
   }>;
   speakerName?: string;
   speakerTitle?: string;
@@ -216,6 +221,25 @@ async function searchGoogleMaps(query: string): Promise<{
   }
 }
 
+// Helper function to properly escape YAML string values
+function escapeYamlString(value: string): string {
+  // If the string contains special characters, wrap in quotes and escape properly
+  if (
+    value.includes(":") ||
+    value.includes("#") ||
+    value.includes('"') ||
+    value.includes("'") ||
+    value.includes("\\") ||
+    value.includes("\n") ||
+    value.trim() !== value
+  ) {
+    // Use double quotes and escape backslashes first, then double quotes
+    // This prevents injection vulnerabilities
+    return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  }
+  return value;
+}
+
 // Helper function to generate default YAML template with live data (ETSA format)
 function generateDefaultYamlTemplate(formData: BlogPostFormData): string {
   const tagsArray = formData.tags
@@ -227,13 +251,20 @@ function generateDefaultYamlTemplate(formData: BlogPostFormData): string {
   - Tag 2
   - Tag 3`;
 
-  const yaml = `title: ${formData.title || "Your Post Title"}
-date: ${formData.date || new Date().toISOString().split("T")[0]}
-excerpt: >-
-  ${
+  // Prepare single-line values with proper escaping
+  const title = escapeYamlString(formData.title || "Your Post Title");
+  const excerpt = escapeYamlString(
     formData.excerpt ||
-    "Brief description of your post content and what attendees will learn."
-  }
+      "Brief description of your post content and what attendees will learn.",
+  );
+  const speakerBio = escapeYamlString(
+    formData.speakerBio ||
+      "Brief speaker biography highlighting their experience and expertise.",
+  );
+
+  const yaml = `title: ${title}
+date: ${formData.date || new Date().toISOString().split("T")[0]}
+excerpt: ${excerpt}
 tags:
 ${tagsArray}
 author: ${formData.author || "ETSA"}
@@ -249,11 +280,7 @@ speakers:
           : "speaker_name"
       }.jpeg`
     }
-    bio: >-
-      ${
-        formData.speakerBio ||
-        "Brief speaker biography highlighting their experience and expertise."
-      }
+    bio: ${speakerBio}
     linkedIn: https://www.linkedin.com/in/speaker-profile/
 presentationSlides: ${formData.presentationSlides || "slides.pdf"}
 eventDate: ${formData.eventDate || getFirstTuesdayOfNextMonth()}
@@ -343,14 +370,7 @@ function reconstructYamlContent(
         published: formData.published,
       };
 
-      // Add optional fields if they have values
-      if (formData.speakerName)
-        extractedFields.speakerName = formData.speakerName;
-      if (formData.speakerTitle)
-        extractedFields.speakerTitle = formData.speakerTitle;
-      if (formData.speakerCompany)
-        extractedFields.speakerCompany = formData.speakerCompany;
-      if (formData.speakerBio) extractedFields.speakerBio = formData.speakerBio;
+      // Only add optional presentation/event fields if they have values
       if (formData.presentationTitle)
         extractedFields.presentationTitle = formData.presentationTitle;
       if (formData.presentationDescription)
@@ -364,10 +384,15 @@ function reconstructYamlContent(
       if (formData.eventLocation)
         extractedFields.eventLocation = formData.eventLocation;
 
+      // IMPORTANT: Do NOT add legacy speaker fields (speakerName, speakerTitle, etc.)
+      // The YAML editor should contain the modern 'speakers' array, and we preserve
+      // whatever is in parsedRaw. Form fields are only for preview/convenience.
+
       return { ...parsedRaw, ...extractedFields };
     }
 
-    // Fallback to form data only
+    // Fallback to form data only - should rarely happen
+    // When it does, don't include speaker fields at all since they should be in YAML
     return {
       title: formData.title,
       date: formData.date,
@@ -378,12 +403,6 @@ function reconstructYamlContent(
         .filter(Boolean),
       author: formData.author,
       published: formData.published,
-      ...(formData.speakerName && { speakerName: formData.speakerName }),
-      ...(formData.speakerTitle && { speakerTitle: formData.speakerTitle }),
-      ...(formData.speakerCompany && {
-        speakerCompany: formData.speakerCompany,
-      }),
-      ...(formData.speakerBio && { speakerBio: formData.speakerBio }),
       ...(formData.presentationTitle && {
         presentationTitle: formData.presentationTitle,
       }),
@@ -695,6 +714,27 @@ function createDefaultValues(
 ): BlogPostFormData {
   const frontmatter = initialData?.frontmatter;
 
+  // Extract speaker data from either legacy fields or speakers array (first speaker)
+  let speakerName = getStringValue(frontmatter?.speakerName);
+  let speakerTitle = getStringValue(frontmatter?.speakerTitle);
+  let speakerCompany = getStringValue(frontmatter?.speakerCompany);
+  let speakerBio = getStringValue(frontmatter?.speakerBio);
+  let speakerImage = getStringValue(frontmatter?.speakerImage);
+
+  // If no legacy fields but speakers array exists, use first speaker
+  if (
+    !speakerName &&
+    Array.isArray(frontmatter?.speakers) &&
+    frontmatter.speakers.length > 0
+  ) {
+    const firstSpeaker = frontmatter.speakers[0];
+    speakerName = getStringValue(firstSpeaker.name);
+    speakerTitle = getStringValue(firstSpeaker.title);
+    speakerCompany = getStringValue(firstSpeaker.company);
+    speakerBio = getStringValue(firstSpeaker.bio);
+    speakerImage = getStringValue(firstSpeaker.image);
+  }
+
   return {
     title: getStringValue(frontmatter?.title),
     date: getStringValue(
@@ -704,11 +744,11 @@ function createDefaultValues(
     excerpt: getStringValue(frontmatter?.excerpt),
     tags: Array.isArray(frontmatter?.tags) ? frontmatter.tags.join(", ") : "",
     author: getStringValue(frontmatter?.author, "ETSA"), // Default to ETSA
-    speakerName: getStringValue(frontmatter?.speakerName),
-    speakerTitle: getStringValue(frontmatter?.speakerTitle),
-    speakerCompany: getStringValue(frontmatter?.speakerCompany),
-    speakerBio: getStringValue(frontmatter?.speakerBio),
-    speakerImage: getStringValue(frontmatter?.speakerImage),
+    speakerName,
+    speakerTitle,
+    speakerCompany,
+    speakerBio,
+    speakerImage,
     presentationTitle: getStringValue(frontmatter?.presentationTitle),
     presentationDescription: getStringValue(
       frontmatter?.presentationDescription,
@@ -1368,9 +1408,21 @@ export default function BlogPostEditor({
 
           {/* Speaker Information Section */}
           <div className="mt-8">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Speaker Information
-            </h3>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Speaker Information
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  For multiple speakers, use the YAML editor below to add
+                  additional speakers to the{" "}
+                  <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">
+                    speakers
+                  </code>{" "}
+                  array.
+                </p>
+              </div>
+            </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label

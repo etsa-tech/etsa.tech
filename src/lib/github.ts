@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { getGitHubClient, getRepoInfo } from "./github-app";
+import { sanitizeForBranchName } from "./utils";
 
 // Legacy function to get octokit client - now uses GitHub App
 async function getOctokit(): Promise<Octokit> {
@@ -238,11 +239,43 @@ export async function getOpenPRForPost(
       state: "open",
     });
 
+    // Get post title for matching fix/ and chore/ branches
+    let postTitle = slug;
+    try {
+      const postContent = await getBlogPost(slug);
+      const matter = (await import("gray-matter")).default;
+      const parsed = matter(postContent);
+      postTitle = parsed.data.title || slug;
+    } catch {
+      // If we can't get the post, use the slug
+    }
+
+    // Sanitize title for branch name matching
+    const sanitizedTitle = sanitizeForBranchName(postTitle);
+
     // Look for PRs with branches that match the post pattern
+    // Old patterns for backward compatibility
     const updateBranchPattern = `update-post-${slug}-`;
-    const matchingPR = response.data.find((pr) =>
-      pr.head.ref.startsWith(updateBranchPattern),
-    );
+    const newPostBranchPattern = `new-post-${slug}-`;
+
+    // Old feature pattern
+    const datePrefix = slug.split("-").slice(0, 3).join("-");
+    const featureBranchPattern = `feature/${datePrefix}-`;
+
+    // New patterns - fix/ and chore/
+    const fixBranchPattern = `fix/${sanitizedTitle}`;
+    const choreBranchPattern = `chore/${sanitizedTitle}`;
+
+    const matchingPR = response.data.find((pr) => {
+      const branchName = pr.head.ref;
+      return (
+        branchName.startsWith(updateBranchPattern) ||
+        branchName.startsWith(newPostBranchPattern) ||
+        branchName.startsWith(featureBranchPattern) ||
+        branchName === fixBranchPattern ||
+        branchName === choreBranchPattern
+      );
+    });
 
     if (matchingPR) {
       return {

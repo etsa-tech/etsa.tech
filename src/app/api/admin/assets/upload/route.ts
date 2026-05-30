@@ -9,6 +9,7 @@ import {
   getBlogPost,
 } from "@/lib/github";
 import matter from "gray-matter";
+import { sanitizeForBranchName } from "@/lib/utils";
 
 // Force dynamic rendering - don't try to statically analyze this route
 export const dynamic = "force-dynamic";
@@ -51,28 +52,51 @@ export async function POST(request: NextRequest) {
 
     // If we're on main branch, check for existing update branch or create new one
     if (currentBranch === "main") {
-      // Check if there's already an update branch for this post
-      const existingBranchPattern = `update-post-${slug}-`;
-
       try {
+        // Get the blog post to extract title for branch naming
+        const blogPostContent = await getBlogPost(slug);
+        const parsed = matter(blogPostContent);
+        const title = parsed.data.title || slug;
+
+        // Check if there's already a branch for this post (support both old and new patterns)
         const { data: branches } = await octokit.rest.repos.listBranches({
           owner,
           repo,
         });
 
-        const existingBranch = branches.find((branch) =>
-          branch.name.startsWith(existingBranchPattern),
+        // Old patterns for backward compatibility
+        const updateBranchPattern = `update-post-${slug}-`;
+        const newPostBranchPattern = `new-post-${slug}-`;
+
+        // Old feature pattern
+        const datePrefix = slug.split("-").slice(0, 3).join("-");
+        const featureBranchPattern = `feature/${datePrefix}-`;
+
+        // Sanitize title for branch name matching
+        const sanitizedTitle = sanitizeForBranchName(title);
+
+        // New patterns - fix/ and chore/
+        const fixBranchPattern = `fix/${sanitizedTitle}`;
+        const choreBranchPattern = `chore/${sanitizedTitle}`;
+
+        const existingBranch = branches.find(
+          (branch) =>
+            branch.name.startsWith(updateBranchPattern) ||
+            branch.name.startsWith(newPostBranchPattern) ||
+            branch.name.startsWith(featureBranchPattern) ||
+            branch.name === fixBranchPattern ||
+            branch.name === choreBranchPattern,
         );
 
         if (existingBranch) {
           // Use existing branch
           targetBranch = existingBranch.name;
-          console.log(`Using existing update branch: ${targetBranch}`);
+          console.log(`Using existing branch: ${targetBranch}`);
         } else {
-          // Create new branch
-          const updateBranchName = `update-post-${slug}-${Date.now()}`;
+          // Create new branch in the format: fix/posttitle
+          const updateBranchName = `fix/${sanitizedTitle}`;
           console.log(
-            `Creating new update branch for asset upload: ${updateBranchName}`,
+            `Creating new fix branch for asset upload: ${updateBranchName}`,
           );
           await createBranch(updateBranchName);
           targetBranch = updateBranchName;
@@ -132,19 +156,25 @@ Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
     let prInfo = null;
     if (shouldCreatePR) {
       try {
-        // Get the blog post title for the PR
+        // Get the blog post info for the PR title
         let postTitle = slug;
         try {
           const blogPostContent = await getBlogPost(slug);
           const parsed = matter(blogPostContent);
           postTitle = parsed.data.title || slug;
         } catch {
-          // If we can't get the post title, use the slug
+          // If we can't get the post info, use the slug
         }
 
+        // Sanitize title for PR subject
+        const sanitizedTitle = sanitizeForBranchName(postTitle);
+
+        // Use conventional commit format for PR title
+        // Subject is just the title, following conventional commits format
+        const prTitle = `fix(blog): ${sanitizedTitle}`;
         const { prNumber, isNew } = await createOrGetPullRequest(
           targetBranch,
-          `Update blog post: ${postTitle}`,
+          prTitle,
           `This PR updates the blog post "${postTitle}" by uploading the asset "${
             file.name
           }".\n\nChanges made via ETSA Admin interface by ${session!.user

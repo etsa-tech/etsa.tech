@@ -90,15 +90,17 @@ export default function NewPostPage() {
       });
 
       if (data.createPR && !openPR) {
-        // For new PR creation, redirect to edit page
+        // For new PR creation, redirect to edit page with branch parameter
         setTimeout(() => {
           setMessage({
             type: "success",
             text: "Redirecting to edit page...",
           });
           setTimeout(() => {
-            // Use the slug from the API response to ensure consistency
-            const editUrl = `/admin/posts/${result.slug}/edit`;
+            // Use the slug and branchName from the API response to ensure consistency
+            const editUrl = `/admin/posts/${
+              result.slug
+            }/edit?branch=${encodeURIComponent(result.branchName)}`;
             console.log("Redirecting to:", editUrl);
             router.push(editUrl);
           }, 500);

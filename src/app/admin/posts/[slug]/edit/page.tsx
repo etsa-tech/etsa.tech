@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import { useAdmin } from "@/contexts/AdminContext";
 
 export default function EditPostPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
   const { selectedBranch, setSelectedBranch, availableBranches } = useAdmin();
 
@@ -29,8 +30,10 @@ export default function EditPostPage() {
   const [viewBranch, setViewBranch] = useState<string>(""); // One-time branch selector
   const [prCheckComplete, setPrCheckComplete] = useState(false);
 
-  // Check for open PR for this post
+  // Check for open PR for this post and handle URL branch parameter
   useEffect(() => {
+    const branchParam = searchParams.get("branch");
+
     const checkOpenPR = async () => {
       try {
         const response = await fetch(`/api/admin/posts/${slug}/pr`);
@@ -38,28 +41,55 @@ export default function EditPostPage() {
           const data = await response.json();
           if (data.openPR) {
             console.log(
-              `Found open PR #${data.openPR.prNumber} for post ${slug}, using branch: ${data.openPR.branchName}`,
+              `Found open PR #${data.openPR.prNumber} for post ${slug}`,
             );
             setOpenPR(data.openPR);
-            // Set the default view branch to the PR branch
-            setViewBranch(data.openPR.branchName);
+
+            // If branch is specified in URL, use that; otherwise use PR branch
+            if (branchParam) {
+              console.log(
+                `Edit page: Using branch from URL parameter: ${branchParam}`,
+              );
+              setViewBranch(branchParam);
+            } else {
+              console.log(
+                `Edit page: Using PR branch: ${data.openPR.branchName}`,
+              );
+              setViewBranch(data.openPR.branchName);
+            }
           } else {
-            console.log(
-              `No open PR found for post ${slug}, using branch: ${selectedBranch}`,
-            );
-            // No open PR, use selectedBranch
-            setViewBranch(selectedBranch);
+            console.log(`No open PR found for post ${slug}`);
+
+            // If branch is specified in URL, use that; otherwise use selectedBranch
+            if (branchParam) {
+              console.log(
+                `Edit page: Using branch from URL parameter: ${branchParam}`,
+              );
+              setViewBranch(branchParam);
+            } else {
+              console.log(
+                `Edit page: Using selected branch: ${selectedBranch}`,
+              );
+              setViewBranch(selectedBranch);
+            }
           }
         } else {
-          console.log(
-            `Error checking PR for post ${slug}, using branch: ${selectedBranch}`,
-          );
-          // Error or no PR, use selectedBranch
-          setViewBranch(selectedBranch);
+          console.log(`Error checking PR for post ${slug}`);
+          // If branch is specified in URL, use that; otherwise use selectedBranch
+          if (branchParam) {
+            setViewBranch(branchParam);
+          } else {
+            setViewBranch(selectedBranch);
+          }
         }
       } catch (error) {
         console.error("Error checking for open PR:", error);
-        setViewBranch(selectedBranch);
+        // If branch is specified in URL, use that; otherwise use selectedBranch
+        if (branchParam) {
+          setViewBranch(branchParam);
+        } else {
+          setViewBranch(selectedBranch);
+        }
       } finally {
         setPrCheckComplete(true);
       }
@@ -68,7 +98,7 @@ export default function EditPostPage() {
     if (slug && selectedBranch) {
       checkOpenPR();
     }
-  }, [slug, selectedBranch]);
+  }, [slug, selectedBranch, searchParams]);
 
   // Check for existing update branch for this post and switch to it
   useEffect(() => {
