@@ -253,7 +253,8 @@ export async function getOpenPRForPost(
     const sanitizedTitle = String(postTitle)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+      .replace(/^-+/, "") // Remove leading hyphens
+      .replace(/-+$/, ""); // Remove trailing hyphens
 
     // Look for PRs with branches that match the post pattern
     // Old patterns for backward compatibility

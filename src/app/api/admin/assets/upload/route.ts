@@ -75,7 +75,8 @@ export async function POST(request: NextRequest) {
         const sanitizedTitle = String(title)
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
+          .replace(/^-+/, "") // Remove leading hyphens
+          .replace(/-+$/, ""); // Remove trailing hyphens
 
         // New patterns - fix/ and chore/
         const fixBranchPattern = `fix/${sanitizedTitle}`;
@@ -172,7 +173,8 @@ Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
         const sanitizedTitle = String(postTitle)
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
+          .replace(/^-+/, "") // Remove leading hyphens
+          .replace(/-+$/, ""); // Remove trailing hyphens
 
         // Use conventional commit format for PR title
         // Subject is just the title, following conventional commits format

@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
       const sanitizedTitle = String(title)
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+        .replace(/^-+/, "") // Remove leading hyphens
+        .replace(/-+$/, ""); // Remove trailing hyphens
       const branchName = `feature/${eventDate}-${sanitizedTitle}`;
 
       await createBranch(branchName);

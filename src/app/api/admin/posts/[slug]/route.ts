@@ -90,7 +90,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       const sanitizedTitle = String(title)
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+        .replace(/^-+/, "") // Remove leading hyphens
+        .replace(/-+$/, ""); // Remove trailing hyphens
 
       // New patterns - fix/ and chore/
       const fixBranchPattern = `fix/${sanitizedTitle}`;
