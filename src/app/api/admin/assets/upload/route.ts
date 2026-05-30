@@ -9,6 +9,7 @@ import {
   getBlogPost,
 } from "@/lib/github";
 import matter from "gray-matter";
+import { sanitizeForBranchName } from "@/lib/utils";
 
 // Force dynamic rendering - don't try to statically analyze this route
 export const dynamic = "force-dynamic";
@@ -72,18 +73,7 @@ export async function POST(request: NextRequest) {
         const featureBranchPattern = `feature/${datePrefix}-`;
 
         // Sanitize title for branch name matching
-        // Using non-backtracking approach to prevent ReDoS
-        let sanitizedTitle = String(title)
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-");
-
-        // Trim leading and trailing hyphens safely
-        while (sanitizedTitle.startsWith("-")) {
-          sanitizedTitle = sanitizedTitle.slice(1);
-        }
-        while (sanitizedTitle.endsWith("-")) {
-          sanitizedTitle = sanitizedTitle.slice(0, -1);
-        }
+        const sanitizedTitle = sanitizeForBranchName(title);
 
         // New patterns - fix/ and chore/
         const fixBranchPattern = `fix/${sanitizedTitle}`;
@@ -177,18 +167,7 @@ Uploaded via ETSA Admin interface by ${session!.user?.name}.`,
         }
 
         // Sanitize title for PR subject
-        // Using non-backtracking approach to prevent ReDoS
-        let sanitizedTitle = String(postTitle)
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-");
-
-        // Trim leading and trailing hyphens safely
-        while (sanitizedTitle.startsWith("-")) {
-          sanitizedTitle = sanitizedTitle.slice(1);
-        }
-        while (sanitizedTitle.endsWith("-")) {
-          sanitizedTitle = sanitizedTitle.slice(0, -1);
-        }
+        const sanitizedTitle = sanitizeForBranchName(postTitle);
 
         // Use conventional commit format for PR title
         // Subject is just the title, following conventional commits format

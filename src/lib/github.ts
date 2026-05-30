@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { getGitHubClient, getRepoInfo } from "./github-app";
+import { sanitizeForBranchName } from "./utils";
 
 // Legacy function to get octokit client - now uses GitHub App
 async function getOctokit(): Promise<Octokit> {
@@ -250,18 +251,7 @@ export async function getOpenPRForPost(
     }
 
     // Sanitize title for branch name matching
-    // Using non-backtracking patterns to prevent ReDoS
-    let sanitizedTitle = String(postTitle)
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-");
-
-    // Trim leading and trailing hyphens safely
-    while (sanitizedTitle.startsWith("-")) {
-      sanitizedTitle = sanitizedTitle.slice(1);
-    }
-    while (sanitizedTitle.endsWith("-")) {
-      sanitizedTitle = sanitizedTitle.slice(0, -1);
-    }
+    const sanitizedTitle = sanitizeForBranchName(postTitle);
 
     // Look for PRs with branches that match the post pattern
     // Old patterns for backward compatibility

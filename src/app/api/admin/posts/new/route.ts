@@ -9,6 +9,7 @@ import {
 } from "@/lib/github";
 import matter from "gray-matter";
 import { formatBlogPostContent } from "@/lib/server-only-formatter";
+import { sanitizeForBranchName } from "@/lib/utils";
 
 // Force dynamic rendering - don't try to statically analyze this route
 export const dynamic = "force-dynamic";
@@ -48,20 +49,7 @@ export async function POST(request: NextRequest) {
       const title = frontmatter.title || slug;
 
       // Create branch name in format: feature/EVENTDATE-EVENTTITLE
-      // Sanitize title for branch name (replace spaces and special chars with hyphens)
-      // Using non-backtracking approach to prevent ReDoS
-      let sanitizedTitle = String(title)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-");
-
-      // Trim leading and trailing hyphens safely
-      while (sanitizedTitle.startsWith("-")) {
-        sanitizedTitle = sanitizedTitle.slice(1);
-      }
-      while (sanitizedTitle.endsWith("-")) {
-        sanitizedTitle = sanitizedTitle.slice(0, -1);
-      }
-
+      const sanitizedTitle = sanitizeForBranchName(title);
       const branchName = `feature/${eventDate}-${sanitizedTitle}`;
 
       await createBranch(branchName);

@@ -1,6 +1,41 @@
 // Utility functions that can be used on both client and server
 import sanitizeHtml from "sanitize-html";
 import { PostFrontmatter, Speaker } from "@/types/post";
+
+/**
+ * Sanitize a title or text for use in branch names, URLs, or file names.
+ * Converts to lowercase, replaces non-alphanumeric characters with hyphens,
+ * and removes leading/trailing hyphens.
+ *
+ * Uses a non-backtracking approach to prevent ReDoS vulnerabilities.
+ *
+ * @param text - The text to sanitize
+ * @returns Sanitized string suitable for branch names or URLs
+ *
+ * @example
+ * sanitizeForBranchName("My Great Title!") // "my-great-title"
+ * sanitizeForBranchName("---Test---") // "test"
+ * sanitizeForBranchName("Hello: World") // "hello-world"
+ */
+export function sanitizeForBranchName(text: string): string {
+  // Replace non-alphanumeric characters with hyphens
+  let sanitized = String(text)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+
+  // Trim leading hyphens safely (no ReDoS risk)
+  while (sanitized.startsWith("-")) {
+    sanitized = sanitized.slice(1);
+  }
+
+  // Trim trailing hyphens safely (no ReDoS risk)
+  while (sanitized.endsWith("-")) {
+    sanitized = sanitized.slice(0, -1);
+  }
+
+  return sanitized;
+}
+
 // Format date for display
 export function formatDate(dateString: string): string {
   // Parse date components manually to avoid timezone issues

@@ -12,6 +12,7 @@ import {
 } from "@/lib/github";
 import matter from "gray-matter";
 import { formatBlogPostContent } from "@/lib/server-only-formatter";
+import { sanitizeForBranchName } from "@/lib/utils";
 
 // Force dynamic rendering - don't try to statically analyze this route
 export const dynamic = "force-dynamic";
@@ -87,18 +88,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       const featureBranchPattern = `feature/${datePrefix}-`;
 
       // Sanitize title for branch name matching
-      // Using non-backtracking approach to prevent ReDoS
-      let sanitizedTitle = String(title)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-");
-
-      // Trim leading and trailing hyphens safely
-      while (sanitizedTitle.startsWith("-")) {
-        sanitizedTitle = sanitizedTitle.slice(1);
-      }
-      while (sanitizedTitle.endsWith("-")) {
-        sanitizedTitle = sanitizedTitle.slice(0, -1);
-      }
+      const sanitizedTitle = sanitizeForBranchName(title);
 
       // New patterns - fix/ and chore/
       const fixBranchPattern = `fix/${sanitizedTitle}`;
