@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.3] - 2026-06-14
 
+### 🐛 Bug Fixes
+
+- **deps**: update dependency nodemailer to v9 ([#368](https://github.com/etsa-tech/etsa.tech/pull/368)) by @renovate[bot]
+
+## [2.1.3] - 2026-06-14
+
 ### 🔧 Chores
 
 - **deps**: update dependency prettier to v3.8.4 ([#362](https://github.com/etsa-tech/etsa.tech/pull/362)) by @renovate[bot]
