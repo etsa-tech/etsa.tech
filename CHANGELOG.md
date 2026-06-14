@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency sanitize-html to v2.17.5 ([#365](https://github.com/etsa-tech/etsa.tech/pull/365)) by @renovate[bot]
+
+## [2.1.3] - 2026-06-14
+
+### 🔧 Chores
+
 - **deps**: update dependency @types/node to v24.13.2 ([#366](https://github.com/etsa-tech/etsa.tech/pull/366)) by @renovate[bot]
 
 ## [2.1.3] - 2026-06-14
