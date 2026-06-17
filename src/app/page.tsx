@@ -1,12 +1,14 @@
 import { getCarouselImages } from "@/lib/server-only-carousel";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
-import { getRecentBlogPosts } from "@/lib/blog";
+import { getRecentBlogPosts, getLatestAnnouncement } from "@/lib/blog";
 import { PostCard } from "@/components/PostCard";
 import Link from "next/link";
+import { getAnnouncementUrl } from "@/lib/utils";
 
 export default function Home() {
   const carouselImages = getCarouselImages();
   const recentBlogPosts = getRecentBlogPosts(3);
+  const latestAnnouncement = getLatestAnnouncement();
 
   return (
     <div>
@@ -36,6 +38,74 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Latest Announcement Section */}
+      {latestAnnouncement && (
+        <section className="py-8 bg-etsa-primary/5 dark:bg-etsa-primary/10 border-b-2 border-etsa-primary/20 dark:border-etsa-primary/30">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-etsa-primary/10 dark:bg-etsa-primary/20 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-etsa-primary dark:text-etsa-light"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-block px-2 py-1 bg-etsa-primary text-white text-xs font-semibold rounded uppercase">
+                    Announcement
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {new Date(
+                      latestAnnouncement.frontmatter.date,
+                    ).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                  {latestAnnouncement.frontmatter.title}
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 mb-3">
+                  {latestAnnouncement.frontmatter.excerpt}
+                </p>
+                <Link
+                  href={getAnnouncementUrl(latestAnnouncement.slug)}
+                  className="inline-flex items-center text-etsa-primary dark:text-etsa-light hover:underline font-medium"
+                >
+                  Read full announcement
+                  <svg
+                    className="ml-1 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Content Section */}
       <section className="py-16 bg-white dark:bg-gray-800">
