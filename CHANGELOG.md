@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-06-17
+
+### 🔧 Chores
+
+- **deps**: update dependency nodemailer to v9.0.1 ([#369](https://github.com/etsa-tech/etsa.tech/pull/369)) by @renovate[bot]
+
 ## [2.1.3] - 2026-06-14
 
 ### 🐛 Bug Fixes
