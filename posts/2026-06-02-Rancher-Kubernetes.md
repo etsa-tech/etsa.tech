@@ -29,6 +29,7 @@ eventLocation:
     lat: "35.965179"
     lng: "-83.919846"
 published: true
+recordingUrl: "https://youtu.be/58RWJvbiSVs"
 ---
 
 Our speaker will give us a guided tour of the open source projects that quietly run Kubernetes everywhere. He will talk about K3s, RKE2, Rancher, Longhorn, Harvester, NeuVector, Kubewarden, Fleet, and the immutable OS underneath it and every box mapped to a real GitHub repo.
