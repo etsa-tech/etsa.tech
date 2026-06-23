@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update actions/checkout action to v7 ([#371](https://github.com/etsa-tech/etsa.tech/pull/371)) by @renovate[bot]
+
+## [3.0.0] - 2026-06-23
+
+### 🔧 Chores
+
 - **deps**: update dependency react-hook-form to v7.80.0 ([#372](https://github.com/etsa-tech/etsa.tech/pull/372)) by @renovate[bot]
 
 ## [3.0.0] - 2026-06-23
