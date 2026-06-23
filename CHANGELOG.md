@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-06-23
+
+### 🔧 Chores
+
+- **deps**: update dependency conventional-changelog to v7.2.1 ([#374](https://github.com/etsa-tech/etsa.tech/pull/374)) by @renovate[bot]
+
 ## [3.0.0] - 2026-06-17
 
 ### 🔧 Chores
