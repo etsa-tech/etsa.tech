@@ -7,7 +7,7 @@ import { z } from "zod";
 import dynamic from "next/dynamic";
 import { remark } from "remark";
 import html from "remark-html";
-import yaml from "js-yaml";
+import { load, dump } from "js-yaml";
 import Image from "next/image";
 import { sanitizeForBranchName } from "@/lib/utils";
 
@@ -318,7 +318,7 @@ function parseMultiDocumentYaml(content: string): {
 
     if (documents.length === 1) {
       // Single document
-      const parsed = (yaml.load(content) as Record<string, unknown>) || {};
+      const parsed = (load(content) as Record<string, unknown>) || {};
       return {
         firstDocument: parsed,
         rawFirstDocument: content.trim(),
@@ -331,7 +331,7 @@ function parseMultiDocumentYaml(content: string): {
     const remainingDocs = documents.slice(2).join("---\n").trim();
 
     const firstDocument =
-      (yaml.load(firstDocContent) as Record<string, unknown>) || {};
+      (load(firstDocContent) as Record<string, unknown>) || {};
 
     return {
       firstDocument,
@@ -356,7 +356,7 @@ function reconstructYamlContent(
   try {
     // If raw YAML is provided and valid, use it as the base
     if (rawYaml.trim()) {
-      const parsedRaw = (yaml.load(rawYaml) as Record<string, unknown>) || {};
+      const parsedRaw = (load(rawYaml) as Record<string, unknown>) || {};
 
       // Override with form data for extracted fields
       const extractedFields: Record<string, unknown> = {
@@ -867,7 +867,7 @@ export default function BlogPostEditor({
         } catch (error) {
           console.error("Error parsing multi-document YAML:", error);
           if (initialData.frontmatter) {
-            const yamlString = yaml.dump(initialData.frontmatter, {
+            const yamlString = dump(initialData.frontmatter, {
               indent: 2,
               lineWidth: -1,
               noRefs: true,

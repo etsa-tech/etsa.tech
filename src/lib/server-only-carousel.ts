@@ -2,7 +2,7 @@
 import "server-only";
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import { load } from "js-yaml";
 
 // Interface for carousel metadata schema
 interface CarouselMetadata {
@@ -33,7 +33,7 @@ export function getCarouselImages(): Array<{
     let metadata: CarouselMetadata;
     try {
       const yamlContent = fs.readFileSync(metadataPath, "utf8");
-      metadata = yaml.load(yamlContent) as CarouselMetadata;
+      metadata = load(yamlContent) as CarouselMetadata;
     } catch (yamlError) {
       console.warn(
         "Could not read carousel metadata YAML, using defaults:",
