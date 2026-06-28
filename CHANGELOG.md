@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.0] - 2026-06-28
 
+### 🐛 Bug Fixes
+
+- **deps**: update dependency js-yaml to v5 ([#373](https://github.com/etsa-tech/etsa.tech/pull/373)) by @renovate[bot]
+
+## [4.0.0] - 2026-06-28
+
 ### 🔧 Chores
 
 - **deps**: update dependency postcss to v8.5.16 ([#380](https://github.com/etsa-tech/etsa.tech/pull/380)) by @renovate[bot]
