@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-06-28
+
+### 🔧 Chores
+
+- **deps**: update dependency autoprefixer to v10.5.2 ([#376](https://github.com/etsa-tech/etsa.tech/pull/376)) by @renovate[bot]
+
+## [3.0.0] - 2026-06-28
+
+### 🔧 Chores
+
+- **deps**: update dependency prettier to v3.9.1 ([#377](https://github.com/etsa-tech/etsa.tech/pull/377)) by @renovate[bot]
+
+## [3.0.0] - 2026-06-28
+
+### 🔧 Chores
+
+- **deps**: update dependency conventional-changelog to v8 ([#378](https://github.com/etsa-tech/etsa.tech/pull/378)) by @renovate[bot]
+
+## [3.0.0] - 2026-06-28
+
+### 🔧 Chores
+
+- **deps**: update dependency js-yaml to v4.3.0 ([#379](https://github.com/etsa-tech/etsa.tech/pull/379)) by @renovate[bot]
+
+## [3.0.0] - 2026-06-28
+
+### 🔧 Chores
+
+- **deps**: update commitlint monorepo to v21.1.0 ([#375](https://github.com/etsa-tech/etsa.tech/pull/375)) by @renovate[bot]
+
 ## [3.0.0] - 2026-06-23
 
 ### 🔧 Chores
