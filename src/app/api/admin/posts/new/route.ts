@@ -8,6 +8,7 @@ import {
   createOrGetPullRequest,
 } from "@/lib/github";
 import matter from "gray-matter";
+import { load, dump } from "js-yaml";
 import { formatBlogPostContent } from "@/lib/server-only-formatter";
 import { sanitizeForBranchName } from "@/lib/utils";
 
@@ -35,16 +36,15 @@ export async function POST(request: NextRequest) {
 
     // Combine frontmatter and content
     // Configure YAML options to force single-line strings (no block scalars)
-    const yaml = require("js-yaml");
     const rawContent = matter.stringify(content, frontmatter, {
       engines: {
         yaml: {
-          parse: (input: string) => yaml.load(input),
+          parse: (input: string) => load(input) as object,
           stringify: (data: unknown) => {
-            return yaml.dump(data, {
+            return dump(data, {
               lineWidth: -1, // Disable line wrapping
               forceQuotes: true, // Always use quotes for strings
-              quotingType: '"', // Use double quotes
+              quoteStyle: "double", // Use double quotes
               flowLevel: -1, // Use block style for collections, but not scalars
             });
           },
