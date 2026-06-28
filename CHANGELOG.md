@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency js-yaml to v4.3.0 ([#379](https://github.com/etsa-tech/etsa.tech/pull/379)) by @renovate[bot]
+
+## [3.0.0] - 2026-06-28
+
+### 🔧 Chores
+
 - **deps**: update commitlint monorepo to v21.1.0 ([#375](https://github.com/etsa-tech/etsa.tech/pull/375)) by @renovate[bot]
 
 ## [3.0.0] - 2026-06-23
