@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-06-28
+
+### 🔧 Chores
+
+- **deps**: update dependency postcss to v8.5.16 ([#380](https://github.com/etsa-tech/etsa.tech/pull/380)) by @renovate[bot]
+
 ## [3.0.0] - 2026-06-28
 
 ### 🔧 Chores
@@ -881,7 +887,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance monitoring with Lighthouse
 - Accessibility testing with axe-core
 
-[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v4.0.0...HEAD
 [0.1.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.1.0
 [0.2.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.0
 [0.2.1]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.1
@@ -903,3 +909,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [2.1.2]: https://github.com/etsa-tech/etsa.tech/releases/tag/v2.1.2
 [2.1.3]: https://github.com/etsa-tech/etsa.tech/releases/tag/v2.1.3
 [3.0.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v3.0.0
+[4.0.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v4.0.0
