@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency autoprefixer to v10.5.2 ([#376](https://github.com/etsa-tech/etsa.tech/pull/376)) by @renovate[bot]
+
+## [3.0.0] - 2026-06-28
+
+### 🔧 Chores
+
 - **deps**: update dependency prettier to v3.9.1 ([#377](https://github.com/etsa-tech/etsa.tech/pull/377)) by @renovate[bot]
 
 ## [3.0.0] - 2026-06-28
@@ -875,7 +881,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance monitoring with Lighthouse
 - Accessibility testing with axe-core
 
-[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/etsa-tech/etsa.tech/compare/v3.0.0...HEAD
 [0.1.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.1.0
 [0.2.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.0
 [0.2.1]: https://github.com/etsa-tech/etsa.tech/releases/tag/v0.2.1
@@ -897,4 +903,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [2.1.2]: https://github.com/etsa-tech/etsa.tech/releases/tag/v2.1.2
 [2.1.3]: https://github.com/etsa-tech/etsa.tech/releases/tag/v2.1.3
 [3.0.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v3.0.0
-[4.0.0]: https://github.com/etsa-tech/etsa.tech/releases/tag/v4.0.0
