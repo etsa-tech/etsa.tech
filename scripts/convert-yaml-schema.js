@@ -122,7 +122,7 @@ function processMarkdownFile(filePath) {
       lineWidth: 80,
       noRefs: true,
       sortKeys: false,
-      quotingType: '"',
+      quoteStyle: "double",
       forceQuotes: false,
       flowLevel: -1,
     });

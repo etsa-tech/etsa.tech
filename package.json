@@ -17,7 +17,6 @@
     "@monaco-editor/react": "^4.7.0",
     "@octokit/app": "^16.1.0",
     "@octokit/rest": "^22.0.0",
-    "@types/js-yaml": "^4.0.9",
     "@types/nodemailer": "^8.0.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^5.0.0",

@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
             return dump(data, {
               lineWidth: -1, // Disable line wrapping
               forceQuotes: true, // Always use quotes for strings
-              quotingType: '"', // Use double quotes
+              quoteStyle: "double", // Use double quotes
               flowLevel: -1, // Use block style for collections, but not scalars
             });
           },
