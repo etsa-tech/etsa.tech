@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.1] - 2026-07-02
+
+### 📚 Documentation
+
+- **posts**: add July 2026 Summer Social meeting info ([#387](https://github.com/etsa-tech/etsa.tech/pull/387)) by @bataylor976
+
 ## [4.0.0] - 2026-06-28
 
 ### 🐛 Bug Fixes
