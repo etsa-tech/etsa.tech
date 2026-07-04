@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update commitlint monorepo to v21.2.0 ([#384](https://github.com/etsa-tech/etsa.tech/pull/384)) by @renovate[bot]
+
+## [4.0.1] - 2026-07-04
+
+### 🔧 Chores
+
 - **deps**: update dependency prettier to v3.9.4 ([#381](https://github.com/etsa-tech/etsa.tech/pull/381)) by @renovate[bot]
 
 ## [4.0.1] - 2026-07-02
