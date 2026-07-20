@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency postcss to v8.5.20 ([#397](https://github.com/etsa-tech/etsa.tech/pull/397)) by @renovate[bot]
+
+## [4.0.1] - 2026-07-20
+
+### 🔧 Chores
+
 - **deps**: update dependency @types/node to v24.13.3 ([#391](https://github.com/etsa-tech/etsa.tech/pull/391)) by @renovate[bot]
 
 ## [4.0.1] - 2026-07-20
