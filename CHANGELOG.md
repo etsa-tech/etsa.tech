@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency autoprefixer to v10.5.4 ([#398](https://github.com/etsa-tech/etsa.tech/pull/398)) by @renovate[bot]
+
+## [4.0.1] - 2026-07-21
+
+### 🔧 Chores
+
 - **deps**: update dependency @commitlint/cli to v21.2.1 ([#390](https://github.com/etsa-tech/etsa.tech/pull/390)) by @renovate[bot]
 
 ## [4.0.1] - 2026-07-20
