@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency react-dom to v19.2.8 ([#406](https://github.com/etsa-tech/etsa.tech/pull/406)) by @renovate[bot]
+
+## [4.0.1] - 2026-07-23
+
+### 🔧 Chores
+
 - **deps**: update nextjs monorepo to v16.2.11 ([#407](https://github.com/etsa-tech/etsa.tech/pull/407)) by @renovate[bot]
 
 ## [4.0.1] - 2026-07-23
