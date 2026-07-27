@@ -1,6 +1,6 @@
 ---
 author: ETSA
-date: 2026-07-31
+date: 2026-07-27
 eventDate: 2026-08-04
 eventLocation:
   address: 17 Market Square SUITE 101, Knoxville, TN 37902
