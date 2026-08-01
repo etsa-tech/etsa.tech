@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-08-01
+
+### 🔧 Chores
+
+- **deps**: update dependency js-yaml to v5.2.3 ([#422](https://github.com/etsa-tech/etsa.tech/pull/422)) by @renovate[bot]
+
 ## [4.1.0] - 2026-08-01
 
 ### 🔧 Chores
