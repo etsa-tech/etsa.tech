@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.1.0] - 2026-08-01
 
+### 🔧 Chores
+
+- **deps**: update dependency react-hook-form to v7.84.0 ([#421](https://github.com/etsa-tech/etsa.tech/pull/421)) by @renovate[bot]
+
+## [4.1.0] - 2026-08-01
+
 ### 🐛 Bug Fixes
 
 - **deps**: upgrade next from 16.2.10 to 16.2.11 ([#409](https://github.com/etsa-tech/etsa.tech/pull/409)) by @wesleykirkland
