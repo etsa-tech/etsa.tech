@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
-- **deps**: update dependency react-hook-form to v7.84.0 ([#421](https://github.com/etsa-tech/etsa.tech/pull/421)) by @renovate[bot]
+- **deps**: update dependency @netlify/plugin-nextjs to v5.15.13 ([#416](https://github.com/etsa-tech/etsa.tech/pull/416)) by @renovate[bot]
 
 ## [4.1.0] - 2026-08-01
 
