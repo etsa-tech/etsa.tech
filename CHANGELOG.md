@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update hadolint/hadolint-action action to v3.4.0 ([#419](https://github.com/etsa-tech/etsa.tech/pull/419)) by @renovate[bot]
+
+## [4.1.0] - 2026-08-01
+
+### 🔧 Chores
+
 - **deps**: update react monorepo to v19.2.18 ([#420](https://github.com/etsa-tech/etsa.tech/pull/420)) by @renovate[bot]
 
 ## [4.1.0] - 2026-08-01
