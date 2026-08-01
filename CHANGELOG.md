@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.1.0] - 2026-08-01
 
+### 🐛 Bug Fixes
+
+- **deps**: upgrade next from 16.2.10 to 16.2.11 ([#409](https://github.com/etsa-tech/etsa.tech/pull/409)) by @wesleykirkland
+
+## [4.1.0] - 2026-08-01
+
 ### 🔧 Chores
 
 - **deps**: update hadolint/hadolint-action action to v3.4.0 ([#419](https://github.com/etsa-tech/etsa.tech/pull/419)) by @renovate[bot]
