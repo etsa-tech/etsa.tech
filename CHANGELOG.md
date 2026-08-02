@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-08-02
+
+### 🔧 Chores
+
+- **deps**: update react monorepo to v19.2.8 ([#423](https://github.com/etsa-tech/etsa.tech/pull/423)) by @renovate[bot]
+
 ## [5.0.0] - 2026-08-01
 
 ### 🔧 Chores
