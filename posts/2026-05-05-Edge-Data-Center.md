@@ -16,7 +16,7 @@ author: ETSA
 speakers:
   - name: Aaron Andersen
     title: Group Manager, Advanced Computing Operations, National Laboratory of the Rockies
-    image: /images/speakers/Aaron_Andersen.jpeg
+    image: /images/speakers/aaron_andersen.jpeg
     bio: >-
       Aaron Andersen oversees NLRs Advanced Computing Operations group within the Computational Sciences Center, providing highly energy-efficient, high-performance computing (HPC) and artificial intelligence (AI) resources, on-prem cloud, and cloud technologies for researchers across the laboratory. He has crosscutting expertise in data center design, system architecture, engineering, and operations. Andersen has research interests in data centers, thermal management and optimization.
     linkedIn: https://www.linkedin.com/in/aaron-h-andersen/

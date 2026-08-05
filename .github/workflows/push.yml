@@ -28,11 +28,6 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Install OpenTofu
-        uses: opentofu/setup-opentofu@v2
-        with:
-          tofu_version: "1.10.3"
-
       - name: Install pre-commit
         run: |
           python -m pip install --upgrade pip

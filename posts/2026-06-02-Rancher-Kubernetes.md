@@ -19,9 +19,10 @@ speakers:
     company: "Rancher Government Solutions"
     image: "/images/speakers/chris_reynolds.jpg"
     bio: "Chris Reynolds is a nerd at Rancher Government, where he helps federal teams put Kubernetes into places it has no business going, air-gapped, classified, and otherwise unfriendly. Before that he spent time at Red Hat in the federal SA/DA org, at Kubecost on the global public sector team, and as a DoD/IC contractor. He also did a bit of time at PSU building HPC clusters. He's been in and around distributed systems for over twenty years."
-    linkedIn: "https://www.linkedin.com/in/speaker-profile/"
-presentationSlides: "slides.pdf"
+    linkedIn: "https://www.linkedin.com/in/chris-reynolds-aa3541b/"
+presentationSlides: "OSS_Stack.pdf"
 eventDate: "2026-06-03"
+recordingUrl: "https://www.youtube.com/watch?v=58RWJvbiSVs"
 eventLocation:
   name: "Knoxville Entrepreneur Center"
   address: "17 Market Square SUITE 101, Knoxville, TN 37902"
