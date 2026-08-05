@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-08-05
+
+### 🐛 Bug Fixes
+
+- **blog**: there-and-back-again-a-home-lab-journey-through-one-of-the-most-interesting-times-in-it ([#429](https://github.com/etsa-tech/etsa.tech/pull/429)) by @etsa-admin-interface[bot]
+
 ## [5.0.0] - 2026-08-02
 
 ### 🔧 Chores
