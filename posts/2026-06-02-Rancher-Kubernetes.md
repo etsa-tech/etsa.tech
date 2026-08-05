@@ -22,6 +22,7 @@ speakers:
     linkedIn: "https://www.linkedin.com/in/chris-reynolds-aa3541b/"
 presentationSlides: "OSS_Stack.pdf"
 eventDate: "2026-06-03"
+recordingUrl: "https://www.youtube.com/watch?v=58RWJvbiSVs"
 eventLocation:
   name: "Knoxville Entrepreneur Center"
   address: "17 Market Square SUITE 101, Knoxville, TN 37902"
