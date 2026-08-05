@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update all non-major dependencies ([#431](https://github.com/etsa-tech/etsa.tech/pull/431)) by @renovate[bot]
+
+## [5.0.1] - 2026-08-05
+
+### 🔧 Chores
+
 - renovate config, content updates, and cleanup ([#430](https://github.com/etsa-tech/etsa.tech/pull/430)) by @wesleykirkland
 
 ## [5.0.0] - 2026-08-05
