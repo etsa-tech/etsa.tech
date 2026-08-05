@@ -148,6 +148,16 @@ export async function getGitHubClient(): Promise<Octokit> {
 }
 
 /**
+ * Get the raw installation access token (e.g. for authenticating to APIs
+ * that aren't part of the REST API surface Octokit covers, like the Git
+ * LFS batch endpoint).
+ */
+export async function getGitHubToken(): Promise<string> {
+  await getGitHubClient();
+  return tokenCache!.token;
+}
+
+/**
  * Clear the token cache (useful for testing or error recovery)
  */
 export function clearTokenCache(): void {

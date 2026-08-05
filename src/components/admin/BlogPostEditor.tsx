@@ -348,6 +348,18 @@ function parseMultiDocumentYaml(content: string): {
   }
 }
 
+// Only string/number/boolean values stringify meaningfully; guards against
+// `String(x)` producing "[object Object]" for a malformed coordinates block.
+function isCoordinateScalar(
+  value: unknown,
+): value is string | number | boolean {
+  return (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  );
+}
+
 // Helper function to reconstruct the full YAML content
 function reconstructYamlContent(
   formData: BlogPostFormData,
@@ -357,6 +369,20 @@ function reconstructYamlContent(
     // If raw YAML is provided and valid, use it as the base
     if (rawYaml.trim()) {
       const parsedRaw = (load(rawYaml) as Record<string, unknown>) || {};
+
+      // Coordinates must stay strings. If the raw YAML has them unquoted
+      // (e.g. `lat: 35.965179`), js-yaml's load() parses them as numbers,
+      // which then round-trips oddly on save. Force them back to strings.
+      const rawEventLocation = parsedRaw.eventLocation as
+        | { coordinates?: { lat?: unknown; lng?: unknown } }
+        | undefined;
+      const rawCoordinates = rawEventLocation?.coordinates;
+      if (rawCoordinates) {
+        if (isCoordinateScalar(rawCoordinates.lat))
+          rawCoordinates.lat = String(rawCoordinates.lat);
+        if (isCoordinateScalar(rawCoordinates.lng))
+          rawCoordinates.lng = String(rawCoordinates.lng);
+      }
 
       // Override with form data for extracted fields
       const extractedFields: Record<string, unknown> = {

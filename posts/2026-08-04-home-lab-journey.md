@@ -1,46 +1,29 @@
 ---
-author: ETSA
+author: "ETSA"
 date: "2026-07-27"
 eventDate: "2026-08-04"
 eventLocation:
-  address: 17 Market Square SUITE 101, Knoxville, TN 37902
+  address: "17 Market Square SUITE 101, Knoxville, TN 37902"
   coordinates:
-    lat: 35.965179
+    lat: "35.965179"
     lng: "-83.919846"
-  name: Knoxville Entrepreneur Center
-excerpt: Follow one engineer's journey from a single Raspberry Pi to a
-  full-featured home lab and the lessons learned along the way.
+  name: "Knoxville Entrepreneur Center"
+excerpt: "Follow one engineer's journey from a single Raspberry Pi to a full-featured home lab and the lessons learned along the way."
 published: true
 speakers:
-  - bio: Alex is a self-taught IT professional that has worked in
-      television, healthcare, and now a National Lab. After 2 brief stints
-      in 2 different colleges out of high school, Alex hung up the books
-      and classrooms temporarily to become a Martial Arts instructor in
-      1999 and opened his own school in Maryville, TN in 2001. In 2005,
-      Alex went back to school and graduated with an Associates of Applied
-      Science in Design before teaching himself IT. It was a long,
-      twisting road to his current position at Oak Ridge National
-      Laboratory as a Kubernetes Platform Engineer, but those experiences
-      allowed him unique perspectives that he brings with him to both his
-      professional and private life. Outside of work, Alex enjoys the
-      creative endeavors, such as art, writing, photography, video and
-      photo editing, sighing heavily as he builds and often destroys
-      things in his homelab, and the occasional glass of Bourbon, Mojito,
-      or Amaretto Sour. He loves exploring technologies that are TRULY
-      open source, riding in his Jeep Wrangler with the roof off, and
-      spending time with his wife, children, and pittie best friend, Brom.
-    company: Oak Ridge National Laboratory
-    image: /images/speakers/AlexFranklin.jpeg
+  - bio: "Alex is a self-taught IT professional that has worked in television, healthcare, and now a National Lab. After 2 brief stints in 2 different colleges out of high school, Alex hung up the books and classrooms temporarily to become a Martial Arts instructor in 1999 and opened his own school in Maryville, TN in 2001. In 2005, Alex went back to school and graduated with an Associates of Applied Science in Design before teaching himself IT. It was a long, twisting road to his current position at Oak Ridge National Laboratory as a Kubernetes Platform Engineer, but those experiences allowed him unique perspectives that he brings with him to both his professional and private life. Outside of work, Alex enjoys the creative endeavors, such as art, writing, photography, video and photo editing, sighing heavily as he builds and often destroys things in his homelab, and the occasional glass of Bourbon, Mojito, or Amaretto Sour. He loves exploring technologies that are TRULY open source, riding in his Jeep Wrangler with the roof off, and spending time with his wife, children, and pittie best friend, Brom."
+    company: "Oak Ridge National Laboratory"
+    image: "/images/speakers/alex_franklin.jpg"
     linkedIn: "https://www.linkedin.com/in/alex-franklin-61159713b/"
-    name: Alex Franklin
-    title: Kubernetes Platform Engineer
+    name: "Alex Franklin"
+    title: "Kubernetes Platform Engineer"
 tags:
-  - Linux
-  - Home Lab
-  - Kubernetes
-  - Open Source
-title: "There and Back Again: A Home Lab Journey through One of the Most
-  Interesting Times in IT"
+  - "Linux"
+  - "Home Lab"
+  - "Kubernetes"
+  - "Open Source"
+title: "There and Back Again: A Home Lab Journey through One of the Most Interesting Times in IT"
+recordingUrl: "https://www.youtube.com/watch?v=kq4LEqlvyjU"
 ---
 
 I began a graveyard shift job in 2019 for Covenant Health in their data

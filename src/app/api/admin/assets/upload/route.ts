@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isAuthorizedUser } from "@/lib/auth-utils";
-import { getGitHubClient, getRepoInfo } from "@/lib/github-app";
+import { getGitHubClient, getGitHubToken, getRepoInfo } from "@/lib/github-app";
 import {
   createBranch,
   createOrGetPullRequest,
@@ -10,6 +10,7 @@ import {
 } from "@/lib/github";
 import matter from "gray-matter";
 import { sanitizeForBranchName } from "@/lib/utils";
+import { getCommitContent } from "@/lib/git-lfs";
 
 // Force dynamic rendering - don't try to statically analyze this route
 export const dynamic = "force-dynamic";
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     const octokit = await getGitHubClient();
+    const token = await getGitHubToken();
     const { owner, repo } = getRepoInfo();
 
     // Determine the target branch for the upload
@@ -111,10 +113,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Convert file to base64
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const base64Content = buffer.toString("base64");
+
+    // Files tracked by Git LFS (see .gitattributes) must be committed as an
+    // LFS pointer file, not the raw bytes. The GitHub contents API has no
+    // concept of the LFS clean/smudge filter, so we upload the object to
+    // LFS storage ourselves and commit the resulting pointer text instead.
+    const base64Content = await getCommitContent(
+      owner,
+      repo,
+      token,
+      file.name,
+      buffer,
+    );
 
     // Create the file path
     const filePath = `public/presentation/${slug}/${file.name}`;

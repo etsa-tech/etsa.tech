@@ -8,7 +8,8 @@ import {
   createOrGetPullRequest,
 } from "@/lib/github";
 import matter from "gray-matter";
-import { load, dump } from "js-yaml";
+import { load } from "js-yaml";
+import { dumpFrontmatterYaml } from "@/lib/yaml-frontmatter";
 import { formatBlogPostContent } from "@/lib/server-only-formatter";
 import { sanitizeForBranchName } from "@/lib/utils";
 
@@ -40,14 +41,7 @@ export async function POST(request: NextRequest) {
       engines: {
         yaml: {
           parse: (input: string) => load(input) as object,
-          stringify: (data: unknown) => {
-            return dump(data, {
-              lineWidth: -1, // Disable line wrapping
-              forceQuotes: true, // Always use quotes for strings
-              quoteStyle: "double", // Use double quotes
-              flowLevel: -1, // Use block style for collections, but not scalars
-            });
-          },
+          stringify: (data: unknown) => dumpFrontmatterYaml(data),
         },
       },
     });
