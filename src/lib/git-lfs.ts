@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 
 /**
  * Minimal Git LFS client for uploading binary assets through GitHub's

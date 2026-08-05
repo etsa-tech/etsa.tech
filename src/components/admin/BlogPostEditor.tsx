@@ -348,6 +348,18 @@ function parseMultiDocumentYaml(content: string): {
   }
 }
 
+// Only string/number/boolean values stringify meaningfully; guards against
+// `String(x)` producing "[object Object]" for a malformed coordinates block.
+function isCoordinateScalar(
+  value: unknown,
+): value is string | number | boolean {
+  return (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  );
+}
+
 // Helper function to reconstruct the full YAML content
 function reconstructYamlContent(
   formData: BlogPostFormData,
@@ -366,9 +378,9 @@ function reconstructYamlContent(
         | undefined;
       const rawCoordinates = rawEventLocation?.coordinates;
       if (rawCoordinates) {
-        if (rawCoordinates.lat !== undefined)
+        if (isCoordinateScalar(rawCoordinates.lat))
           rawCoordinates.lat = String(rawCoordinates.lat);
-        if (rawCoordinates.lng !== undefined)
+        if (isCoordinateScalar(rawCoordinates.lng))
           rawCoordinates.lng = String(rawCoordinates.lng);
       }
 

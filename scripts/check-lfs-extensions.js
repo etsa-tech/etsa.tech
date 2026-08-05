@@ -7,8 +7,8 @@
 // from .gitattributes, uploads for newly-LFS-tracked extensions would
 // silently stop being stored via LFS.
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const ROOT = path.join(__dirname, "..");
 const GITATTRIBUTES_PATH = path.join(ROOT, ".gitattributes");
@@ -19,8 +19,11 @@ function getGitattributesExtensions() {
   const extensions = new Set();
 
   for (const line of content.split("\n")) {
-    const match = line.match(/^\*\.(\w+)\s+.*filter=lfs/);
-    if (match) extensions.add(match[1].toLowerCase());
+    const [pattern, ...attrs] = line.trim().split(/\s+/);
+    const extMatch = pattern.match(/^\*\.(\w+)$/);
+    if (extMatch && attrs.includes("filter=lfs")) {
+      extensions.add(extMatch[1].toLowerCase());
+    }
   }
 
   return extensions;
@@ -63,7 +66,7 @@ if (missingFromLib.length === 0 && missingFromGitattributes.length === 0) {
     `✅ LFS_TRACKED_EXTENSIONS in git-lfs.ts matches .gitattributes (${[
       ...gitattributesExtensions,
     ]
-      .sort()
+      .sort((a, b) => a.localeCompare(b))
       .join(", ")})`,
   );
   process.exit(0);
