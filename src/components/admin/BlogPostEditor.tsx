@@ -358,6 +358,20 @@ function reconstructYamlContent(
     if (rawYaml.trim()) {
       const parsedRaw = (load(rawYaml) as Record<string, unknown>) || {};
 
+      // Coordinates must stay strings. If the raw YAML has them unquoted
+      // (e.g. `lat: 35.965179`), js-yaml's load() parses them as numbers,
+      // which then round-trips oddly on save. Force them back to strings.
+      const rawEventLocation = parsedRaw.eventLocation as
+        | { coordinates?: { lat?: unknown; lng?: unknown } }
+        | undefined;
+      const rawCoordinates = rawEventLocation?.coordinates;
+      if (rawCoordinates) {
+        if (rawCoordinates.lat !== undefined)
+          rawCoordinates.lat = String(rawCoordinates.lat);
+        if (rawCoordinates.lng !== undefined)
+          rawCoordinates.lng = String(rawCoordinates.lng);
+      }
+
       // Override with form data for extracted fields
       const extractedFields: Record<string, unknown> = {
         title: formData.title,
