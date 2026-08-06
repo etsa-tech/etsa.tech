@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.1] - 2026-08-06
+
+### 🐛 Bug Fixes
+
+- **blog**: javascript-in-asp-net-mvc ([#434](https://github.com/etsa-tech/etsa.tech/pull/434)) by @etsa-admin-interface[bot]
+
 ## [5.0.1] - 2026-08-05
 
 ### 🔧 Chores
