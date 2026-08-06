@@ -34,7 +34,7 @@ export async function getSheetRsvpsForEvent(
 
     const result = await response.json();
     if (!Array.isArray(result?.rows)) {
-      throw new Error("Google Sheets webhook response missing rows array");
+      throw new TypeError("Google Sheets webhook response missing rows array");
     }
 
     // "Can you attend?" holds free text across years of sheet history -

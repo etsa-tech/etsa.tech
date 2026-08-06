@@ -48,47 +48,83 @@ interface CsvAttendee {
   name: string;
 }
 
+interface CsvParseState {
+  rows: string[][];
+  row: string[];
+  field: string;
+  inQuotes: boolean;
+}
+
+function endCsvRow(state: CsvParseState): void {
+  state.row.push(state.field);
+  state.rows.push(state.row);
+  state.row = [];
+  state.field = "";
+}
+
+// Returns how many extra characters this char consumed (0 or 1, for \r\n).
+function consumeQuotedCsvChar(
+  state: CsvParseState,
+  char: string,
+  next: string | undefined,
+): number {
+  if (char === '"' && next === '"') {
+    state.field += '"';
+    return 1;
+  }
+  if (char === '"') {
+    state.inQuotes = false;
+    return 0;
+  }
+  state.field += char;
+  return 0;
+}
+
+function consumeUnquotedCsvChar(
+  state: CsvParseState,
+  char: string,
+  next: string | undefined,
+): number {
+  if (char === '"') {
+    state.inQuotes = true;
+    return 0;
+  }
+  if (char === ",") {
+    state.row.push(state.field);
+    state.field = "";
+    return 0;
+  }
+  if (char === "\n" || char === "\r") {
+    const extraConsumed = char === "\r" && next === "\n" ? 1 : 0;
+    endCsvRow(state);
+    return extraConsumed;
+  }
+  state.field += char;
+  return 0;
+}
+
 // Minimal RFC4180-ish CSV parser - handles quoted fields, escaped quotes,
 // and CRLF/LF line endings. Runs entirely client-side; nothing uploaded.
 function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = "";
-  let inQuotes = false;
+  const state: CsvParseState = {
+    rows: [],
+    row: [],
+    field: "",
+    inQuotes: false,
+  };
 
   for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const next = text[i + 1];
+    const extraConsumed = state.inQuotes
+      ? consumeQuotedCsvChar(state, text[i], text[i + 1])
+      : consumeUnquotedCsvChar(state, text[i], text[i + 1]);
+    i += extraConsumed;
+  }
 
-    if (inQuotes) {
-      if (char === '"' && next === '"') {
-        field += '"';
-        i++;
-      } else if (char === '"') {
-        inQuotes = false;
-      } else {
-        field += char;
-      }
-    } else if (char === '"') {
-      inQuotes = true;
-    } else if (char === ",") {
-      row.push(field);
-      field = "";
-    } else if (char === "\n" || char === "\r") {
-      if (char === "\r" && next === "\n") i++;
-      row.push(field);
-      rows.push(row);
-      row = [];
-      field = "";
-    } else {
-      field += char;
-    }
+  if (state.field.length > 0 || state.row.length > 0) {
+    endCsvRow(state);
   }
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    rows.push(row);
-  }
-  return rows.filter((r) => r.some((cell) => cell.trim() !== ""));
+
+  return state.rows.filter((r) => r.some((cell) => cell.trim() !== ""));
 }
 
 function parseAttendeesCsv(text: string): CsvAttendee[] {
@@ -675,8 +711,12 @@ export default function RsvpReportPage() {
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {displayClusters.map((cluster, idx) => (
-              <tr key={`cluster-${idx}`}>
+            {displayClusters.map((cluster) => (
+              <tr
+                key={cluster.mergedFrom
+                  .map((e) => `${e.source}:${e.name}`)
+                  .join("|")}
+              >
                 <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">
                   {cluster.name}
                   {cluster.mergedFrom.length > 1 && (

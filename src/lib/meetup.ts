@@ -85,7 +85,7 @@ export async function getMeetupRsvpCount(
       : undefined;
 
     if (typeof rsvpConnection?.totalCount !== "number") {
-      throw new Error("Meetup page did not include a YES RSVP count");
+      throw new TypeError("Meetup page did not include a YES RSVP count");
     }
 
     return {
