@@ -8,8 +8,10 @@ import {
   createOrUpdateFile,
   createBranch,
   createOrGetPullRequest,
+  enableAutoMergeForPR,
   getBranches,
 } from "@/lib/github";
+import { getRepoInfo } from "@/lib/github-app";
 import matter from "gray-matter";
 import { load } from "js-yaml";
 import { dumpFrontmatterYaml } from "@/lib/yaml-frontmatter";
@@ -63,7 +65,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const { slug } = await params;
-    const { frontmatter, content, createPR = true } = await request.json();
+    const {
+      frontmatter,
+      content,
+      createPR = true,
+      autoMerge = false,
+    } = await request.json();
 
     const { searchParams } = new URL(request.url);
     const branch = searchParams.get("branch") || "main";
@@ -170,14 +177,27 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           .user?.name}.`,
       );
 
+      const { owner, repo } = getRepoInfo();
+
+      // Auto-merge is opt-in per call site, not a general PUT behavior - only
+      // the RSVP report's "save Meetup Event ID" flow sets this, since it's
+      // a narrow metadata-only change. The route's own auth check above
+      // (isAuthorizedUser - @etsa.tech accounts only) is what "the user
+      // matches" gates on; there's no separate per-PR-type permission model.
+      const autoMergeEnabled = autoMerge
+        ? await enableAutoMergeForPR(prNumber)
+        : false;
+
       return NextResponse.json({
         success: true,
         message: isNew
           ? "Pull request created successfully"
           : "Changes saved to existing pull request",
         prNumber,
+        prUrl: `https://github.com/${owner}/${repo}/pull/${prNumber}`,
         branchName,
         isNewPR: isNew,
+        autoMergeEnabled,
       });
     } else {
       // Direct update (for drafts or immediate changes) - need SHA for existing file

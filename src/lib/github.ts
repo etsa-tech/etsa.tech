@@ -328,6 +328,50 @@ export async function createOrGetPullRequest(
   }
 }
 
+// Enable GitHub's auto-merge on a PR, so it merges itself once required
+// checks/reviews pass, with no further manual action. Best-effort: requires
+// "Allow auto-merge" enabled in the repo's settings, so failures here are
+// logged and swallowed rather than failing the caller's request - the PR
+// itself was already created successfully regardless.
+export async function enableAutoMergeForPR(
+  prNumber: number,
+  mergeMethod: "MERGE" | "SQUASH" | "REBASE" = "SQUASH",
+): Promise<boolean> {
+  try {
+    const octokit = await getOctokit();
+    const { owner, repo } = getRepo();
+
+    const { repository } = await octokit.graphql<{
+      repository: { pullRequest: { id: string } };
+    }>(
+      `query($owner: String!, $repo: String!, $number: Int!) {
+        repository(owner: $owner, name: $repo) {
+          pullRequest(number: $number) { id }
+        }
+      }`,
+      { owner, repo, number: prNumber },
+    );
+
+    await octokit.graphql(
+      `mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+        enablePullRequestAutoMerge(input: {
+          pullRequestId: $pullRequestId,
+          mergeMethod: $mergeMethod
+        }) {
+          pullRequest { autoMergeRequest { enabledAt } }
+        }
+      }`,
+      { pullRequestId: repository.pullRequest.id, mergeMethod },
+    );
+
+    console.log(`Enabled auto-merge on PR #${prNumber}`);
+    return true;
+  } catch (error) {
+    console.error(`Failed to enable auto-merge on PR #${prNumber}:`, error);
+    return false;
+  }
+}
+
 // Create pull request (legacy function for backward compatibility)
 export async function createPullRequest(
   branchName: string,

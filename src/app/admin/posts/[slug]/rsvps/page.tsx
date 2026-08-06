@@ -162,9 +162,12 @@ export default function RsvpReportPage() {
 
   const [manualMeetupId, setManualMeetupId] = useState("");
   const [isSavingMeetupId, setIsSavingMeetupId] = useState(false);
-  const [saveMeetupMessage, setSaveMeetupMessage] = useState<string | null>(
-    null,
-  );
+  const [saveMeetupMessage, setSaveMeetupMessage] = useState<{
+    prefix: string;
+    suffix: string;
+    prNumber?: number;
+    prUrl?: string;
+  } | null>(null);
 
   // Loading text below depends on client-only state (which source is still
   // pending) - gate it behind mount so the server-rendered HTML and the
@@ -182,21 +185,36 @@ export default function RsvpReportPage() {
       if (!getResponse.ok) throw new Error("Failed to load post");
       const { frontmatter, content } = await getResponse.json();
 
-      const putResponse = await fetch(`/api/admin/posts/${slug}?branch=main`, {
+      // main is branch-protected, so this goes through the same PR flow as
+      // every other post edit in the admin (createPR: true) rather than
+      // attempting a direct commit, which GitHub rejects. autoMerge is only
+      // set here - a narrow, metadata-only change - not on general content
+      // edits, which still go through normal review.
+      const putResponse = await fetch(`/api/admin/posts/${slug}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           frontmatter: { ...frontmatter, meetupEventId: eventId },
           content,
-          createPR: false,
+          createPR: true,
+          autoMerge: true,
         }),
       });
       if (!putResponse.ok) throw new Error("Failed to save");
-      setSaveMeetupMessage(
-        "Saved to the post - future report loads will use it directly.",
-      );
+      const result = await putResponse.json();
+      setSaveMeetupMessage({
+        prefix: result.isNewPR ? "Opened" : "Added to existing",
+        suffix: result.autoMergeEnabled
+          ? "- it'll merge itself automatically once checks pass."
+          : "with this change - merge it on GitHub to apply.",
+        prNumber: result.prNumber,
+        prUrl: result.prUrl,
+      });
     } catch (err) {
-      setSaveMeetupMessage("Failed to save the Meetup Event ID.");
+      setSaveMeetupMessage({
+        prefix: "Failed to save the Meetup Event ID.",
+        suffix: "",
+      });
       console.error("Error saving meetupEventId:", err);
     } finally {
       setIsSavingMeetupId(false);
@@ -471,7 +489,18 @@ export default function RsvpReportPage() {
           )}
           {saveMeetupMessage && (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {saveMeetupMessage}
+              {saveMeetupMessage.prefix}{" "}
+              {saveMeetupMessage.prUrl && saveMeetupMessage.prNumber && (
+                <a
+                  href={saveMeetupMessage.prUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-etsa-primary hover:text-etsa-primary-dark underline"
+                >
+                  PR #{saveMeetupMessage.prNumber}
+                </a>
+              )}{" "}
+              {saveMeetupMessage.suffix}
             </p>
           )}
         </div>
