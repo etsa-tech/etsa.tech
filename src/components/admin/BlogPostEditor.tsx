@@ -34,6 +34,7 @@ const blogPostSchema = z.object({
   presentationDescription: z.string().optional(),
   presentationSlides: z.string().optional(),
   recordingUrl: z.string().optional(),
+  meetupEventId: z.string().optional(),
   eventDate: z.string().optional(),
   eventLocation: z.string().optional(),
   eventLocationName: z.string().optional(),
@@ -69,6 +70,7 @@ interface BlogPostFrontmatter {
   speakerImage?: string;
   presentationSlides?: string;
   recordingUrl?: string;
+  meetupEventId?: string;
   eventDate?: string;
   eventLocation?: {
     name?: string;
@@ -407,6 +409,8 @@ function reconstructYamlContent(
         extractedFields.presentationSlides = formData.presentationSlides;
       if (formData.recordingUrl)
         extractedFields.recordingUrl = formData.recordingUrl;
+      if (formData.meetupEventId)
+        extractedFields.meetupEventId = formData.meetupEventId;
       if (formData.eventDate) extractedFields.eventDate = formData.eventDate;
       if (formData.eventLocation)
         extractedFields.eventLocation = formData.eventLocation;
@@ -440,6 +444,9 @@ function reconstructYamlContent(
         presentationSlides: formData.presentationSlides,
       }),
       ...(formData.recordingUrl && { recordingUrl: formData.recordingUrl }),
+      ...(formData.meetupEventId && {
+        meetupEventId: formData.meetupEventId,
+      }),
       ...(formData.eventDate && { eventDate: formData.eventDate }),
       ...(formData.eventLocation && { eventLocation: formData.eventLocation }),
     };
@@ -782,6 +789,7 @@ function createDefaultValues(
     ),
     presentationSlides: getStringValue(frontmatter?.presentationSlides),
     recordingUrl: getStringValue(frontmatter?.recordingUrl),
+    meetupEventId: getStringValue(frontmatter?.meetupEventId),
     eventDate: getStringValue(
       frontmatter?.eventDate,
       getFirstTuesdayOfNextMonth(),
@@ -1914,6 +1922,26 @@ export default function BlogPostEditor({
                   placeholder="https://www.youtube.com/watch?v=..."
                   className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
                 />
+              </div>
+
+              {/* Meetup Event ID */}
+              <div>
+                <label
+                  htmlFor="meetupEventId"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Meetup Event ID
+                </label>
+                <input
+                  id="meetupEventId"
+                  type="text"
+                  {...register("meetupEventId")}
+                  placeholder="e.g. 311641435 (the number in the meetup.com event URL)"
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Used to pull the Meetup RSVP count on the RSVPs report page.
+                </p>
               </div>
             </div>
           )}

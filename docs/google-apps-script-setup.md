@@ -10,6 +10,7 @@ The Google Apps Script acts as a webhook endpoint that:
 - Validates the incoming data
 - Writes the data to your Google Sheet in the correct format
 - Returns success/error responses to the form
+- Serves RSVPs back out for a given event (`GET ?event=<title>`), used by the admin portal's RSVP report page to read what's already in the sheet
 
 ## Prerequisites
 
@@ -132,15 +133,53 @@ function doPost(e) {
 }
 
 /**
- * Handle GET requests for testing and health checks
+ * Handle GET requests: a health check when called with no params, or a
+ * lookup of RSVPs for a given event (used by the admin portal's RSVP
+ * report) when called with ?event=<event title>.
  */
 function doGet(e) {
-  const timestamp = new Date().toISOString();
-  console.log("Health check request received at:", timestamp);
+  const eventFilter = e.parameter && e.parameter.event;
 
-  return ContentService.createTextOutput(
-    `ETSA RSVP webhook is running - ${timestamp}`,
-  ).setMimeType(ContentService.MimeType.TEXT);
+  if (!eventFilter) {
+    const timestamp = new Date().toISOString();
+    console.log("Health check request received at:", timestamp);
+    return ContentService.createTextOutput(
+      `ETSA RSVP webhook is running - ${timestamp}`,
+    ).setMimeType(ContentService.MimeType.TEXT);
+  }
+
+  try {
+    const sheet = SpreadsheetApp.getActiveSheet();
+    const data = sheet.getDataRange().getValues();
+    const [headerRow, ...dataRows] = data;
+
+    const colIndex = (headerName) => headerRow.indexOf(headerName);
+    const timestampCol = colIndex("Timestamp");
+    const emailCol = colIndex("Email Address");
+    const canAttendCol = colIndex("Can you attend?");
+    const firstNameCol = colIndex("What is your first name?");
+    const lastNameCol = colIndex("What is your last name?");
+    const eventCol = colIndex("Event");
+
+    const rows = dataRows
+      .filter((row) => eventCol !== -1 && row[eventCol] === eventFilter)
+      .map((row) => ({
+        timestamp: timestampCol !== -1 ? String(row[timestampCol]) : "",
+        email: emailCol !== -1 ? row[emailCol] : "",
+        canAttend: canAttendCol !== -1 ? row[canAttendCol] : "",
+        firstName: firstNameCol !== -1 ? row[firstNameCol] : "",
+        lastName: lastNameCol !== -1 ? row[lastNameCol] : "",
+      }));
+
+    return ContentService.createTextOutput(
+      JSON.stringify({ rows }),
+    ).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    console.error("Error reading RSVPs for event:", error);
+    return ContentService.createTextOutput(
+      JSON.stringify({ rows: [], error: error.toString() }),
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 /**
@@ -243,6 +282,14 @@ curl -X POST "YOUR_WEBHOOK_URL" \
     "timestamp": "2024-01-01T12:00:00Z"
   }'
 ```
+
+### Testing the Event Lookup
+
+```bash
+curl "YOUR_WEBHOOK_URL?event=Your%20Post%20Title"
+```
+
+Should return `{"rows": [...]}` with any RSVPs whose `Event` column exactly matches the given title.
 
 ### Using the Test Function
 
