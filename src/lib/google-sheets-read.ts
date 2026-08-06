@@ -4,6 +4,7 @@ export interface SheetRsvpRow {
   email: string;
   canAttend: string;
   timestamp: string;
+  comments: string;
 }
 
 // Reads RSVPs back out of the Google Sheet the /rsvp form writes to, via the
@@ -36,7 +37,12 @@ export async function getSheetRsvpsForEvent(
       throw new Error("Google Sheets webhook response missing rows array");
     }
 
-    return result.rows;
+    // "Can you attend?" holds free text across years of sheet history -
+    // the current form writes "Yes", older Google Form entries wrote
+    // "Yes, I'll be there". Match either; exclude "No"/"Maybe".
+    return (result.rows as SheetRsvpRow[]).filter(
+      (row) => row.canAttend?.trim().toLowerCase().startsWith("yes"),
+    );
   } catch (error) {
     clearTimeout(timeoutId);
     console.error("Failed to read RSVPs from Google Sheets:", error);

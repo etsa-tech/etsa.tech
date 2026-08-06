@@ -153,12 +153,19 @@ function doGet(e) {
     const data = sheet.getDataRange().getValues();
     const [headerRow, ...dataRows] = data;
 
-    const colIndex = (headerName) => headerRow.indexOf(headerName);
+    // Case/whitespace-insensitive header match - sheet headers accumulated
+    // over years of manual edits aren't guaranteed byte-identical.
+    const normalizeHeader = (value) => String(value).trim().toLowerCase();
+    const colIndex = (headerName) => {
+      const target = normalizeHeader(headerName);
+      return headerRow.findIndex((h) => normalizeHeader(h) === target);
+    };
     const timestampCol = colIndex("Timestamp");
     const emailCol = colIndex("Email Address");
     const canAttendCol = colIndex("Can you attend?");
     const firstNameCol = colIndex("What is your first name?");
     const lastNameCol = colIndex("What is your last name?");
+    const commentsCol = colIndex("Comments and/or questions");
     const eventCol = colIndex("Event");
 
     const rows = dataRows
@@ -169,6 +176,7 @@ function doGet(e) {
         canAttend: canAttendCol !== -1 ? row[canAttendCol] : "",
         firstName: firstNameCol !== -1 ? row[firstNameCol] : "",
         lastName: lastNameCol !== -1 ? row[lastNameCol] : "",
+        comments: commentsCol !== -1 ? row[commentsCol] : "",
       }));
 
     return ContentService.createTextOutput(
