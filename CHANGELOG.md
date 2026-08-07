@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.3] - 2026-08-07
+
+### 🐛 Bug Fixes
+
+- **blog**: taking-control-and-breaking-the-cycle-of-burnout ([#438](https://github.com/etsa-tech/etsa.tech/pull/438)) by @etsa-admin-interface[bot]
+
 ## [5.1.2] - 2026-08-07
 
 ### 🐛 Bug Fixes
