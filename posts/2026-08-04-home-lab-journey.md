@@ -25,6 +25,7 @@ tags:
 title: "There and Back Again: A Home Lab Journey through One of the Most Interesting Times in IT"
 recordingUrl: "https://www.youtube.com/watch?v=kq4LEqlvyjU"
 meetupEventId: "315866502"
+presentationSlides: "There and Back Again_ A Homelab Journey.pdf"
 ---
 
 I began a graveyard shift job in 2019 for Covenant Health in their data
