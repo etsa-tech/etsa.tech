@@ -307,7 +307,7 @@ export default function AboutPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="https://www.meetup.com/etsa-tech"
+                href="https://www.meetup.com/lopsa-etenn/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary btn-lg"

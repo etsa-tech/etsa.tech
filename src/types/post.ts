@@ -33,6 +33,7 @@ export interface PostFrontmatter {
   presentationDescription?: string;
   presentationSlides?: string;
   recordingUrl?: string;
+  meetupEventId?: string;
   eventDate?: string;
   eventLocation?:
     | string

@@ -8,8 +8,10 @@ import {
   createOrUpdateFile,
   createBranch,
   createOrGetPullRequest,
+  enableAutoMergeForPR,
   getBranches,
 } from "@/lib/github";
+import { getRepoInfo } from "@/lib/github-app";
 import matter from "gray-matter";
 import { load } from "js-yaml";
 import { dumpFrontmatterYaml } from "@/lib/yaml-frontmatter";
@@ -21,6 +23,63 @@ export const dynamic = "force-dynamic";
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
+}
+
+// Finds an existing update branch for this post (old and new naming
+// patterns, for backward compatibility) or creates a new fix/ branch, and
+// returns the file SHA to update against. Pulled out of PUT to keep that
+// function's branching down to the create-PR-vs-direct-commit decision.
+async function resolveBranchForEdit(
+  slug: string,
+  title: string,
+): Promise<{ branchName: string; fileSha: string; sanitizedTitle: string }> {
+  const sanitizedTitle = sanitizeForBranchName(title);
+
+  const allBranches = await getBranches();
+  const updateBranchPattern = `update-post-${slug}-`;
+  const newPostBranchPattern = `new-post-${slug}-`;
+  const datePrefix = slug.split("-").slice(0, 3).join("-");
+  const featureBranchPattern = `feature/${datePrefix}-`;
+  const fixBranchPattern = `fix/${sanitizedTitle}`;
+  const choreBranchPattern = `chore/${sanitizedTitle}`;
+
+  const existingBranch = allBranches.find(
+    (branch) =>
+      branch.startsWith(updateBranchPattern) ||
+      branch.startsWith(newPostBranchPattern) ||
+      branch.startsWith(featureBranchPattern) ||
+      branch === fixBranchPattern ||
+      branch === choreBranchPattern,
+  );
+
+  if (existingBranch) {
+    console.log(`Using existing branch: ${existingBranch}`);
+    try {
+      const fileData = await getFileContentWithSha(
+        `posts/${slug}.md`,
+        existingBranch,
+      );
+      return {
+        branchName: existingBranch,
+        fileSha: fileData.sha,
+        sanitizedTitle,
+      };
+    } catch {
+      // File doesn't exist yet in this branch - fall back to main's SHA.
+      const fileData = await getFileContentWithSha(`posts/${slug}.md`, "main");
+      return {
+        branchName: existingBranch,
+        fileSha: fileData.sha,
+        sanitizedTitle,
+      };
+    }
+  }
+
+  const branchName = `fix/${sanitizedTitle}`;
+  console.log(`Creating new fix branch: ${branchName}`);
+  await createBranch(branchName);
+  const fileData = await getFileContentWithSha(`posts/${slug}.md`, "main");
+  return { branchName, fileSha: fileData.sha, sanitizedTitle };
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -63,7 +122,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const { slug } = await params;
-    const { frontmatter, content, createPR = true } = await request.json();
+    const {
+      frontmatter,
+      content,
+      createPR = true,
+      autoMerge = false,
+    } = await request.json();
 
     const { searchParams } = new URL(request.url);
     const branch = searchParams.get("branch") || "main";
@@ -86,70 +150,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       // Extract title for branch name and PR title
       const title = frontmatter.title || slug;
 
-      // Check if there's already a branch for this post (support both old and new patterns)
-      const allBranches = await getBranches();
-
-      // Old patterns for backward compatibility
-      const updateBranchPattern = `update-post-${slug}-`;
-      const newPostBranchPattern = `new-post-${slug}-`;
-
-      // Old feature pattern
-      const datePrefix = slug.split("-").slice(0, 3).join("-");
-      const featureBranchPattern = `feature/${datePrefix}-`;
-
-      // Sanitize title for branch name matching
-      const sanitizedTitle = sanitizeForBranchName(title);
-
-      // New patterns - fix/ and chore/
-      const fixBranchPattern = `fix/${sanitizedTitle}`;
-      const choreBranchPattern = `chore/${sanitizedTitle}`;
-
-      const existingBranch = allBranches.find(
-        (branch) =>
-          branch.startsWith(updateBranchPattern) ||
-          branch.startsWith(newPostBranchPattern) ||
-          branch.startsWith(featureBranchPattern) ||
-          branch === fixBranchPattern ||
-          branch === choreBranchPattern,
-      );
-
-      let branchName: string;
-      let fileSha: string;
-
-      if (existingBranch) {
-        // Use existing branch
-        branchName = existingBranch;
-        console.log(`Using existing branch: ${branchName}`);
-
-        // Get the file SHA from the existing branch
-        try {
-          const fileData = await getFileContentWithSha(
-            `posts/${slug}.md`,
-            branchName,
-          );
-          fileSha = fileData.sha;
-        } catch {
-          // If file doesn't exist in the branch, get SHA from main
-          const fileData = await getFileContentWithSha(
-            `posts/${slug}.md`,
-            "main",
-          );
-          fileSha = fileData.sha;
-        }
-      } else {
-        // Create a new branch in the format: fix/posttitle
-        // Use 'fix' for content corrections/updates
-        branchName = `fix/${sanitizedTitle}`;
-        console.log(`Creating new fix branch: ${branchName}`);
-        await createBranch(branchName);
-
-        // Get the current file SHA from main branch for the update
-        const fileData = await getFileContentWithSha(
-          `posts/${slug}.md`,
-          "main",
-        );
-        fileSha = fileData.sha;
-      }
+      const { branchName, fileSha, sanitizedTitle } =
+        await resolveBranchForEdit(slug, title);
 
       // Update the file in the branch
       await createOrUpdateFile(
@@ -170,14 +172,27 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           .user?.name}.`,
       );
 
+      const { owner, repo } = getRepoInfo();
+
+      // Auto-merge is opt-in per call site, not a general PUT behavior - only
+      // the RSVP report's "save Meetup Event ID" flow sets this, since it's
+      // a narrow metadata-only change. The route's own auth check above
+      // (isAuthorizedUser - @etsa.tech accounts only) is what "the user
+      // matches" gates on; there's no separate per-PR-type permission model.
+      const autoMergeEnabled = autoMerge
+        ? await enableAutoMergeForPR(prNumber)
+        : false;
+
       return NextResponse.json({
         success: true,
         message: isNew
           ? "Pull request created successfully"
           : "Changes saved to existing pull request",
         prNumber,
+        prUrl: `https://github.com/${owner}/${repo}/pull/${prNumber}`,
         branchName,
         isNewPR: isNew,
+        autoMergeEnabled,
       });
     } else {
       // Direct update (for drafts or immediate changes) - need SHA for existing file

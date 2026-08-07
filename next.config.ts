@@ -5,6 +5,13 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false, // Disable source maps in production to prevent code exposure
   poweredByHeader: false, // Remove X-Powered-By header to avoid technology disclosure
 
+  // Pin the workspace root to this repo - without this, Next.js/Turbopack
+  // can misdetect it when a stray lockfile exists further up the directory
+  // tree (e.g. an unrelated ~/package-lock.json).
+  turbopack: {
+    root: __dirname,
+  },
+
   images: {
     unoptimized: true,
     // Allow Google profile images (NextAuth Google provider)

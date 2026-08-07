@@ -352,6 +352,12 @@ export default function BlogPostsTable({
                     >
                       Edit
                     </Link>
+                    <Link
+                      href={`/admin/posts/${post.slug}/rsvps`}
+                      className="text-etsa-primary hover:text-etsa-primary-dark"
+                    >
+                      RSVPs
+                    </Link>
                   </div>
                 </td>
               </tr>
