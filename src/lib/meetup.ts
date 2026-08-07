@@ -2,6 +2,7 @@ interface MeetupEventInfo {
   count: number;
   title: string;
   dateTime: string;
+  sampleAttendeeNames: string[];
 }
 
 interface MeetupEventListItem {
@@ -32,10 +33,40 @@ function normalizeTitle(title: string): string {
   return title.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
+// The rsvps(...) connection on an Event entry carries up to 5 Rsvp -> Member
+// refs regardless of whether the event was reached via a single-event fetch
+// or the group's events-list fetch - both expose real attendee names
+// anonymously. Only the dedicated /attendees/ sub-page is login-walled.
+function extractSampleAttendeeNames(
+  eventEntry: Record<string, unknown>,
+  apolloState: Record<string, unknown>,
+  rsvpKey: string | undefined,
+): string[] {
+  const rsvpConnection = rsvpKey
+    ? (eventEntry[rsvpKey] as
+        | { edges?: { node?: { __ref?: string } }[] }
+        | undefined)
+    : undefined;
+
+  return (rsvpConnection?.edges ?? [])
+    .map((edge) => {
+      const rsvpRef = edge.node?.__ref;
+      const rsvp = rsvpRef
+        ? (apolloState[rsvpRef] as { member?: { __ref?: string } } | undefined)
+        : undefined;
+      const memberRef = rsvp?.member?.__ref;
+      const member = memberRef
+        ? (apolloState[memberRef] as { name?: string } | undefined)
+        : undefined;
+      return member?.name;
+    })
+    .filter((name): name is string => Boolean(name));
+}
+
 // Meetup server-renders event data into a __NEXT_DATA__ JSON blob, including
-// an Apollo GraphQL cache with the RSVP count. This is reachable with a plain
-// anonymous fetch. Attendee *names* are not - Meetup redirects the
-// /attendees/ sub-page to a login wall - so this only ever returns a count.
+// an Apollo GraphQL cache with the RSVP count and a handful of real attendee
+// names. This is reachable with a plain anonymous fetch - only the dedicated
+// /attendees/ sub-page is login-walled.
 export async function getMeetupRsvpCount(
   eventId: string,
 ): Promise<MeetupEventInfo | null> {
@@ -88,11 +119,26 @@ export async function getMeetupRsvpCount(
       throw new TypeError("Meetup page did not include a YES RSVP count");
     }
 
+    // The single-event page's rsvps(YES) connection only ever carries
+    // totalCount here - no Rsvp/Member data is included, unlike the
+    // events-list page - so this is normally empty. Kept anyway in case
+    // Meetup ever includes edges on this query.
+    const directSampleNames = extractSampleAttendeeNames(
+      eventEntry,
+      apolloState,
+      rsvpKey,
+    );
+    const sampleAttendeeNames =
+      directSampleNames.length > 0
+        ? directSampleNames
+        : await findRecentEventSampleNames(eventId);
+
     return {
       count: rsvpConnection.totalCount,
       title: typeof eventEntry.title === "string" ? eventEntry.title : "",
       dateTime:
         typeof eventEntry.dateTime === "string" ? eventEntry.dateTime : "",
+      sampleAttendeeNames,
     };
   } catch (error) {
     clearTimeout(timeoutId);
@@ -146,27 +192,11 @@ async function fetchMeetupEventsList(
 
       const going = entry.going as { totalCount?: number } | undefined;
       const rsvpKey = Object.keys(entry).find((k) => k.startsWith("rsvps("));
-      const rsvpConnection = rsvpKey
-        ? (entry[rsvpKey] as
-            | { edges?: { node?: { __ref?: string } }[] }
-            | undefined)
-        : undefined;
-
-      const sampleAttendeeNames = (rsvpConnection?.edges ?? [])
-        .map((edge) => {
-          const rsvpRef = edge.node?.__ref;
-          const rsvp = rsvpRef
-            ? (apolloState[rsvpRef] as
-                | { member?: { __ref?: string } }
-                | undefined)
-            : undefined;
-          const memberRef = rsvp?.member?.__ref;
-          const member = memberRef
-            ? (apolloState[memberRef] as { name?: string } | undefined)
-            : undefined;
-          return member?.name;
-        })
-        .filter((name): name is string => Boolean(name));
+      const sampleAttendeeNames = extractSampleAttendeeNames(
+        entry,
+        apolloState,
+        rsvpKey,
+      );
 
       events.push({
         id: typeof entry.id === "string" ? entry.id : "",
@@ -182,6 +212,19 @@ async function fetchMeetupEventsList(
     console.error(`Failed to fetch Meetup ${type} events list:`, error);
     return [];
   }
+}
+
+// Fallback for getMeetupRsvpCount's single-event fetch, which never has
+// attendee names: look for the same event ID in the recent upcoming/past
+// events list instead. Only works for events still in that ~10-event
+// window - older ones simply get no sample names, same as before.
+async function findRecentEventSampleNames(eventId: string): Promise<string[]> {
+  const [upcoming, past] = await Promise.all([
+    fetchMeetupEventsList("upcoming"),
+    fetchMeetupEventsList("past"),
+  ]);
+  const match = [...upcoming, ...past].find((event) => event.id === eventId);
+  return match?.sampleAttendeeNames ?? [];
 }
 
 // Fallback for posts with no stored meetupEventId: search Meetup's recent

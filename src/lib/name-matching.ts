@@ -61,6 +61,10 @@ export function normalizeName(name: string): string {
 }
 
 export interface NamedEntry {
+  // Unique per raw entry (not derived from name/source) so entries that
+  // legitimately share a name and source - e.g. the same person RSVPing
+  // twice - don't collide when used as a React key.
+  id: string;
   name: string;
   source: string;
   timestamp?: string;

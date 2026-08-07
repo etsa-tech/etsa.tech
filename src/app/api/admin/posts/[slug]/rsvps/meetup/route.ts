@@ -23,12 +23,16 @@ export async function GET(
     }
 
     const { slug } = await params;
+    const { searchParams } = new URL(request.url);
+    // Lets the RSVP report query an arbitrary ID the user just typed in,
+    // without waiting for it to be saved to the post's frontmatter first.
+    const queryEventId = searchParams.get("eventId")?.trim() || null;
 
     const rawContent = await getBlogPost(slug, "main");
     const { data: frontmatter } = matter(rawContent);
     const postTitle: string = frontmatter.title || "";
     const storedMeetupEventId: string | null =
-      frontmatter.meetupEventId || null;
+      queryEventId || frontmatter.meetupEventId || null;
 
     const meetupResult = storedMeetupEventId
       ? await getMeetupRsvpCount(storedMeetupEventId).then((info) =>
@@ -59,10 +63,7 @@ export async function GET(
             title: meetupResult.title,
             dateTime: meetupResult.dateTime,
             matchedByTitle: meetupResult.matchedByTitle,
-            sampleAttendeeNames:
-              "sampleAttendeeNames" in meetupResult
-                ? meetupResult.sampleAttendeeNames
-                : [],
+            sampleAttendeeNames: meetupResult.sampleAttendeeNames,
             error: null,
           }
         : {
