@@ -212,6 +212,31 @@ export default function RsvpReportPage() {
     setIsMounted(true);
   }, []);
 
+  // Looks up an arbitrary Meetup event ID live, independent of whether it's
+  // been saved to the post's frontmatter yet - so a manually-entered ID
+  // shows real attendee data immediately instead of only after the PR
+  // merges and the page is reloaded.
+  const queryMeetupEventId = async (eventId: string) => {
+    if (!eventId) return;
+    setIsMeetupLoading(true);
+    setMeetupLoadError(null);
+    try {
+      const response = await fetch(
+        `/api/admin/posts/${slug}/rsvps/meetup?eventId=${encodeURIComponent(
+          eventId,
+        )}`,
+      );
+      if (!response.ok) throw new Error("Failed to load Meetup RSVPs");
+      const data = await response.json();
+      setMeetupData(data);
+    } catch (err) {
+      setMeetupLoadError("Failed to load Meetup RSVPs.");
+      console.error("Error querying manual Meetup Event ID:", err);
+    } finally {
+      setIsMeetupLoading(false);
+    }
+  };
+
   const saveMeetupEventId = async (eventId: string) => {
     if (!eventId) return;
     setIsSavingMeetupId(true);
@@ -317,7 +342,8 @@ export default function RsvpReportPage() {
   // its count has no identity and is added to the total separately below.
   const namedEntries = useMemo<NamedEntry[]>(() => {
     const sheetEntries: NamedEntry[] = (sheetData?.sheet.rows ?? []).map(
-      (row) => ({
+      (row, i) => ({
+        id: `${SOURCE_SHEET}-${i}`,
         name: `${row.firstName} ${row.lastName}`.trim(),
         source: SOURCE_SHEET,
         timestamp: row.timestamp,
@@ -325,9 +351,14 @@ export default function RsvpReportPage() {
       }),
     );
     const meetupEntries: NamedEntry[] = (meetup?.sampleAttendeeNames ?? []).map(
-      (name) => ({ name, source: SOURCE_MEETUP }),
+      (name, i) => ({
+        id: `${SOURCE_MEETUP}-${i}`,
+        name,
+        source: SOURCE_MEETUP,
+      }),
     );
-    const csvEntries: NamedEntry[] = csvAttendees.map((a) => ({
+    const csvEntries: NamedEntry[] = csvAttendees.map((a, i) => ({
+      id: `${SOURCE_CSV}-${i}`,
       name: a.name,
       source: SOURCE_CSV,
     }));
@@ -515,7 +546,10 @@ export default function RsvpReportPage() {
                 <button
                   type="button"
                   disabled={isSavingMeetupId || !manualMeetupId}
-                  onClick={() => saveMeetupEventId(manualMeetupId)}
+                  onClick={() => {
+                    saveMeetupEventId(manualMeetupId);
+                    queryMeetupEventId(manualMeetupId);
+                  }}
                   className="text-xs px-2 py-1 rounded bg-etsa-primary text-white hover:bg-etsa-primary-dark disabled:opacity-50"
                 >
                   Save
@@ -712,11 +746,7 @@ export default function RsvpReportPage() {
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {displayClusters.map((cluster) => (
-              <tr
-                key={cluster.mergedFrom
-                  .map((e) => `${e.source}:${e.name}`)
-                  .join("|")}
-              >
+              <tr key={cluster.mergedFrom.map((e) => e.id).join("|")}>
                 <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">
                   {cluster.name}
                   {cluster.mergedFrom.length > 1 && (
@@ -747,8 +777,24 @@ export default function RsvpReportPage() {
             {unnamedMeetupCount > 0 && (
               <tr>
                 <td className="px-6 py-3 text-sm text-gray-900 dark:text-white italic">
-                  {unnamedMeetupCount} additional Meetup RSVP
-                  {unnamedMeetupCount === 1 ? "" : "s"} (names not available)
+                  {meetup?.attendeesUrl ? (
+                    <a
+                      href={meetup.attendeesUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="not-italic text-etsa-primary hover:text-etsa-primary-dark underline"
+                    >
+                      {unnamedMeetupCount} additional Meetup RSVP
+                      {unnamedMeetupCount === 1 ? "" : "s"} (names not
+                      available)
+                    </a>
+                  ) : (
+                    <>
+                      {unnamedMeetupCount} additional Meetup RSVP
+                      {unnamedMeetupCount === 1 ? "" : "s"} (names not
+                      available)
+                    </>
+                  )}
                 </td>
                 <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
                   Meetup
