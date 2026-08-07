@@ -45,3 +45,7 @@ To Do.txt
 
 # Local Netlify folder
 .netlify
+
+/.vscode/mcp.json
+.mcp.json
+/.claude/settings.json
