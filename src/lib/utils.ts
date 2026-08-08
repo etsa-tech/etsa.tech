@@ -215,6 +215,26 @@ export function getPostSpeakers(frontmatter: PostFrontmatter): Speaker[] {
   return speakers;
 }
 
+// Derive the bio/date/abstract/speaker fields a social mailing needs from
+// post frontmatter. Presentation posts only - blog posts don't carry the
+// speaker bio / event date fields this depends on.
+export function getSocialContentFields(frontmatter: PostFrontmatter): {
+  bio: string;
+  date: string;
+  abstract: string;
+  speakerName: string;
+  company: string;
+} {
+  const [speaker] = getPostSpeakers(frontmatter);
+  return {
+    bio: speaker?.bio ?? "",
+    date: frontmatter.eventDate ?? frontmatter.meetingDate ?? frontmatter.date,
+    abstract: frontmatter.presentationDescription ?? frontmatter.excerpt,
+    speakerName: speaker?.name ?? "",
+    company: speaker?.company ?? "",
+  };
+}
+
 // Generate speaker URL
 export function getSpeakerUrl(speakerName: string): string {
   return `/speaker/${encodeURIComponent(

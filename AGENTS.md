@@ -7,7 +7,8 @@ the task done:
 
 - `pre-commit run --all-files`
 - `npm run build`
-- Verify against the Sonarqube plugin for any fixes that need to be applied. Prompt the user on cognitive complexity fixes.
+- Verify against the SonarQube plugin for any fixes that need to be applied. Prompt the user on cognitive complexity fixes.
+- Verify `README.md` is up to date
 
 Fix any failures before considering the work complete.
 

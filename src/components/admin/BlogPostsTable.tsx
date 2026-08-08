@@ -15,6 +15,7 @@ interface BlogPost {
     speakerName?: string;
     speakerImage?: string;
     published?: boolean;
+    blogpost?: boolean;
     speakers?: Array<{
       name: string;
       image?: string;
@@ -50,6 +51,76 @@ function SortIcon({
     </span>
   );
 }
+
+function ActionIcon({ path }: Readonly<{ path: string }>) {
+  return (
+    <svg
+      className="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d={path} />
+    </svg>
+  );
+}
+
+function PostActions({
+  slug,
+  title,
+  isPresentation,
+}: Readonly<{ slug: string; title: string; isPresentation: boolean }>) {
+  return (
+    <div className="flex items-center space-x-3">
+      <Link
+        href={`/presentation/${slug}`}
+        target="_blank"
+        title="View"
+        aria-label={`View ${title}`}
+        className="text-etsa-primary hover:text-etsa-primary-dark"
+      >
+        <ActionIcon path={ICON_PATHS.view} />
+      </Link>
+      <Link
+        href={`/admin/posts/${slug}/edit`}
+        title="Edit"
+        aria-label={`Edit ${title}`}
+        className="text-etsa-primary hover:text-etsa-primary-dark"
+      >
+        <ActionIcon path={ICON_PATHS.edit} />
+      </Link>
+      <Link
+        href={`/admin/posts/${slug}/rsvps`}
+        title="RSVPs"
+        aria-label={`RSVPs for ${title}`}
+        className="text-etsa-primary hover:text-etsa-primary-dark"
+      >
+        <ActionIcon path={ICON_PATHS.rsvps} />
+      </Link>
+      {isPresentation && (
+        <Link
+          href={`/admin/posts/${slug}/social`}
+          title="Social"
+          aria-label={`Social mailing for ${title}`}
+          className="text-etsa-primary hover:text-etsa-primary-dark"
+        >
+          <ActionIcon path={ICON_PATHS.social} />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+const ICON_PATHS = {
+  view: "M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
+  edit: "M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z M19.5 15v3.75A2.25 2.25 0 0117.25 21H5.25A2.25 2.25 0 013 18.75V6.75A2.25 2.25 0 015.25 4.5h3.75",
+  rsvps:
+    "M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z",
+  social:
+    "M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46",
+} as const;
 
 export default function BlogPostsTable({
   posts,
@@ -245,8 +316,56 @@ export default function BlogPostsTable({
         </div>
       </div>
 
+      {/* Mobile card list - avoids the sideways scroll a wide table would
+          need on small screens */}
+      <div className="sm:hidden divide-y divide-gray-200 dark:divide-gray-700">
+        {currentPosts.map((post) => (
+          <div key={post.slug} className="p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 h-10 w-10">
+                {post.speakerImage ? (
+                  <Image
+                    className="h-10 w-10 rounded-full object-cover"
+                    src={post.speakerImage}
+                    alt={post.speakerName}
+                    width={40}
+                    height={40}
+                  />
+                ) : (
+                  <div className="h-10 w-10 rounded-full bg-etsa-primary flex items-center justify-center">
+                    <span className="text-white font-medium text-sm">
+                      {post.speakerName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="ml-3 min-w-0 flex-1">
+                <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {post.speakerName}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                  {post.title}
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {post.date ? formatDate(post.date) : "No date"}
+              </span>
+              <PostActions
+                slug={post.slug}
+                title={post.title}
+                isPresentation={
+                  post.originalPost.frontmatter?.blogpost !== true
+                }
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
@@ -338,27 +457,13 @@ export default function BlogPostsTable({
                   {post.date ? formatDate(post.date) : "No date"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex items-center space-x-3">
-                    <Link
-                      href={`/presentation/${post.slug}`}
-                      target="_blank"
-                      className="text-etsa-primary hover:text-etsa-primary-dark"
-                    >
-                      View
-                    </Link>
-                    <Link
-                      href={`/admin/posts/${post.slug}/edit`}
-                      className="text-etsa-primary hover:text-etsa-primary-dark"
-                    >
-                      Edit
-                    </Link>
-                    <Link
-                      href={`/admin/posts/${post.slug}/rsvps`}
-                      className="text-etsa-primary hover:text-etsa-primary-dark"
-                    >
-                      RSVPs
-                    </Link>
-                  </div>
+                  <PostActions
+                    slug={post.slug}
+                    title={post.title}
+                    isPresentation={
+                      post.originalPost.frontmatter?.blogpost !== true
+                    }
+                  />
                 </td>
               </tr>
             ))}

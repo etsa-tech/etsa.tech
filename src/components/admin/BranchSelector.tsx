@@ -52,7 +52,7 @@ export default function BranchSelector({
   }
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       <label
         htmlFor="branch-select"
         className="text-sm text-gray-600 dark:text-gray-400"
@@ -97,7 +97,8 @@ export default function BranchSelector({
 
       {selectedBranch !== "main" && (
         <span
-          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          title={selectedBranch}
+          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium max-w-full break-all ${
             selectedBranch.startsWith("update-post-")
               ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200"
               : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200"
