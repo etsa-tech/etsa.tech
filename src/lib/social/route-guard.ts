@@ -48,7 +48,7 @@ export async function requireDraftedCampaign(
   providerName: string,
 ): Promise<(SocialCacheRecord & { campaignId: string }) | NextResponse> {
   const existing = await getCachedSocialRecord(slug, providerName);
-  if (!existing || !existing.campaignId) {
+  if (!existing?.campaignId) {
     return NextResponse.json(
       { error: "No draft campaign exists yet - create one first" },
       { status: 400 },

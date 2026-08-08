@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import type { SocialCacheRecord } from "@/types/social";
@@ -218,9 +218,6 @@ export default function SocialMailingPage() {
     }
   };
 
-  const canSendLive =
-    record?.status === "tested" && record.testRecipients.length > 0;
-
   if (isLoadingPost) {
     return <div className="container py-12">Loading…</div>;
   }
@@ -236,6 +233,56 @@ export default function SocialMailingPage() {
           Social mailings are only available for presentation posts.
         </p>
       </div>
+    );
+  }
+
+  const canSendLive =
+    record?.status === "tested" && record.testRecipients.length > 0;
+
+  let draftButtonLabel = "Create draft campaign";
+  if (isDrafting) {
+    draftButtonLabel = "Creating draft…";
+  } else if (record?.campaignId) {
+    draftButtonLabel = "Recreate draft from current content";
+  }
+
+  let sendSectionContent: ReactNode;
+  if (!canSendLive) {
+    sendSectionContent = (
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        A successful test send is required before sending live.
+      </p>
+    );
+  } else if (record?.status === "sent") {
+    sendSectionContent = (
+      <p className="text-sm text-green-700 dark:text-green-400">
+        This campaign has already been sent.
+      </p>
+    );
+  } else {
+    sendSectionContent = (
+      <>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          Type the post title to confirm sending to the full audience:{" "}
+          <span className="font-mono">{post.title}</span>. This cannot be
+          undone.
+        </p>
+        <input
+          type="text"
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white mb-3"
+        />
+        <button
+          type="button"
+          onClick={sendLive}
+          disabled={isSending || confirmText !== post.title}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 disabled:opacity-50"
+        >
+          {isSending ? "Sending…" : "Send to full audience"}
+        </button>
+        {sendError && <p className="mt-2 text-sm text-red-600">{sendError}</p>}
+      </>
     );
   }
 
@@ -343,11 +390,7 @@ export default function SocialMailingPage() {
           disabled={isDrafting}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-etsa-primary hover:bg-etsa-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-etsa-primary disabled:opacity-50"
         >
-          {isDrafting
-            ? "Creating draft…"
-            : record?.campaignId
-              ? "Recreate draft from current content"
-              : "Create draft campaign"}
+          {draftButtonLabel}
         </button>
         {draftError && (
           <p className="mt-2 text-sm text-red-600">{draftError}</p>
@@ -437,40 +480,7 @@ export default function SocialMailingPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           3. Send to audience
         </h2>
-        {!canSendLive ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            A successful test send is required before sending live.
-          </p>
-        ) : record?.status === "sent" ? (
-          <p className="text-sm text-green-700 dark:text-green-400">
-            This campaign has already been sent.
-          </p>
-        ) : (
-          <>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              Type the post title (
-              <span className="font-mono">{post.title}</span>) to confirm
-              sending to the full audience. This cannot be undone.
-            </p>
-            <input
-              type="text"
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value)}
-              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white mb-3"
-            />
-            <button
-              type="button"
-              onClick={sendLive}
-              disabled={isSending || confirmText !== post.title}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 disabled:opacity-50"
-            >
-              {isSending ? "Sending…" : "Send to full audience"}
-            </button>
-            {sendError && (
-              <p className="mt-2 text-sm text-red-600">{sendError}</p>
-            )}
-          </>
-        )}
+        {sendSectionContent}
       </section>
     </div>
   );
