@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.6] - 2026-08-08
+
+### 🐛 Bug Fixes
+
+- **blog**: public-internet-security ([#441](https://github.com/etsa-tech/etsa.tech/pull/441)) by @etsa-admin-interface[bot]
+
 ## [5.1.5] - 2026-08-07
 
 ### 🐛 Bug Fixes
