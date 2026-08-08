@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { isAuthorizedUser } from "@/lib/auth-utils";
-import { getProvider } from "@/lib/social";
+import { resolveSocialRoute } from "@/lib/social/route-guard";
 import { getSocialDraftContent } from "@/lib/social/post-data";
 import { saveCachedSocialRecord } from "@/lib/social-cache";
 
@@ -13,19 +10,9 @@ export async function POST(
   { params }: { params: Promise<{ slug: string; provider: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!isAuthorizedUser(session)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { slug, provider: providerName } = await params;
-    const provider = getProvider(providerName);
-    if (!provider) {
-      return NextResponse.json(
-        { error: `Unknown social provider: ${providerName}` },
-        { status: 404 },
-      );
-    }
+    const ctx = await resolveSocialRoute(params);
+    if (ctx instanceof NextResponse) return ctx;
+    const { session, slug, providerName, provider } = ctx;
 
     const content = await getSocialDraftContent(slug);
     const { campaignId, campaignUrl } = await provider.createDraft({

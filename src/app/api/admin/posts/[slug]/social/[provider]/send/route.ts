@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { isAuthorizedUser } from "@/lib/auth-utils";
-import { getProvider } from "@/lib/social";
-import { getPublishedPostFrontmatter } from "@/lib/social/post-data";
 import {
-  getCachedSocialRecord,
-  saveCachedSocialRecord,
-} from "@/lib/social-cache";
+  resolveSocialRoute,
+  requireDraftedCampaign,
+} from "@/lib/social/route-guard";
+import { getPublishedPostFrontmatter } from "@/lib/social/post-data";
+import { saveCachedSocialRecord } from "@/lib/social-cache";
 
 export const dynamic = "force-dynamic";
 
@@ -16,19 +13,9 @@ export async function POST(
   { params }: { params: Promise<{ slug: string; provider: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!isAuthorizedUser(session)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { slug, provider: providerName } = await params;
-    const provider = getProvider(providerName);
-    if (!provider) {
-      return NextResponse.json(
-        { error: `Unknown social provider: ${providerName}` },
-        { status: 404 },
-      );
-    }
+    const ctx = await resolveSocialRoute(params);
+    if (ctx instanceof NextResponse) return ctx;
+    const { session, slug, providerName, provider } = ctx;
 
     const { confirm } = (await request.json()) as { confirm?: unknown };
     const { title } = await getPublishedPostFrontmatter(slug);
@@ -39,13 +26,8 @@ export async function POST(
       );
     }
 
-    const existing = await getCachedSocialRecord(slug, providerName);
-    if (!existing?.campaignId) {
-      return NextResponse.json(
-        { error: "No draft campaign exists yet - create one first" },
-        { status: 400 },
-      );
-    }
+    const existing = await requireDraftedCampaign(slug, providerName);
+    if (existing instanceof NextResponse) return existing;
 
     // The hard gate: a live send to the real audience is refused unless a
     // test send against this exact campaign has already happened. Creating

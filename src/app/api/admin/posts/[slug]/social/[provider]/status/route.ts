@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { isAuthorizedUser } from "@/lib/auth-utils";
+import { resolveSocialRoute } from "@/lib/social/route-guard";
 import { getCachedSocialRecord } from "@/lib/social-cache";
 
 export const dynamic = "force-dynamic";
@@ -11,13 +9,11 @@ export async function GET(
   { params }: { params: Promise<{ slug: string; provider: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!isAuthorizedUser(session)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const ctx = await resolveSocialRoute(params);
+    if (ctx instanceof NextResponse) return ctx;
+    const { slug, providerName } = ctx;
 
-    const { slug, provider } = await params;
-    const cached = await getCachedSocialRecord(slug, provider);
+    const cached = await getCachedSocialRecord(slug, providerName);
     return NextResponse.json({ cached });
   } catch (error) {
     console.error("Error loading social send status:", error);
