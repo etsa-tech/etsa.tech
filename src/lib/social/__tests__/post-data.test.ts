@@ -62,9 +62,7 @@ describe("getSocialDraftContent", () => {
         excerpt: "excerpt fallback",
         presentationDescription: "The real abstract",
         eventDate: "2026-08-04",
-        speakers: [
-          { name: "Jane Doe", company: "Acme", bio: "Jane's bio" },
-        ],
+        speakers: [{ name: "Jane Doe", company: "Acme", bio: "Jane's bio" }],
       }),
     );
 
