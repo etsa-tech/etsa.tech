@@ -4,7 +4,7 @@ The official website for ETSA, a professional meetup organization based in Knoxv
 
 ## Features
 
-- **Modern Design**: Built with Next.js 15, TypeScript, and Tailwind CSS
+- **Modern Design**: Built with Next.js 16, TypeScript, and Tailwind CSS
 - **Blog System**: Markdown-based blog system for past speaker presentations
 - **Photo Carousel**: Rotating photos from meetup events with visible captions
 - **Dark/Light Mode**: Full theme support with system preference detection
@@ -14,7 +14,7 @@ The official website for ETSA, a professional meetup organization based in Knoxv
 
 ## Technology Stack
 
-- **Framework**: Next.js 15 with App Router
+- **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4 with custom design system
 - **Content**: Markdown with gray-matter for frontmatter
@@ -84,6 +84,50 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Environment Variables (Public Site)
+
+These configure the public-facing site (branding, contact form, RSVP, maps,
+analytics). Admin-specific variables (OAuth, GitHub App, Mailchimp) are
+documented under [Admin Interface](#admin-interface).
+
+```bash
+# Site branding and metadata
+NEXT_PUBLIC_ORG_NAME=ETSA                    # Org name used in page titles/metadata
+NEXT_PUBLIC_ORG_LOCATION=Knoxville           # City shown in metadata/descriptions
+NEXT_PUBLIC_ORG_FOUNDED_YEAR=2012            # Used to compute "years running" on the homepage
+NEXT_PUBLIC_MEMBER_COUNT=500                 # Displayed member count on homepage/about
+NEXT_PUBLIC_SITE_URL=https://etsa.tech       # Canonical URL for sitemap/robots/RSS
+NEXT_PUBLIC_WEBSITE_URL=https://etsa.tech    # Used in Open Graph metadata and maps embed referrer
+
+# Social/external links (footer, contact page)
+NEXT_PUBLIC_GITHUB_URL=https://github.com/etsa-tech
+NEXT_PUBLIC_LINKEDIN_URL=https://www.linkedin.com/company/etsa-tech
+NEXT_PUBLIC_MEETUP_URL=https://www.meetup.com/lopsa-etenn/
+
+# Contact form / RSVP email delivery (SMTP)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_TLS=true                                # "true" enables STARTTLS/rejectUnauthorized
+SMTP_USERNAME=your_smtp_username
+SMTP_PASSWORD=your_smtp_password
+SMTP_FROM=""
+SMTP_TO=""
+
+# hCaptcha (spam protection on Contact and RSVP forms)
+NEXT_PUBLIC_HCAPTCHA_SITE_KEY=your_hcaptcha_site_key
+HCAPTCHA_SECRET_KEY=your_hcaptcha_secret_key
+
+# Google Maps (admin location search) and Google Sheets (RSVP backend)
+GOOGLE_MAPS_API_KEY_GEOCODING=your_google_maps_api_key
+GOOGLE_SHEETS_WEBHOOK_URL=your_apps_script_webhook_url
+
+# Meetup.com RSVP counts (admin RSVP report)
+MEETUP_GROUP_SLUG=etsa-tech
+
+# Analytics (optional)
+NEXT_PUBLIC_OVERTRACKING_SITE_ID=your_overtracking_site_id
+```
+
 ## Project Structure
 
 ```
@@ -127,7 +171,7 @@ The ETSA website includes a secure admin interface for content management access
 - **Blog Post Management**: Create, edit, and manage blog posts with markdown editor
 - **GitHub Integration**: Automatic pull request creation for content changes
 - **Asset Management**: Upload and manage images and files (coming soon)
-- **Social Media Integration**: LinkedIn and Mailchimp integration (coming soon)
+- **Social Media Integration**: Mailchimp campaign drafting, contact search, test sends, and a confirmation-gated live send, per presentation post; LinkedIn integration (coming soon)
 
 ### Required Environment Variables
 
@@ -145,6 +189,12 @@ GITHUB_APP_INSTALLATION_ID=your_installation_id
 GITHUB_WEBHOOK_SECRET=your_webhook_secret
 GITHUB_OWNER=etsa
 GITHUB_REPO=etsa.tech
+
+# Mailchimp (newsletter signup + admin social-mailing portal)
+MAILCHIMP_API_KEY=your_mailchimp_api_key
+MAILCHIMP_SERVER_PREFIX=us1  # the "usX" suffix on your API key
+MAILCHIMP_LIST_ID=your_audience_id
+MAILCHIMP_TEMPLATE_ID_PRESENTATION=your_template_id  # admin social portal, presentation posts only
 ```
 
 #### How to create GitHub App
@@ -554,6 +604,7 @@ The `netlify.toml` file includes:
 - ESLint for code quality
 - Prettier for code formatting
 - Tailwind CSS for styling
+- Jest for unit/integration tests (`npm test`)
 
 ## SonarCloud Configuration
 
@@ -654,7 +705,7 @@ graph TB
 1. Fork the repository
 2. Create a feature branch: `git checkout -b your-feature-branch`
 3. Make your changes
-4. Test thoroughly: `npm run build && npm run lint`
+4. Test thoroughly: `npm run build && npm run lint && npm test`
 5. Commit with conventional commits format: `git commit -m "feat(component): add new feature"`
 6. Submit a pull request with a title following conventional commits format
 
@@ -689,7 +740,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - **Website**: [https://etsa.tech](https://etsa.tech)
 - **Email**: Utilize the contact form on our website
-- **Meetup**: [https://www.meetup.com/etsa-tech](https://www.meetup.com/etsa-tech)
+- **Meetup**: [https://www.meetup.com/lopsa-etenn](https://www.meetup.com/lopsa-etenn)
 - **LinkedIn**: [https://www.linkedin.com/company/etsa-tech](https://www.linkedin.com/company/etsa-tech)
 - **GitHub**: [https://github.com/etsa-tech](https://github.com/etsa-tech)
 

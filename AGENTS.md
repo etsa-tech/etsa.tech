@@ -7,7 +7,12 @@ the task done:
 
 - `pre-commit run --all-files`
 - `npm run build`
-- Verify against the Sonarqube plugin for any fixes that need to be applied. Prompt the user on cognitive complexity fixes.
+- Verify against the SonarQube plugin for any fixes that need to be applied. Prompt the user on cognitive complexity fixes.
+- Verify `README.md` is up to date. The `readme-env-vars` pre-commit hook
+  mechanically enforces that every `process.env.X` used in `src/` is
+  documented in a ` ```bash ` block in README.md - it will fail the commit
+  if not. That check does NOT cover prose accuracy (feature status,
+  framework versions, setup steps) - still verify that by hand.
 
 Fix any failures before considering the work complete.
 

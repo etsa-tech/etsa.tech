@@ -54,10 +54,23 @@ repos:
             .*/__tests__/.*\.(ts|tsx)$
           )
         pass_filenames: false
+      - id: jest
+        name: Unit tests
+        entry: npm test -- --ci
+        language: system
+        files: \.(ts|tsx)$
+        pass_filenames: false
       - id: lfs-extensions-sync
         name: Git LFS extensions sync
         description: Keeps src/lib/git-lfs.ts's LFS_TRACKED_EXTENSIONS in sync with .gitattributes
         entry: npm run check:lfs-extensions
         language: system
         files: ^(\.gitattributes|src/lib/git-lfs\.ts)$
+        pass_filenames: false
+      - id: readme-env-vars
+        name: README env var docs
+        description: Every process.env.X used in src/ must be documented in README.md
+        entry: npm run check:readme-env-vars
+        language: system
+        files: ^(src/.*\.(ts|tsx)|README\.md)$
         pass_filenames: false

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import BlogPostEditor from "@/components/admin/BlogPostEditor";
 import { useAdmin } from "@/contexts/AdminContext";
 
@@ -318,10 +319,18 @@ export default function EditPostPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Edit Blog Post: {String(postData.frontmatter.title || "Untitled")}
         </h1>
+        {postData.frontmatter.blogpost !== true && (
+          <Link
+            href={`/admin/posts/${slug}/social`}
+            className="text-sm text-etsa-primary hover:text-etsa-primary-dark"
+          >
+            Mailchimp announcement →
+          </Link>
+        )}
       </div>
 
       {/* Branch Selector for viewing different versions */}
