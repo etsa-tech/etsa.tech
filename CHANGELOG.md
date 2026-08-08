@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-08-08
+
+### ✨ Features
+
+- **admin**: mailchimp social-mailing portal for presentation posts ([#443](https://github.com/etsa-tech/etsa.tech/pull/443)) by @wesleykirkland
+
 ## [5.1.7] - 2026-08-08
 
 ### ✨ Features
