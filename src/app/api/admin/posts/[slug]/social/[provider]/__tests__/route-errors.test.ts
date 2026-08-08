@@ -327,9 +327,11 @@ describe("search route", () => {
   });
 
   it("returns matching contacts for a query", async () => {
-    jest.mocked(mockMailchimpProvider.searchContacts).mockResolvedValue([
-      { id: "1", email: "wesley@wesleyk.me", name: "Wesley" },
-    ]);
+    jest
+      .mocked(mockMailchimpProvider.searchContacts)
+      .mockResolvedValue([
+        { id: "1", email: "wesley@wesleyk.me", name: "Wesley" },
+      ]);
     const res = await searchContacts(
       getRequest("/api/admin/posts/p/social/mailchimp/search?q=wesley"),
       routeParams("p"),
