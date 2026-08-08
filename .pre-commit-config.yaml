@@ -67,3 +67,10 @@ repos:
         language: system
         files: ^(\.gitattributes|src/lib/git-lfs\.ts)$
         pass_filenames: false
+      - id: readme-env-vars
+        name: README env var docs
+        description: Every process.env.X used in src/ must be documented in README.md
+        entry: npm run check:readme-env-vars
+        language: system
+        files: ^(src/.*\.(ts|tsx)|README\.md)$
+        pass_filenames: false
