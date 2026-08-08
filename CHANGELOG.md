@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.7] - 2026-08-08
+
+### ✨ Features
+
+- **admin**: cache RSVP report to Netlify Blobs with autosave ([#442](https://github.com/etsa-tech/etsa.tech/pull/442)) by @wesleykirkland
+
 ## [5.1.6] - 2026-08-08
 
 ### 🐛 Bug Fixes
