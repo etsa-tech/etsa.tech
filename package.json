@@ -16,6 +16,7 @@
     "@hcaptcha/react-hcaptcha": "^2.0.0",
     "@hookform/resolvers": "^5.2.1",
     "@monaco-editor/react": "^4.7.0",
+    "@netlify/blobs": "^10.7.12",
     "@octokit/app": "^16.1.0",
     "@octokit/rest": "^22.0.0",
     "@types/nodemailer": "^8.0.0",

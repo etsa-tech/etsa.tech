@@ -3,7 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { clusterEntriesByName, type NamedEntry } from "@/lib/name-matching";
+import {
+  clusterEntriesByName,
+  type EntryCluster,
+  type NamedEntry,
+} from "@/lib/name-matching";
 
 interface SheetRsvpRow {
   firstName: string;
@@ -167,10 +171,70 @@ function parseAttendeesCsv(text: string): CsvAttendee[] {
 const SOURCE_SHEET = "Google Sheet";
 const SOURCE_MEETUP = "Meetup";
 const SOURCE_CSV = "Meetup (CSV export)";
+const SOURCE_MANUAL = "Manual estimate";
+
+type SortColumn = "name" | "source" | "timestamp" | "comments";
+
+type TableRow =
+  | {
+      kind: "cluster";
+      key: string;
+      name: string;
+      sources: string[];
+      timestamp?: string;
+      comments: string;
+      cluster: EntryCluster;
+    }
+  | { kind: "unnamedMeetup"; key: string; name: string; sources: string[] }
+  | { kind: "manualEstimate"; key: string; name: string; sources: string[] };
+
+// How long the report must sit unchanged before it's auto-saved to the
+// Netlify Blobs cache.
+const AUTOSAVE_DELAY_MS = 10000;
+
+interface CachedReportData {
+  sheetData: SheetData | null;
+  meetupData: MeetupData | null;
+  csvAttendees: CsvAttendee[];
+  csvFileName: string | null;
+  manualEstimate: number;
+  dedupeEnabled: boolean;
+  confidenceThreshold: number;
+}
 
 function InlineSpinner() {
   return (
     <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-etsa-primary align-[-2px]" />
+  );
+}
+
+function SortableHeaderCell({
+  label,
+  column,
+  activeColumn,
+  direction,
+  onSort,
+}: Readonly<{
+  label: string;
+  column: SortColumn;
+  activeColumn: SortColumn;
+  direction: "asc" | "desc";
+  onSort: (column: SortColumn) => void;
+}>) {
+  const isActive = activeColumn === column;
+  return (
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <button
+        type="button"
+        onClick={() => onSort(column)}
+        className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200"
+      >
+        {label}
+        <span className="inline-block w-3 text-[10px] normal-case">
+          {isActive ? (direction === "asc" ? "▲" : "▼") : ""}
+        </span>
+      </button>
+    </th>
   );
 }
 
@@ -205,6 +269,25 @@ export default function RsvpReportPage() {
     prUrl?: string;
   } | null>(null);
 
+  // Cached-report state: loaded once on mount from Netlify Blobs, then
+  // auto-saved back after AUTOSAVE_DELAY_MS of no further edits.
+  const [isLoadingCache, setIsLoadingCache] = useState(true);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSavingReport, setIsSavingReport] = useState(false);
+  const [saveNotification, setSaveNotification] = useState<string | null>(null);
+  const [autosaveDeadline, setAutosaveDeadline] = useState<number | null>(null);
+  const [secondsUntilAutosave, setSecondsUntilAutosave] = useState<
+    number | null
+  >(null);
+
+  // Table view state - filtering/sorting is presentation-only, not part of
+  // the cached report.
+  const [tableFilterText, setTableFilterText] = useState("");
+  const [tableSourceFilter, setTableSourceFilter] = useState("all");
+  const [sortColumn, setSortColumn] = useState<SortColumn>("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
   // Loading text below depends on client-only state (which source is still
   // pending) - gate it behind mount so the server-rendered HTML and the
   // first client render match, then swap in the real status after hydration.
@@ -229,6 +312,7 @@ export default function RsvpReportPage() {
       if (!response.ok) throw new Error("Failed to load Meetup RSVPs");
       const data = await response.json();
       setMeetupData(data);
+      setIsDirty(true);
     } catch (err) {
       setMeetupLoadError("Failed to load Meetup RSVPs.");
       console.error("Error querying manual Meetup Event ID:", err);
@@ -284,8 +368,9 @@ export default function RsvpReportPage() {
 
   // Sheet and Meetup are fetched independently (separate API routes) so the
   // page can show which one is still loading instead of one opaque spinner
-  // gating everything until both are done.
-  useEffect(() => {
+  // gating everything until both are done. Marks the report dirty once both
+  // land, so a fresh pull from sources gets auto-saved back to the cache.
+  const loadFromSources = () => {
     if (!slug) return;
 
     setIsSheetLoading(true);
@@ -300,7 +385,10 @@ export default function RsvpReportPage() {
         setSheetLoadError("Failed to load Google Sheet RSVPs.");
         console.error("Error loading Sheet RSVPs:", err);
       })
-      .finally(() => setIsSheetLoading(false));
+      .finally(() => {
+        setIsSheetLoading(false);
+        setIsDirty(true);
+      });
 
     setIsMeetupLoading(true);
     setMeetupLoadError(null);
@@ -314,8 +402,134 @@ export default function RsvpReportPage() {
         setMeetupLoadError("Failed to load Meetup RSVPs.");
         console.error("Error loading Meetup RSVPs:", err);
       })
-      .finally(() => setIsMeetupLoading(false));
+      .finally(() => {
+        setIsMeetupLoading(false);
+        setIsDirty(true);
+      });
+  };
+
+  // On mount, look for a cached report before hitting Sheet/Meetup live -
+  // the cache is the fast path, live sources are only pulled when there's
+  // nothing cached yet or the user explicitly asks for a refresh.
+  useEffect(() => {
+    if (!slug) return;
+    let cancelled = false;
+
+    (async () => {
+      setIsLoadingCache(true);
+      try {
+        const response = await fetch(`/api/admin/posts/${slug}/rsvps/cache`);
+        if (response.ok) {
+          const { cached } = await response.json();
+          if (cached && !cancelled) {
+            const data = cached.data as CachedReportData;
+            setSheetData(data.sheetData ?? null);
+            setMeetupData(data.meetupData ?? null);
+            setCsvAttendees(data.csvAttendees ?? []);
+            setCsvFileName(data.csvFileName ?? null);
+            setManualEstimate(data.manualEstimate ?? 0);
+            setDedupeEnabled(data.dedupeEnabled ?? true);
+            setConfidenceThreshold(data.confidenceThreshold ?? 0.9);
+            setCachedAt(cached.savedAt);
+            setIsSheetLoading(false);
+            setIsMeetupLoading(false);
+            setIsLoadingCache(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Error loading cached RSVP report:", err);
+      }
+      if (!cancelled) {
+        setIsLoadingCache(false);
+        loadFromSources();
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
+
+  const saveReport = async () => {
+    if (!slug) return;
+    setIsSavingReport(true);
+    try {
+      const payload: CachedReportData = {
+        sheetData,
+        meetupData,
+        csvAttendees,
+        csvFileName,
+        manualEstimate,
+        dedupeEnabled,
+        confidenceThreshold,
+      };
+      const response = await fetch(`/api/admin/posts/${slug}/rsvps/cache`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Failed to save report");
+      const { cached } = await response.json();
+      setCachedAt(cached.savedAt);
+      setIsDirty(false);
+      setSaveNotification("Report saved.");
+    } catch (err) {
+      console.error("Error saving RSVP report:", err);
+      setSaveNotification("Failed to save report.");
+    } finally {
+      setIsSavingReport(false);
+    }
+  };
+
+  // Auto-save once the report has sat unchanged for AUTOSAVE_DELAY_MS - any
+  // further edit resets this timer via the dependency array below.
+  useEffect(() => {
+    if (!isDirty || isLoadingCache) {
+      setAutosaveDeadline(null);
+      return;
+    }
+    setAutosaveDeadline(Date.now() + AUTOSAVE_DELAY_MS);
+    const timer = setTimeout(() => {
+      saveReport();
+    }, AUTOSAVE_DELAY_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isDirty,
+    isLoadingCache,
+    sheetData,
+    meetupData,
+    csvAttendees,
+    csvFileName,
+    manualEstimate,
+    dedupeEnabled,
+    confidenceThreshold,
+  ]);
+
+  // Ticks the "saving in Ns" countdown shown next to "Unsaved changes." -
+  // purely cosmetic, doesn't drive the actual save (the timer above does).
+  useEffect(() => {
+    if (autosaveDeadline === null) {
+      setSecondsUntilAutosave(null);
+      return;
+    }
+    const update = () => {
+      setSecondsUntilAutosave(
+        Math.max(0, Math.ceil((autosaveDeadline - Date.now()) / 1000)),
+      );
+    };
+    update();
+    const interval = setInterval(update, 250);
+    return () => clearInterval(interval);
+  }, [autosaveDeadline]);
+
+  useEffect(() => {
+    if (!saveNotification) return;
+    const timer = setTimeout(() => setSaveNotification(null), 4000);
+    return () => clearTimeout(timer);
+  }, [saveNotification]);
 
   const handleCsvUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -332,6 +546,7 @@ export default function RsvpReportPage() {
         ? "Couldn't find a name column in this CSV - check that it's the guest list export from the Meetup event dashboard."
         : null,
     );
+    setIsDirty(true);
   };
 
   const postTitle = sheetData?.postTitle || meetupData?.postTitle || "";
@@ -397,6 +612,149 @@ export default function RsvpReportPage() {
     isMeetupLoading && "Meetup",
   ].filter((source): source is string => Boolean(source));
 
+  // One row per line in the table below - named clusters plus the two
+  // aggregate "no identity" rows, unified so filtering/sorting can treat
+  // them the same way.
+  const tableRows = useMemo<TableRow[]>(() => {
+    const rows: TableRow[] = displayClusters.map((cluster) => ({
+      kind: "cluster",
+      key: cluster.mergedFrom.map((e) => e.id).join("|"),
+      name: cluster.name,
+      sources: cluster.sources,
+      timestamp: cluster.timestamp,
+      comments: cluster.primaryEntry.comments || "",
+      cluster,
+    }));
+    if (unnamedMeetupCount > 0) {
+      rows.push({
+        kind: "unnamedMeetup",
+        key: "unnamed-meetup",
+        name: `${unnamedMeetupCount} additional Meetup RSVP${
+          unnamedMeetupCount === 1 ? "" : "s"
+        } (names not available)`,
+        sources: [SOURCE_MEETUP],
+      });
+    }
+    if (manualEstimate > 0) {
+      rows.push({
+        kind: "manualEstimate",
+        key: "manual-estimate",
+        name: `${manualEstimate} estimated walk-in${
+          manualEstimate === 1 ? "" : "s"
+        }`,
+        sources: [SOURCE_MANUAL],
+      });
+    }
+    return rows;
+  }, [displayClusters, unnamedMeetupCount, manualEstimate]);
+
+  const availableSources = useMemo(() => {
+    const sources = new Set<string>();
+    tableRows.forEach((row) => row.sources.forEach((s) => sources.add(s)));
+    return Array.from(sources).sort();
+  }, [tableRows]);
+
+  const filteredRows = useMemo(() => {
+    const needle = tableFilterText.trim().toLowerCase();
+    return tableRows.filter((row) => {
+      if (
+        tableSourceFilter !== "all" &&
+        !row.sources.includes(tableSourceFilter)
+      ) {
+        return false;
+      }
+      if (!needle) return true;
+      const comments = row.kind === "cluster" ? row.comments : "";
+      const haystack = `${row.name} ${row.sources.join(
+        " ",
+      )} ${comments}`.toLowerCase();
+      return haystack.includes(needle);
+    });
+  }, [tableRows, tableFilterText, tableSourceFilter]);
+
+  const sortedRows = useMemo(() => {
+    const sortValue = (row: TableRow): string => {
+      switch (sortColumn) {
+        case "name":
+          return row.name;
+        case "source":
+          return row.sources.join(", ");
+        case "comments":
+          return row.kind === "cluster" ? row.comments : "";
+        case "timestamp":
+          return "";
+      }
+    };
+    const sorted = [...filteredRows].sort((a, b) => {
+      if (sortColumn === "timestamp") {
+        const aTime =
+          a.kind === "cluster" && a.timestamp
+            ? new Date(a.timestamp).getTime()
+            : null;
+        const bTime =
+          b.kind === "cluster" && b.timestamp
+            ? new Date(b.timestamp).getTime()
+            : null;
+        if (aTime === null && bTime === null) return 0;
+        if (aTime === null) return 1;
+        if (bTime === null) return -1;
+        return aTime - bTime;
+      }
+      return sortValue(a).localeCompare(sortValue(b));
+    });
+    return sortDirection === "asc" ? sorted : sorted.reverse();
+  }, [filteredRows, sortColumn, sortDirection]);
+
+  const toggleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const escapeCsvField = (value: string): string =>
+    /["\r\n,]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+
+  // Client-side only, same as the CSV upload above - nothing is sent
+  // anywhere. One row per person (or per estimated walk-in) so the file
+  // stays tabular - no aggregate/summary rows that would break parsing.
+  const downloadCsvReport = () => {
+    const rows: string[][] = [
+      ["Name", "Source", "RSVP'd", "Comments and/or questions"],
+    ];
+    displayClusters.forEach((cluster) => {
+      rows.push([
+        cluster.name,
+        cluster.sources.join(", "),
+        formatTimestamp(cluster.timestamp),
+        cluster.primaryEntry.comments || "",
+      ]);
+    });
+    for (let i = 0; i < unnamedMeetupCount; i++) {
+      rows.push(["Meetup RSVP (name not available)", "Meetup", "", ""]);
+    }
+    for (let i = 0; i < manualEstimate; i++) {
+      rows.push(["Estimated walk-in", "Manual estimate", "", ""]);
+    }
+
+    const csvText = rows
+      .map((row) => row.map(escapeCsvField).join(","))
+      .join("\r\n");
+    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `rsvp-report-${slug}-${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -406,22 +764,70 @@ export default function RsvpReportPage() {
         >
           &larr; Back to Posts
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-          RSVP Report{postTitle ? `: ${postTitle}` : ""}
-        </h1>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            RSVP Report{postTitle ? `: ${postTitle}` : ""}
+          </h1>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={isLoadingCache || isAnythingLoading}
+              onClick={loadFromSources}
+              className="text-sm px-3 py-1.5 rounded-md border border-etsa-primary text-etsa-primary hover:bg-etsa-primary/10 disabled:opacity-50"
+            >
+              Refresh from data sources
+            </button>
+            <button
+              type="button"
+              disabled={isLoadingCache || isSavingReport}
+              onClick={saveReport}
+              className="text-sm px-3 py-1.5 rounded-md border border-etsa-primary text-etsa-primary hover:bg-etsa-primary/10 disabled:opacity-50"
+            >
+              {isSavingReport ? "Saving..." : "Save now"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadCsvReport}
+              className="text-sm px-3 py-1.5 rounded-md bg-etsa-primary text-white hover:bg-etsa-primary-dark"
+            >
+              Download CSV report
+            </button>
+          </div>
+        </div>
         <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
           Combines RSVPs from the site&apos;s Google Sheet, Meetup, an uploaded
-          Meetup guest-list CSV, and a manual walk-in estimate. Nothing on this
-          page is saved - re-open it fresh each time you need the number.
+          Meetup guest-list CSV, and a manual walk-in estimate. Loads the last
+          saved report automatically, then auto-saves back to the cache{" "}
+          {AUTOSAVE_DELAY_MS / 1000} seconds after you stop making changes.
         </p>
         {isMounted && (
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            {pendingSources.length > 0 ? (
+            {isLoadingCache ? (
+              <>
+                <InlineSpinner /> Checking for a cached report…
+              </>
+            ) : pendingSources.length > 0 ? (
               <>
                 <InlineSpinner /> Loading: {pendingSources.join(", ")}…
               </>
             ) : (
               "All sources loaded."
+            )}
+            {!isLoadingCache && cachedAt && (
+              <span className="ml-2">
+                Cached report from {formatTimestamp(cachedAt)}.
+              </span>
+            )}
+            {isSavingReport && (
+              <span className="ml-2">
+                <InlineSpinner /> Saving report…
+              </span>
+            )}
+            {isDirty && !isSavingReport && (
+              <span className="ml-2">
+                Unsaved changes - autosaving in{" "}
+                {secondsUntilAutosave ?? AUTOSAVE_DELAY_MS / 1000}s.
+              </span>
             )}
             {sheetLoadError && (
               <span className="ml-2 text-red-600 dark:text-red-400">
@@ -436,6 +842,15 @@ export default function RsvpReportPage() {
           </p>
         )}
       </div>
+
+      {saveNotification && (
+        <div
+          role="status"
+          className="fixed bottom-4 right-4 z-50 rounded-md bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm text-white shadow-lg"
+        >
+          {saveNotification}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
@@ -673,9 +1088,10 @@ export default function RsvpReportPage() {
             type="number"
             min={0}
             value={manualEstimate}
-            onChange={(e) =>
-              setManualEstimate(Math.max(0, Number(e.target.value) || 0))
-            }
+            onChange={(e) => {
+              setManualEstimate(Math.max(0, Number(e.target.value) || 0));
+              setIsDirty(true);
+            }}
             className="mt-1 block w-32 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary sm:text-sm"
           />
         </div>
@@ -686,7 +1102,10 @@ export default function RsvpReportPage() {
               id="dedupeEnabled"
               type="checkbox"
               checked={dedupeEnabled}
-              onChange={(e) => setDedupeEnabled(e.target.checked)}
+              onChange={(e) => {
+                setDedupeEnabled(e.target.checked);
+                setIsDirty(true);
+              }}
               className="h-4 w-4 rounded border-gray-300 text-etsa-primary focus:ring-etsa-primary"
             />
             <label
@@ -718,7 +1137,10 @@ export default function RsvpReportPage() {
                 max={1}
                 step={0.01}
                 value={confidenceThreshold}
-                onChange={(e) => setConfidenceThreshold(Number(e.target.value))}
+                onChange={(e) => {
+                  setConfidenceThreshold(Number(e.target.value));
+                  setIsDirty(true);
+                }}
                 className="mt-1 block w-full max-w-xs"
               />
             </div>
@@ -726,117 +1148,187 @@ export default function RsvpReportPage() {
         </div>
       </div>
 
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 flex flex-wrap items-end gap-3">
+        <div className="flex-1 min-w-[200px]">
+          <label
+            htmlFor="tableFilterText"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-300"
+          >
+            Filter
+          </label>
+          <input
+            id="tableFilterText"
+            type="text"
+            value={tableFilterText}
+            onChange={(e) => setTableFilterText(e.target.value)}
+            placeholder="Search name, source, or comments"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary text-sm"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="tableSourceFilter"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-300"
+          >
+            Source
+          </label>
+          <select
+            id="tableSourceFilter"
+            value={tableSourceFilter}
+            onChange={(e) => setTableSourceFilter(e.target.value)}
+            className="mt-1 block rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-etsa-primary focus:ring-etsa-primary text-sm"
+          >
+            <option value="all">All sources</option>
+            {availableSources.map((source) => (
+              <option key={source} value={source}>
+                {source}
+              </option>
+            ))}
+          </select>
+        </div>
+        {(tableFilterText || tableSourceFilter !== "all") && (
+          <button
+            type="button"
+            onClick={() => {
+              setTableFilterText("");
+              setTableSourceFilter("all");
+            }}
+            className="text-sm text-etsa-primary hover:text-etsa-primary-dark"
+          >
+            Clear filters
+          </button>
+        )}
+        <p className="ml-auto text-xs text-gray-500 dark:text-gray-400">
+          Showing {sortedRows.length} of {tableRows.length}
+        </p>
+      </div>
+
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Source
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                RSVP&apos;d
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Comments and/or questions
-              </th>
+              <SortableHeaderCell
+                label="Name"
+                column="name"
+                activeColumn={sortColumn}
+                direction={sortDirection}
+                onSort={toggleSort}
+              />
+              <SortableHeaderCell
+                label="Source"
+                column="source"
+                activeColumn={sortColumn}
+                direction={sortDirection}
+                onSort={toggleSort}
+              />
+              <SortableHeaderCell
+                label="RSVP'd"
+                column="timestamp"
+                activeColumn={sortColumn}
+                direction={sortDirection}
+                onSort={toggleSort}
+              />
+              <SortableHeaderCell
+                label="Comments and/or questions"
+                column="comments"
+                activeColumn={sortColumn}
+                direction={sortDirection}
+                onSort={toggleSort}
+              />
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {displayClusters.map((cluster) => (
-              <tr key={cluster.mergedFrom.map((e) => e.id).join("|")}>
-                <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">
-                  {cluster.name}
-                  {cluster.mergedFrom.length > 1 && (
-                    <span className="block text-xs text-gray-400 dark:text-gray-500">
-                      also matched:{" "}
-                      {cluster.mergedFrom
-                        .filter((e) => e !== cluster.primaryEntry)
-                        .map((e) =>
-                          e.name === cluster.primaryEntry.name
-                            ? `duplicate (${e.source})`
-                            : `${e.name} (${e.source})`,
-                        )
-                        .join(", ")}
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  {cluster.sources.join(", ")}
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  {formatTimestamp(cluster.timestamp)}
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  {cluster.primaryEntry.comments || "—"}
-                </td>
-              </tr>
-            ))}
-            {unnamedMeetupCount > 0 && (
-              <tr>
-                <td className="px-6 py-3 text-sm text-gray-900 dark:text-white italic">
-                  {meetup?.attendeesUrl ? (
-                    <a
-                      href={meetup.attendeesUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="not-italic text-etsa-primary hover:text-etsa-primary-dark underline"
-                    >
-                      {unnamedMeetupCount} additional Meetup RSVP
-                      {unnamedMeetupCount === 1 ? "" : "s"} (names not
-                      available)
-                    </a>
-                  ) : (
-                    <>
-                      {unnamedMeetupCount} additional Meetup RSVP
-                      {unnamedMeetupCount === 1 ? "" : "s"} (names not
-                      available)
-                    </>
-                  )}
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  Meetup
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  —
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  —
-                </td>
-              </tr>
-            )}
-            {manualEstimate > 0 && (
-              <tr>
-                <td className="px-6 py-3 text-sm text-gray-900 dark:text-white italic">
-                  {manualEstimate} estimated walk-in
-                  {manualEstimate === 1 ? "" : "s"}
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  Manual estimate
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  —
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  —
-                </td>
-              </tr>
-            )}
-            {displayClusters.length === 0 &&
-              unnamedMeetupCount === 0 &&
-              manualEstimate === 0 &&
-              !isAnythingLoading && (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-6 text-sm text-center text-gray-500 dark:text-gray-400"
-                  >
-                    No RSVPs yet from any source.
+            {sortedRows.map((row) => {
+              if (row.kind === "cluster") {
+                const cluster = row.cluster;
+                return (
+                  <tr key={row.key}>
+                    <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">
+                      {cluster.name}
+                      {cluster.mergedFrom.length > 1 && (
+                        <span className="block text-xs text-gray-400 dark:text-gray-500">
+                          also matched:{" "}
+                          {cluster.mergedFrom
+                            .filter((e) => e !== cluster.primaryEntry)
+                            .map((e) =>
+                              e.name === cluster.primaryEntry.name
+                                ? `duplicate (${e.source})`
+                                : `${e.name} (${e.source})`,
+                            )
+                            .join(", ")}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                      {cluster.sources.join(", ")}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                      {formatTimestamp(cluster.timestamp)}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                      {cluster.primaryEntry.comments || "—"}
+                    </td>
+                  </tr>
+                );
+              }
+              if (row.kind === "unnamedMeetup") {
+                return (
+                  <tr key={row.key}>
+                    <td className="px-6 py-3 text-sm text-gray-900 dark:text-white italic">
+                      {meetup?.attendeesUrl ? (
+                        <a
+                          href={meetup.attendeesUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="not-italic text-etsa-primary hover:text-etsa-primary-dark underline"
+                        >
+                          {row.name}
+                        </a>
+                      ) : (
+                        row.name
+                      )}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                      {SOURCE_MEETUP}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                      —
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                      —
+                    </td>
+                  </tr>
+                );
+              }
+              return (
+                <tr key={row.key}>
+                  <td className="px-6 py-3 text-sm text-gray-900 dark:text-white italic">
+                    {row.name}
+                  </td>
+                  <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                    {SOURCE_MANUAL}
+                  </td>
+                  <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                    —
+                  </td>
+                  <td className="px-6 py-3 text-sm text-gray-500 dark:text-gray-400">
+                    —
                   </td>
                 </tr>
-              )}
+              );
+            })}
+            {sortedRows.length === 0 && !isAnythingLoading && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-6 py-6 text-sm text-center text-gray-500 dark:text-gray-400"
+                >
+                  {tableRows.length === 0
+                    ? "No RSVPs yet from any source."
+                    : "No rows match the current filter."}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
