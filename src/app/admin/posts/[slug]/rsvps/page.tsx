@@ -222,6 +222,10 @@ function SortableHeaderCell({
   onSort: (column: SortColumn) => void;
 }>) {
   const isActive = activeColumn === column;
+  let indicator = "";
+  if (isActive) {
+    indicator = direction === "asc" ? "▲" : "▼";
+  }
   return (
     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
       <button
@@ -231,7 +235,7 @@ function SortableHeaderCell({
       >
         {label}
         <span className="inline-block w-3 text-[10px] normal-case">
-          {isActive ? (direction === "asc" ? "▲" : "▼") : ""}
+          {indicator}
         </span>
       </button>
     </th>
@@ -651,7 +655,7 @@ export default function RsvpReportPage() {
   const availableSources = useMemo(() => {
     const sources = new Set<string>();
     tableRows.forEach((row) => row.sources.forEach((s) => sources.add(s)));
-    return Array.from(sources).sort();
+    return Array.from(sources).sort((a, b) => a.localeCompare(b));
   }, [tableRows]);
 
   const filteredRows = useMemo(() => {
@@ -715,7 +719,7 @@ export default function RsvpReportPage() {
   };
 
   const escapeCsvField = (value: string): string =>
-    /["\r\n,]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+    /["\r\n,]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
 
   // Client-side only, same as the CSV upload above - nothing is sent
   // anywhere. One row per person (or per estimated walk-in) so the file
@@ -751,9 +755,26 @@ export default function RsvpReportPage() {
       .slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
     URL.revokeObjectURL(url);
   };
+
+  let loadingStatus: React.ReactNode;
+  if (isLoadingCache) {
+    loadingStatus = (
+      <>
+        <InlineSpinner /> Checking for a cached report…
+      </>
+    );
+  } else if (pendingSources.length > 0) {
+    loadingStatus = (
+      <>
+        <InlineSpinner /> Loading: {pendingSources.join(", ")}…
+      </>
+    );
+  } else {
+    loadingStatus = "All sources loaded.";
+  }
 
   return (
     <div className="space-y-6">
@@ -802,17 +823,7 @@ export default function RsvpReportPage() {
         </p>
         {isMounted && (
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            {isLoadingCache ? (
-              <>
-                <InlineSpinner /> Checking for a cached report…
-              </>
-            ) : pendingSources.length > 0 ? (
-              <>
-                <InlineSpinner /> Loading: {pendingSources.join(", ")}…
-              </>
-            ) : (
-              "All sources loaded."
-            )}
+            {loadingStatus}
             {!isLoadingCache && cachedAt && (
               <span className="ml-2">
                 Cached report from {formatTimestamp(cachedAt)}.
@@ -844,12 +855,9 @@ export default function RsvpReportPage() {
       </div>
 
       {saveNotification && (
-        <div
-          role="status"
-          className="fixed bottom-4 right-4 z-50 rounded-md bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm text-white shadow-lg"
-        >
+        <output className="fixed bottom-4 right-4 z-50 rounded-md bg-gray-900 dark:bg-gray-700 px-4 py-2 text-sm text-white shadow-lg">
           {saveNotification}
-        </div>
+        </output>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
