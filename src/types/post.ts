@@ -29,6 +29,7 @@ export interface PostFrontmatter {
   speakerBio?: string;
   speakerImage?: string;
   speakerLinkedIn?: string;
+  // Legacy single-speaker counterpart to Speaker.linkedInUrn above.
   speakerLinkedInUrn?: string;
   speakerTwitter?: string;
   speakerGitHub?: string;
