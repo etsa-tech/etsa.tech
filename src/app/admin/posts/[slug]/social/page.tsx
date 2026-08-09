@@ -24,6 +24,12 @@ interface SocialContact {
   name?: string;
 }
 
+function getSaveDraftLabel(isSaving: boolean, isSaved: boolean): string {
+  if (isSaving) return "Saving…";
+  if (isSaved) return "Saved!";
+  return "Save draft";
+}
+
 function StatusBadge({
   status,
 }: Readonly<{ status: SocialCacheRecord["status"] }>) {
@@ -824,11 +830,10 @@ export default function SocialMailingPage() {
                       disabled={isSavingLinkedInDraft}
                       className="text-xs text-etsa-primary hover:text-etsa-primary-dark underline disabled:opacity-50"
                     >
-                      {isSavingLinkedInDraft
-                        ? "Saving…"
-                        : linkedInDraftSaved
-                          ? "Saved!"
-                          : "Save draft"}
+                      {getSaveDraftLabel(
+                        isSavingLinkedInDraft,
+                        linkedInDraftSaved,
+                      )}
                     </button>
                   </div>
                 </div>

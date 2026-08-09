@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const code = requestUrl.searchParams.get("code");
     const stateParam = requestUrl.searchParams.get("state");
     const state = stateParam ? verifyState(stateParam) : null;
-    if (!code || !state || state.purpose !== "speaker-connect") {
+    if (!code || state?.purpose !== "speaker-connect") {
       redirectTo.searchParams.set("status", "error");
       redirectTo.searchParams.set("error", "invalid_state");
       return NextResponse.redirect(redirectTo);

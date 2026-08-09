@@ -54,7 +54,7 @@ export default async function LinkedInConnectedPage({
             >
               our contact page
             </a>
-            .
+            {"."}
           </p>
         </>
       )}

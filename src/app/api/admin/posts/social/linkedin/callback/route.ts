@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectTo);
     }
 
-    if (!code || !state || state.purpose !== "post") {
+    if (!code || state?.purpose !== "post") {
       redirectTo.searchParams.set("linkedin_error", "invalid_state");
       return NextResponse.redirect(redirectTo);
     }

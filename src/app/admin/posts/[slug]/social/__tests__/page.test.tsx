@@ -439,13 +439,13 @@ describe("SocialMailingPage", () => {
     await userEvent.click(
       await screen.findByRole("button", { name: "wes@example.com" }),
     );
-    expect(screen.getAllByText("wes@example.com").length).toBe(1);
+    expect(screen.getAllByText("wes@example.com")).toHaveLength(1);
 
     await userEvent.type(searchInput, "wes");
     await userEvent.click(
       await screen.findByRole("button", { name: "wes@example.com" }),
     );
-    expect(screen.getAllByText("wes@example.com").length).toBe(1);
+    expect(screen.getAllByText("wes@example.com")).toHaveLength(1);
   });
 
   it("shows a fallback test-error message when the test endpoint fails without an error string", async () => {

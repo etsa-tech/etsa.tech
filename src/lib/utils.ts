@@ -55,10 +55,15 @@ export function buildScopedPrTitle(
 ): string {
   const prefix = `${type}(${scope}): `;
   const available = Math.max(0, maxLength - prefix.length - suffix.length);
-  const truncatedSlug =
-    subjectSlug.length > available
-      ? subjectSlug.slice(0, available).replace(/-+$/, "")
-      : subjectSlug;
+  let truncatedSlug = subjectSlug;
+  if (subjectSlug.length > available) {
+    truncatedSlug = subjectSlug.slice(0, available);
+    // Trim trailing hyphens safely (no ReDoS risk) - matches
+    // sanitizeForBranchName's approach above.
+    while (truncatedSlug.endsWith("-")) {
+      truncatedSlug = truncatedSlug.slice(0, -1);
+    }
+  }
 
   return `${prefix}${truncatedSlug}${suffix}`;
 }
