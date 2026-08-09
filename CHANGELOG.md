@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.4.0] - 2026-08-09
 
+### ✨ Features
+
+- **admin**: add LinkedIn company-page posting via per-post OAuth ([#448](https://github.com/etsa-tech/etsa.tech/pull/448)) by @wesleykirkland
+
+## [5.4.0] - 2026-08-09
+
 ### 🔧 Chores
 
 - **blog**: promote Wesley Kirkland's LinkedIn to frontmatter ([#446](https://github.com/etsa-tech/etsa.tech/pull/446)) by @etsa-admin-interface[bot]
