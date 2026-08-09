@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-08-09
+
+### ✨ Features
+
+- add privacy policy page ([#444](https://github.com/etsa-tech/etsa.tech/pull/444)) by @wesleykirkland
+
 ## [5.2.0] - 2026-08-08
 
 ### ✨ Features
