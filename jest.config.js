@@ -16,14 +16,11 @@ const customJestConfig = {
     "!src/types/**",
     "!src/**/__tests__/**",
     "!src/**/*.test.{ts,tsx}",
-    // LinkedIn-integration work in progress elsewhere in this working
-    // tree (privacy page, LinkedIn client/OAuth routes, speaker URN
-    // store) - excluded from this pass's coverage scope until it lands.
+    // Privacy page work in progress elsewhere in this working tree -
+    // excluded from this pass's coverage scope until it lands. (LinkedIn
+    // admin posting, previously excluded here alongside it, now has full
+    // test coverage and is included.)
     "!src/app/privacy/**",
-    "!src/lib/linkedin/**",
-    "!src/lib/speaker-linkedin-store.ts",
-    "!src/app/api/admin/posts/[slug]/social/linkedin/**",
-    "!src/app/admin/posts/[slug]/social/page.tsx",
   ],
   coverageThreshold: {
     global: {

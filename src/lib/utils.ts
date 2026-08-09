@@ -36,6 +36,38 @@ export function sanitizeForBranchName(text: string): string {
   return sanitized;
 }
 
+/**
+ * Build a Conventional Commits-style PR title ("type(scope): subject") that
+ * fits within commitlint's header-max-length (100 chars by default). Long
+ * post titles get truncated, not the fixed suffix, since the suffix is what
+ * distinguishes machine-generated PRs (e.g. "- remove linkedin from
+ * frontmatter") from a real content edit.
+ *
+ * @example
+ * buildScopedPrTitle("fix", "blog", "a-very-long-slug", " - remove linkedin from frontmatter")
+ */
+export function buildScopedPrTitle(
+  type: string,
+  scope: string,
+  subjectSlug: string,
+  suffix: string = "",
+  maxLength: number = 100,
+): string {
+  const prefix = `${type}(${scope}): `;
+  const available = Math.max(0, maxLength - prefix.length - suffix.length);
+  let truncatedSlug = subjectSlug;
+  if (subjectSlug.length > available) {
+    truncatedSlug = subjectSlug.slice(0, available);
+    // Trim trailing hyphens safely (no ReDoS risk) - matches
+    // sanitizeForBranchName's approach above.
+    while (truncatedSlug.endsWith("-")) {
+      truncatedSlug = truncatedSlug.slice(0, -1);
+    }
+  }
+
+  return `${prefix}${truncatedSlug}${suffix}`;
+}
+
 // Format date for display
 export function formatDate(dateString: string): string {
   // Parse date components manually to avoid timezone issues

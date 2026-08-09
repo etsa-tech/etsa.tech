@@ -328,7 +328,7 @@ export default function EditPostPage() {
             href={`/admin/posts/${slug}/social`}
             className="text-sm text-etsa-primary hover:text-etsa-primary-dark"
           >
-            Mailchimp announcement →
+            Social Integrations →
           </Link>
         )}
       </div>
