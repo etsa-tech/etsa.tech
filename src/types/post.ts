@@ -5,6 +5,11 @@ export interface Speaker {
   bio?: string;
   image?: string;
   linkedIn?: string;
+  // LinkedIn member URN (urn:li:person:{linkedInUrn}), captured when the
+  // speaker completes their own one-time LinkedIn OAuth connect - required
+  // for a real, notifying @mention on LinkedIn posts. LinkedIn gives no way
+  // to resolve this from the plain `linkedIn` profile URL above.
+  linkedInUrn?: string;
   twitter?: string;
   github?: string;
   website?: string;
@@ -24,6 +29,8 @@ export interface PostFrontmatter {
   speakerBio?: string;
   speakerImage?: string;
   speakerLinkedIn?: string;
+  // Legacy single-speaker counterpart to Speaker.linkedInUrn above.
+  speakerLinkedInUrn?: string;
   speakerTwitter?: string;
   speakerGitHub?: string;
   speakerWebsite?: string;

@@ -246,22 +246,6 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/speakers"
-                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
-                >
-                  Past Speakers
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/meeting-info"
-                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
-                >
-                  Meeting Info
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/about"
                   className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
                 >
@@ -276,6 +260,30 @@ export function Footer() {
                   Contact Us
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/meeting-info"
+                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
+                >
+                  Meeting Info
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/speakers"
+                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
+                >
+                  Past Speakers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/privacy"
+                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -286,14 +294,12 @@ export function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href={process.env.NEXT_PUBLIC_MEETUP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/speakers"
                   className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
                 >
-                  Join Meetup
-                </a>
+                  Become a Speaker
+                </Link>
               </li>
               <li>
                 <a
@@ -307,6 +313,16 @@ export function Footer() {
               </li>
               <li>
                 <a
+                  href={process.env.NEXT_PUBLIC_MEETUP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
+                >
+                  Join Meetup
+                </a>
+              </li>
+              <li>
+                <a
                   href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -314,14 +330,6 @@ export function Footer() {
                 >
                   LinkedIn
                 </a>
-              </li>
-              <li>
-                <Link
-                  href="/speakers"
-                  className="text-gray-600 dark:text-gray-400 hover:text-etsa-primary dark:hover:text-etsa-light transition-colors"
-                >
-                  Become a Speaker
-                </Link>
               </li>
             </ul>
           </div>

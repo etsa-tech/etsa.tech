@@ -201,6 +201,7 @@ export function getPostSpeakers(frontmatter: PostFrontmatter): Speaker[] {
       bio: frontmatter.speakerBio,
       image: frontmatter.speakerImage,
       linkedIn: frontmatter.speakerLinkedIn,
+      linkedInUrn: frontmatter.speakerLinkedInUrn,
       twitter: frontmatter.speakerTwitter,
       github: frontmatter.speakerGitHub,
       website: frontmatter.speakerWebsite,
