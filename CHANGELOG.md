@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.0] - 2026-08-09
+
+### 🔧 Chores
+
+- **blog**: promote Wesley Kirkland's LinkedIn to frontmatter ([#445](https://github.com/etsa-tech/etsa.tech/pull/445)) by @etsa-admin-interface[bot]
+
 ## [5.3.0] - 2026-08-09
 
 ### ✨ Features
