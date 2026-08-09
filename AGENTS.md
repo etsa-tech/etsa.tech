@@ -5,6 +5,8 @@
 After completing any request that changes code, run both before reporting
 the task done:
 
+- Ensure tests have not been broken and new code has tests
+- Code coverage floor is 95%
 - `pre-commit run --all-files`
 - `npm run build`
 - Verify against the SonarQube plugin for any fixes that need to be applied. Prompt the user on cognitive complexity fixes.
@@ -12,7 +14,7 @@ the task done:
   mechanically enforces that every `process.env.X` used in `src/` is
   documented in a ` ```bash ` block in README.md - it will fail the commit
   if not. That check does NOT cover prose accuracy (feature status,
-  framework versions, setup steps) - still verify that by hand.
+  framework versions, setup steps) - still verify that by hand
 
 Fix any failures before considering the work complete.
 
