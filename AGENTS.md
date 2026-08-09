@@ -5,6 +5,8 @@
 After completing any request that changes code, run both before reporting
 the task done:
 
+- Ensure tests have not been broken and new code has tests
+- Code coverage floor is 95%
 - `pre-commit run --all-files`
 - `npm run build`
 - Verify against the SonarQube plugin for any fixes that need to be applied. Prompt the user on cognitive complexity fixes.

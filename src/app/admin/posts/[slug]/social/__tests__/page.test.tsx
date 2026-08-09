@@ -1510,4 +1510,75 @@ describe("SocialMailingPage", () => {
       await screen.findByText("confirmation mismatch"),
     ).toBeInTheDocument();
   });
+
+  it("shows the promote PR link without a PR number when the response omits prNumber", async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementation((url: string, init?: RequestInit) => {
+        if (init?.method === "POST" && url.includes("/speaker/promote")) {
+          return Promise.resolve(
+            jsonResponse({
+              success: true,
+              prUrl: "https://github.com/etsa/etsa.tech/pull/99",
+              isNewPR: true,
+              autoMergeEnabled: true,
+            }),
+          );
+        }
+        if (url.includes("/social/linkedin/status")) {
+          return Promise.resolve(
+            jsonResponse({ cached: null, speakerConnected: true }),
+          );
+        }
+        if (url.includes("/status"))
+          return Promise.resolve(jsonResponse({ cached: null }));
+        return Promise.resolve(jsonResponse({ frontmatter }));
+      }) as unknown as typeof fetch;
+    render(<SocialMailingPage />);
+    await screen.findByText("Mailchimp announcement");
+    await screen.findByText("Jane Doe will be tagged.");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Promote to frontmatter" }),
+    );
+
+    expect(
+      await screen.findByRole("link", { name: "View PR ↗" }),
+    ).toHaveAttribute("href", "https://github.com/etsa/etsa.tech/pull/99");
+  });
+
+  it("shows the frontmatter-cleanup PR link without a PR number when unlinking omits prNumber", async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementation((url: string, init?: RequestInit) => {
+        if (init?.method === "POST" && url.includes("/speaker/unlink")) {
+          return Promise.resolve(
+            jsonResponse({
+              success: true,
+              frontmatterCleared: true,
+              prUrl: "https://github.com/etsa/etsa.tech/pull/100",
+              isNewPR: true,
+              autoMergeEnabled: true,
+            }),
+          );
+        }
+        if (url.includes("/social/linkedin/status")) {
+          return Promise.resolve(
+            jsonResponse({ cached: null, speakerConnected: true }),
+          );
+        }
+        if (url.includes("/status"))
+          return Promise.resolve(jsonResponse({ cached: null }));
+        return Promise.resolve(jsonResponse({ frontmatter }));
+      }) as unknown as typeof fetch;
+    render(<SocialMailingPage />);
+    await screen.findByText("Mailchimp announcement");
+    await screen.findByText("Jane Doe will be tagged.");
+
+    await userEvent.click(screen.getByRole("button", { name: "Unlink" }));
+
+    expect(
+      await screen.findByRole("link", { name: "View PR ↗" }),
+    ).toHaveAttribute("href", "https://github.com/etsa/etsa.tech/pull/100");
+  });
 });

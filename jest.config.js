@@ -16,11 +16,6 @@ const customJestConfig = {
     "!src/types/**",
     "!src/**/__tests__/**",
     "!src/**/*.test.{ts,tsx}",
-    // Privacy page work in progress elsewhere in this working tree -
-    // excluded from this pass's coverage scope until it lands. (LinkedIn
-    // admin posting, previously excluded here alongside it, now has full
-    // test coverage and is included.)
-    "!src/app/privacy/**",
   ],
   coverageThreshold: {
     global: {
