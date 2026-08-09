@@ -22,6 +22,7 @@ speakers:
     image: "/images/speakers/wesley_kirkland.jpeg"
     bio: "Wesley Kirkland is a Principal Solutions Architect at Coupe Health. He is passionate about a wide range of technology fields, including home automation, email, internet presence, AWS, and DevOps. Wesley is also a dedicated cat dad to four cats—two adorable tuxedo kitties, a gray boy, and a black void. Outside of tech, he enjoys baking and cooking, finding that food fuels the soul and provides a delightful break from the desk."
     linkedIn: "https://www.linkedin.com/in/wesleykirkland/"
+    linkedInUrn: "lMsetJ91cr"
 recordingUrl: "https://youtu.be/0tpKQ71a_G4"
 eventDate: "2026-02-03"
 published: true

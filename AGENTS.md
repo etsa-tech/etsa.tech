@@ -14,7 +14,7 @@ the task done:
   mechanically enforces that every `process.env.X` used in `src/` is
   documented in a ` ```bash ` block in README.md - it will fail the commit
   if not. That check does NOT cover prose accuracy (feature status,
-  framework versions, setup steps) - still verify that by hand
+  framework versions, setup steps) - still verify that by hand.
 
 Fix any failures before considering the work complete.
 

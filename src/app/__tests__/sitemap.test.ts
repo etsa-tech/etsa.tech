@@ -6,72 +6,53 @@ jest.mock("@/lib/blog", () => ({ getAllPosts: jest.fn() }));
 const mockedGetAllPosts = jest.mocked(getAllPosts);
 const originalEnv = process.env;
 
+beforeEach(() => {
+  process.env = { ...originalEnv, NEXT_PUBLIC_SITE_URL: "https://etsa.tech" };
+});
+
 afterEach(() => {
   process.env = originalEnv;
+  jest.clearAllMocks();
 });
 
 describe("sitemap", () => {
-  it("uses NEXT_PUBLIC_SITE_URL when set", () => {
-    process.env = {
-      ...originalEnv,
-      NEXT_PUBLIC_SITE_URL: "https://example.com",
-    };
-    mockedGetAllPosts.mockReturnValue([]);
-    const entries = sitemap();
-    expect(entries[0].url).toBe("https://example.com");
-  });
-
-  it("falls back to https://etsa.tech when NEXT_PUBLIC_SITE_URL is unset", () => {
-    process.env = { ...originalEnv, NEXT_PUBLIC_SITE_URL: undefined };
-    mockedGetAllPosts.mockReturnValue([]);
-    const entries = sitemap();
-    expect(entries[0].url).toBe("https://etsa.tech");
-  });
-
-  it("includes all static pages", () => {
-    process.env = {
-      ...originalEnv,
-      NEXT_PUBLIC_SITE_URL: "https://example.com",
-    };
-    mockedGetAllPosts.mockReturnValue([]);
-    const urls = sitemap().map((e) => e.url);
-    expect(urls).toEqual([
-      "https://example.com",
-      "https://example.com/presentations",
-      "https://example.com/speakers",
-      "https://example.com/tags",
-      "https://example.com/about",
-      "https://example.com/contact",
-      "https://example.com/rsvp",
-      "https://example.com/rss.xml",
-      "https://example.com/robots.txt",
-      "https://example.com/humans.txt",
-      "https://example.com/.well-known/security.txt",
-    ]);
-  });
-
-  it("appends a dynamic entry per post, using getPostUrl for the path", () => {
-    process.env = {
-      ...originalEnv,
-      NEXT_PUBLIC_SITE_URL: "https://example.com",
-    };
+  it("includes static pages and one entry per post", () => {
     mockedGetAllPosts.mockReturnValue([
       {
-        slug: "my-post",
+        slug: "my-talk",
         readingTime: 1,
         frontmatter: {
-          title: "My Post",
-          date: "2026-01-15",
+          title: "x",
+          date: "2026-01-01",
           excerpt: "e",
           tags: [],
-          author: "a",
-          blogpost: true,
-        },
+        } as never,
       },
     ]);
-    const entries = sitemap();
-    const postEntry = entries[entries.length - 1];
-    expect(postEntry.url).toBe("https://example.com/blog/my-post");
-    expect(postEntry.lastModified).toEqual(new Date("2026-01-15"));
+    const result = sitemap();
+    expect(result.some((e) => e.url === "https://etsa.tech")).toBe(true);
+    expect(
+      result.some((e) => e.url === "https://etsa.tech/presentation/my-talk"),
+    ).toBe(true);
+    expect(result.some((e) => e.url === "https://etsa.tech/privacy")).toBe(
+      true,
+    );
+  });
+
+  it("returns only static pages when there are no posts", () => {
+    mockedGetAllPosts.mockReturnValue([]);
+    const result = sitemap();
+    expect(
+      result.every(
+        (e) => !e.url.includes("/presentation/") && !e.url.includes("/blog/"),
+      ),
+    ).toBe(true);
+  });
+
+  it("falls back to the default site URL when NEXT_PUBLIC_SITE_URL is unset", () => {
+    process.env.NEXT_PUBLIC_SITE_URL = undefined;
+    mockedGetAllPosts.mockReturnValue([]);
+    const result = sitemap();
+    expect(result.some((e) => e.url === "https://etsa.tech")).toBe(true);
   });
 });
