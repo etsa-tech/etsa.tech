@@ -65,4 +65,24 @@ describe("getSheetRsvpsForEvent", () => {
     global.fetch = jest.fn().mockRejectedValue(new Error("network down"));
     expect(await getSheetRsvpsForEvent("My Event")).toEqual([]);
   });
+
+  it("aborts the request itself once the real 15s timeout fires", async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn(
+      (_url, options: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () => {
+            const abortError = new Error("aborted");
+            abortError.name = "AbortError";
+            reject(abortError);
+          });
+        }),
+    ) as unknown as typeof fetch;
+
+    const resultPromise = getSheetRsvpsForEvent("My Event");
+    await jest.advanceTimersByTimeAsync(15000);
+    expect(await resultPromise).toEqual([]);
+
+    jest.useRealTimers();
+  });
 });

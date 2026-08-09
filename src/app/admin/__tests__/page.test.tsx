@@ -39,4 +39,14 @@ describe("AdminDashboard", () => {
     expect(await screen.findByText("Configuration Error")).toBeInTheDocument();
     expect(screen.getAllByText("—").length).toBe(3);
   });
+
+  it("falls back to an empty post list when the response omits posts", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    }) as unknown as typeof fetch;
+    render(<AdminDashboard />);
+    expect(await screen.findByText("Total Posts")).toBeInTheDocument();
+    expect(screen.getAllByText("0").length).toBeGreaterThan(0);
+  });
 });

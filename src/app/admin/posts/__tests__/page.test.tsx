@@ -42,4 +42,14 @@ describe("BlogPostsPage (admin)", () => {
     renderPage();
     expect(await screen.findByText("Error Loading Posts")).toBeInTheDocument();
   });
+
+  it("falls back to an empty post list when the response omits posts", async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+    renderPage();
+    expect(await screen.findByText("No blog posts")).toBeInTheDocument();
+  });
 });

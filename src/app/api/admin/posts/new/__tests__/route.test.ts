@@ -92,6 +92,27 @@ describe("POST /api/admin/posts/new", () => {
     expect(mockedCreateBranch).toHaveBeenCalledWith("feature/2026-02-02-other");
   });
 
+  it("falls back to the slug for the branch/PR title when frontmatter has no title", async () => {
+    mockedCreateOrGetPullRequest.mockResolvedValue({
+      prNumber: 3,
+      isNew: true,
+    });
+    await POST(
+      postReq({
+        slug: "2026-03-03-untitled-post",
+        frontmatter: { date: "2026-03-03" },
+        content: "body",
+      }),
+    );
+    expect(mockedCreateOrUpdateFile).toHaveBeenCalledWith(
+      "posts/2026-03-03-untitled-post.md",
+      expect.any(String),
+      expect.stringContaining("2026-03-03-untitled-post"),
+      undefined,
+      "feature/2026-03-03-2026-03-03-untitled-post",
+    );
+  });
+
   it("writes directly to main when createPR is false", async () => {
     const res = await POST(
       postReq({
@@ -107,6 +128,25 @@ describe("POST /api/admin/posts/new", () => {
       "posts/my-post.md",
       expect.any(String),
       expect.stringContaining("My Post"),
+      undefined,
+      "main",
+    );
+  });
+
+  it("falls back to the slug in the commit message when createPR is false and frontmatter has no title", async () => {
+    const res = await POST(
+      postReq({
+        slug: "untitled-draft",
+        frontmatter: {},
+        content: "body",
+        createPR: false,
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(mockedCreateOrUpdateFile).toHaveBeenCalledWith(
+      "posts/untitled-draft.md",
+      expect.any(String),
+      expect.stringContaining("untitled-draft"),
       undefined,
       "main",
     );

@@ -131,6 +131,27 @@ describe("POST /api/admin/speakers/upload", () => {
     expect((await res.json()).message).toMatch(/updated successfully/);
   });
 
+  it("treats a directory-listing getContent response as no existing file", async () => {
+    octokit.rest.repos.getContent.mockResolvedValue({ data: [] });
+    const res = await POST(uploadRequest({ branch: "feature/x" }));
+    expect((await res.json()).message).not.toMatch(/updated successfully/);
+  });
+
+  it("falls back to the slug for the PR title when the post has no title", async () => {
+    mockedCreateOrGetPullRequest.mockResolvedValue({
+      prNumber: 8,
+      isNew: true,
+    });
+    mockedGetBlogPost.mockResolvedValue("---\n---\nbody");
+    const res = await POST(uploadRequest({ branch: "main" }));
+    expect(res.status).toBe(200);
+    expect(mockedCreateOrGetPullRequest).toHaveBeenCalledWith(
+      expect.any(String),
+      "Update blog post: my-post",
+      expect.stringContaining('"my-post"'),
+    );
+  });
+
   it("400s when a required field is missing", async () => {
     const res = await POST(uploadRequest({ slug: null }));
     expect(res.status).toBe(400);
@@ -162,5 +183,24 @@ describe("POST /api/admin/speakers/upload", () => {
     mockedGetGitHubClient.mockRejectedValue(new Error("auth failed"));
     const res = await POST(uploadRequest({}));
     expect(res.status).toBe(500);
+  });
+
+  it("falls back to the current branch when branch logic throws on main", async () => {
+    octokit.rest.repos.listBranches.mockRejectedValue(new Error("down"));
+    const res = await POST(uploadRequest({ branch: "main" }));
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(body.branch).toBe("main");
+    expect(body.pullRequest).toBeNull();
+    expect(mockedCreateBranch).not.toHaveBeenCalled();
+  });
+
+  it("continues without a PR when PR creation fails after creating a new branch", async () => {
+    mockedCreateOrGetPullRequest.mockRejectedValue(new Error("pr failed"));
+    mockedGetBlogPost.mockResolvedValue('---\ntitle: "My Post"\n---\nbody');
+    const res = await POST(uploadRequest({ branch: "main" }));
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(body.pullRequest).toBeNull();
   });
 });

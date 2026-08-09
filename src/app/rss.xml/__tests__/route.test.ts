@@ -65,6 +65,26 @@ describe("GET /rss.xml", () => {
     expect(body).toContain("author>info@etsa.tech (Amy Zhou, Sam Lee)");
   });
 
+  it("uses singular 'Speaker' for a single-entry speakers array", async () => {
+    mockedGetAllPosts.mockReturnValue([
+      post({
+        speakerName: undefined,
+        speakers: [{ name: "Amy Zhou" }],
+      }),
+    ] as never);
+    const res = await GET();
+    const body = await res.text();
+    expect(body).toContain("Speaker: Amy Zhou");
+    expect(body).not.toContain("Speakers:");
+  });
+
+  it("omits per-item category tags when tags is absent", async () => {
+    mockedGetAllPosts.mockReturnValue([post({ tags: undefined })] as never);
+    const res = await GET();
+    const body = await res.text();
+    expect(body).not.toContain("<category><![CDATA[");
+  });
+
   it("defaults the author to ETSA and omits speaker info when there's no speaker at all", async () => {
     mockedGetAllPosts.mockReturnValue([
       post({ speakerName: undefined, speakers: undefined }),

@@ -121,6 +121,55 @@ describe("POST /api/admin/assets/upload", () => {
     expect(mockedCreateBranch).not.toHaveBeenCalled();
   });
 
+  it("matches an existing branch via an older update-post-/new-post-/feature/ pattern", async () => {
+    octokit.rest.repos.listBranches.mockResolvedValue({
+      data: [{ name: "unrelated-branch" }, { name: "update-post-my-post-123" }],
+    });
+    const res = await POST(uploadRequest({ branch: "main" }));
+    const body = await res.json();
+    expect(body.branch).toBe("update-post-my-post-123");
+    expect(mockedCreateBranch).not.toHaveBeenCalled();
+  });
+
+  it("creates a new branch when an existing branches list has no match", async () => {
+    octokit.rest.repos.listBranches.mockResolvedValue({
+      data: [{ name: "unrelated-branch" }],
+    });
+    const res = await POST(uploadRequest({ branch: "main" }));
+    const body = await res.json();
+    expect(body.branch).toBe("fix/my-post");
+    expect(mockedCreateBranch).toHaveBeenCalledWith("fix/my-post");
+  });
+
+  it("falls back to the slug for branch/PR naming when the post has no title", async () => {
+    mockedGetBlogPost.mockResolvedValue("---\n---\nbody");
+    mockedCreateOrGetPullRequest.mockResolvedValue({
+      prNumber: 5,
+      isNew: true,
+    });
+    const res = await POST(uploadRequest({ branch: "main", slug: "my-post" }));
+    const body = await res.json();
+    expect(mockedCreateBranch).toHaveBeenCalledWith("fix/my-post");
+    expect(body.pullRequest.branchName).toBe("fix/my-post");
+  });
+
+  it("falls back to the slug for the PR title when fetching the post for PR info fails", async () => {
+    mockedGetBlogPost
+      .mockResolvedValueOnce('---\ntitle: "My Post"\n---\nbody')
+      .mockRejectedValueOnce(new Error("not found"));
+    mockedCreateOrGetPullRequest.mockResolvedValue({
+      prNumber: 6,
+      isNew: true,
+    });
+    const res = await POST(uploadRequest({ branch: "main" }));
+    expect(res.status).toBe(200);
+    expect(mockedCreateOrGetPullRequest).toHaveBeenCalledWith(
+      "fix/my-post",
+      "fix(blog): my-post",
+      expect.stringContaining('"my-post"'),
+    );
+  });
+
   it("500s when branch resolution throws on main", async () => {
     octokit.rest.repos.listBranches.mockRejectedValue(new Error("down"));
     const res = await POST(uploadRequest({ branch: "main" }));
@@ -145,11 +194,31 @@ describe("POST /api/admin/assets/upload", () => {
     expect(res.status).toBe(401);
   });
 
+  it("treats a directory-listing getContent response as no existing file", async () => {
+    octokit.rest.repos.getContent.mockResolvedValue({ data: [] });
+    const res = await POST(uploadRequest({ branch: "feature/x" }));
+    expect((await res.json()).message).toBe("File uploaded successfully");
+  });
+
   it("marks the response as updated when the file already exists", async () => {
     octokit.rest.repos.getContent.mockResolvedValue({
       data: { type: "file", sha: "existing" },
     });
     const res = await POST(uploadRequest({ branch: "feature/x" }));
     expect((await res.json()).message).toBe("File updated successfully");
+  });
+
+  it("continues without a PR when PR creation fails after creating a new branch", async () => {
+    mockedCreateOrGetPullRequest.mockRejectedValue(new Error("pr failed"));
+    const res = await POST(uploadRequest({ branch: "main" }));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.pullRequest).toBeNull();
+  });
+
+  it("500s when an unexpected error occurs outside the handled paths", async () => {
+    mockedGetGitHubClient.mockRejectedValue(new Error("boom"));
+    const res = await POST(uploadRequest({ branch: "feature/x" }));
+    expect(res.status).toBe(500);
   });
 });

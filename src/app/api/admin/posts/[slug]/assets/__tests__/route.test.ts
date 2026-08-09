@@ -90,6 +90,19 @@ describe("GET /api/admin/posts/[slug]/assets", () => {
     });
   });
 
+  it("returns no assets when getContent resolves with a single file (not a directory listing)", async () => {
+    octokit.rest.repos.getContent.mockResolvedValue({
+      data: {
+        type: "file",
+        name: "a.png",
+        path: "public/presentation/slug/a.png",
+      },
+    });
+    const res = await GET(new NextRequest("http://localhost/x"), ctx("slug"));
+    const body = await res.json();
+    expect(body.assets).toEqual([]);
+  });
+
   it("defaults size to 0 when the API omits it", async () => {
     octokit.rest.repos.getContent.mockResolvedValue({
       data: [
@@ -154,6 +167,24 @@ describe("DELETE /api/admin/posts/[slug]/assets", () => {
     expect(body.pullRequest.prNumber).toBe(8);
   });
 
+  it("falls back to the slug for the PR title when the post has no title", async () => {
+    octokit.rest.repos.getContent.mockResolvedValue({
+      data: { type: "file", sha: "sha1" },
+    });
+    mockedGetBlogPost.mockResolvedValue("---\n---\nbody");
+    mockedCreateOrGetPullRequest.mockResolvedValue({
+      prNumber: 9,
+      isNew: true,
+    });
+    const res = await DELETE(delReq("?fileName=a.png"), ctx("slug"));
+    expect(res.status).toBe(200);
+    expect(mockedCreateOrGetPullRequest).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.stringContaining("slug"),
+      expect.any(String),
+    );
+  });
+
   it("400s when fileName is missing", async () => {
     const res = await DELETE(delReq(""), ctx("slug"));
     expect(res.status).toBe(400);
@@ -188,6 +219,41 @@ describe("DELETE /api/admin/posts/[slug]/assets", () => {
   it("500s when branch resolution throws on main", async () => {
     octokit.rest.repos.listBranches.mockRejectedValue(new Error("down"));
     const res = await DELETE(delReq("?fileName=a.png"), ctx("slug"));
+    expect(res.status).toBe(500);
+  });
+
+  it("reuses an existing update branch instead of creating a new one when deleting from main", async () => {
+    octokit.rest.repos.listBranches.mockResolvedValue({
+      data: [{ name: "update-post-slug-123" }],
+    });
+    octokit.rest.repos.getContent.mockResolvedValue({
+      data: { type: "file", sha: "sha1" },
+    });
+    const res = await DELETE(delReq("?fileName=a.png"), ctx("slug"));
+    const body = await res.json();
+    expect(body.branch).toBe("update-post-slug-123");
+    expect(mockedCreateBranch).not.toHaveBeenCalled();
+  });
+
+  it("continues without a PR when PR creation fails after creating a new branch", async () => {
+    octokit.rest.repos.getContent.mockResolvedValue({
+      data: { type: "file", sha: "sha1" },
+    });
+    mockedCreateOrGetPullRequest.mockRejectedValue(new Error("pr failed"));
+    const res = await DELETE(delReq("?fileName=a.png"), ctx("slug"));
+    expect(res.status).toBe(200);
+    expect((await res.json()).pullRequest).toBeNull();
+  });
+
+  it("500s when an unexpected error occurs outside the handled paths", async () => {
+    octokit.rest.repos.getContent.mockResolvedValue({
+      data: { type: "file", sha: "sha1" },
+    });
+    octokit.rest.repos.deleteFile.mockRejectedValue(new Error("boom"));
+    const res = await DELETE(
+      delReq("?fileName=a.png&branch=feature/x"),
+      ctx("slug"),
+    );
     expect(res.status).toBe(500);
   });
 });

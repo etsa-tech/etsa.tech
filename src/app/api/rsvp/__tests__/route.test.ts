@@ -120,6 +120,27 @@ describe("POST /api/rsvp", () => {
     const res = await POST(postReq({ ...validRsvpData, captchaToken: "tok" }));
     expect(res.status).toBe(500);
   });
+
+  it("aborts the Sheets request itself once the real 15s timeout fires", async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn(
+      (_url, options: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () => {
+            const abortError = new Error("aborted");
+            abortError.name = "AbortError";
+            reject(abortError);
+          });
+        }),
+    ) as unknown as typeof fetch;
+
+    const resPromise = POST(postReq({ ...validRsvpData, captchaToken: "tok" }));
+    await jest.advanceTimersByTimeAsync(15000);
+    const res = await resPromise;
+    expect(res.status).toBe(500);
+
+    jest.useRealTimers();
+  });
 });
 
 describe("OPTIONS /api/rsvp", () => {

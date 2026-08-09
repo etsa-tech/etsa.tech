@@ -167,6 +167,26 @@ describe("getMeetupRsvpCount", () => {
     global.fetch = jest.fn().mockRejectedValue(new Error("network down"));
     expect(await getMeetupRsvpCount("123")).toBeNull();
   });
+
+  it("aborts the request itself once the real 15s timeout fires", async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn(
+      (_url, options: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () => {
+            const abortError = new Error("aborted");
+            abortError.name = "AbortError";
+            reject(abortError);
+          });
+        }),
+    ) as unknown as typeof fetch;
+
+    const resultPromise = getMeetupRsvpCount("123");
+    jest.advanceTimersByTime(15000);
+    expect(await resultPromise).toBeNull();
+
+    jest.useRealTimers();
+  });
 });
 
 describe("findMeetupEventByTitle", () => {
@@ -274,6 +294,28 @@ describe("findMeetupEventByTitle", () => {
       expect.stringContaining("Failed to fetch Meetup"),
       expect.any(Error),
     );
+    errorSpy.mockRestore();
+  });
+
+  it("aborts the events-list request itself once the real 15s timeout fires", async () => {
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.useFakeTimers();
+    global.fetch = jest.fn(
+      (_url, options: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () => {
+            const abortError = new Error("aborted");
+            abortError.name = "AbortError";
+            reject(abortError);
+          });
+        }),
+    ) as unknown as typeof fetch;
+
+    const resultPromise = findMeetupEventByTitle("AI Talk");
+    jest.advanceTimersByTime(15000);
+    expect(await resultPromise).toBeNull();
+
+    jest.useRealTimers();
     errorSpy.mockRestore();
   });
 });

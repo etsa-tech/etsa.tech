@@ -82,6 +82,22 @@ describe("PUT /api/admin/posts/[slug]/rsvps/cache", () => {
     );
   });
 
+  it("saves with a null savedBy when the session has no email", async () => {
+    mockedGetServerSession.mockResolvedValue({ user: {} } as never);
+    mockedSaveCachedRsvpReport.mockResolvedValue({
+      data: { n: 1 },
+      savedAt: "t",
+      savedBy: null,
+    });
+    const res = await PUT(putReq({ n: 1 }), ctx("slug"));
+    expect(res.status).toBe(200);
+    expect(mockedSaveCachedRsvpReport).toHaveBeenCalledWith(
+      "slug",
+      { n: 1 },
+      null,
+    );
+  });
+
   it("401s for an unauthorized user", async () => {
     mockedIsAuthorizedUser.mockReturnValue(false);
     const res = await PUT(putReq({ n: 1 }), ctx("slug"));

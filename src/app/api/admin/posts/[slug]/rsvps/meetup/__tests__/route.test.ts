@@ -117,6 +117,24 @@ describe("GET /api/admin/posts/[slug]/rsvps/meetup", () => {
     expect(body.meetup.eventUrl).toBeNull();
   });
 
+  it("falls back to an empty title and null URLs when frontmatter has no title and no group slug is configured", async () => {
+    process.env.MEETUP_GROUP_SLUG = undefined;
+    mockedGetBlogPost.mockResolvedValue('---\nmeetupEventId: "123"\n---\nbody');
+    mockedGetMeetupRsvpCount.mockResolvedValue({
+      count: 5,
+      title: "My Event",
+      dateTime: "2026-01-01",
+      sampleAttendeeNames: ["Sam"],
+    });
+
+    const res = await GET(req(), ctx("slug"));
+    const body = await res.json();
+    expect(body.postTitle).toBe("");
+    expect(body.meetup.eventId).toBe("123");
+    expect(body.meetup.eventUrl).toBeNull();
+    expect(body.meetup.attendeesUrl).toBeNull();
+  });
+
   it("401s for an unauthorized user", async () => {
     mockedIsAuthorizedUser.mockReturnValue(false);
     const res = await GET(req(), ctx("slug"));

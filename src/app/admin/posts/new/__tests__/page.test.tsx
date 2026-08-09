@@ -143,6 +143,55 @@ describe("NewPostPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows an 'Updated' message when an asset upload reuses an existing PR", async () => {
+    render(<NewPostPage />);
+    await act(async () =>
+      editorProps!.onPRCreated({
+        prNumber: 3,
+        branchName: "fix/x",
+        isNew: false,
+      }),
+    );
+    expect(
+      await screen.findByText(/Updated PR #3\. Switched to PR branch\./),
+    ).toBeInTheDocument();
+  });
+
+  it("falls back to a generic error message when a non-Error value is thrown", async () => {
+    global.fetch = jest.fn().mockRejectedValue("not an Error instance");
+    render(<NewPostPage />);
+    await act(async () =>
+      editorProps!.onSave({
+        slug: "x",
+        frontmatter: {},
+        content: "x",
+        createPR: false,
+      }),
+    );
+    expect(
+      await screen.findByText("Failed to create post"),
+    ).toBeInTheDocument();
+  });
+
+  it("falls back to a generic error message when the save response has no error field", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: async () => ({}),
+    }) as unknown as typeof fetch;
+    render(<NewPostPage />);
+    await act(async () =>
+      editorProps!.onSave({
+        slug: "x",
+        frontmatter: {},
+        content: "x",
+        createPR: false,
+      }),
+    );
+    expect(
+      await screen.findByText("Failed to create post"),
+    ).toBeInTheDocument();
+  });
+
   it("saves to the existing PR branch via PUT when an open PR and viewing branch are set", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
@@ -176,5 +225,70 @@ describe("NewPostPage", () => {
     expect(
       await screen.findByText("Changes saved to existing pull request #3!"),
     ).toBeInTheDocument();
+  });
+
+  it("shows a 'created' message when saving to an existing PR branch creates a new PR", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ isNewPR: true, prNumber: 3 }),
+    }) as unknown as typeof fetch;
+    render(<NewPostPage />);
+    await act(async () =>
+      editorProps!.onPRCreated({
+        prNumber: 3,
+        branchName: "fix/x",
+        isNew: true,
+      }),
+    );
+    await screen.findByText(/Switched to PR branch/);
+
+    await act(async () =>
+      editorProps!.onSave({
+        slug: "my-post",
+        frontmatter: {},
+        content: "x",
+        createPR: true,
+      }),
+    );
+    expect(
+      await screen.findByText("Pull request #3 created successfully!"),
+    ).toBeInTheDocument();
+  });
+
+  it("saves to the existing PR branch without creating a new PR when createPR is false", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    }) as unknown as typeof fetch;
+    render(<NewPostPage />);
+    // First simulate an asset-upload-created PR to populate openPR/viewingBranch.
+    await act(async () =>
+      editorProps!.onPRCreated({
+        prNumber: 3,
+        branchName: "fix/x",
+        isNew: true,
+      }),
+    );
+    await screen.findByText(/Switched to PR branch/);
+
+    await act(async () =>
+      editorProps!.onSave({
+        slug: "my-post",
+        frontmatter: {},
+        content: "x",
+        createPR: false,
+      }),
+    );
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/admin/posts/my-post?branch=fix%2Fx",
+        expect.objectContaining({ method: "PUT" }),
+      ),
+    );
+    expect(
+      await screen.findByText("Changes saved to PR branch successfully!"),
+    ).toBeInTheDocument();
+    // No redirect should happen while an open PR is being viewed.
+    expect(push).not.toHaveBeenCalled();
   });
 });

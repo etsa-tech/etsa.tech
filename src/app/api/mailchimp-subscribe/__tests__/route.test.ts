@@ -99,6 +99,29 @@ describe("POST /api/mailchimp-subscribe", () => {
     expect(res.status).toBe(500);
   });
 
+  it("aborts the Mailchimp request itself once the real 10s timeout fires", async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn(
+      (_url, options: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () => {
+            const abortError = new Error("aborted");
+            abortError.name = "AbortError";
+            reject(abortError);
+          });
+        }),
+    ) as unknown as typeof fetch;
+
+    const resPromise = POST(
+      postReq({ email: "jane@example.com", name: "Jane" }),
+    );
+    await jest.advanceTimersByTimeAsync(10000);
+    const res = await resPromise;
+    expect(res.status).toBe(500);
+
+    jest.useRealTimers();
+  });
+
   it("falls back to a generic message when a non-Error value is thrown", async () => {
     global.fetch = jest.fn().mockRejectedValue("not an Error instance");
     const res = await POST(

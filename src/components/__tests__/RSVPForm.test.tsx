@@ -25,6 +25,7 @@ let lastHCaptchaProps: {
   onError: () => void;
 } | null = null;
 const resetCaptcha = jest.fn();
+let attachCaptchaRef = true;
 
 jest.mock("@hcaptcha/react-hcaptcha", () => ({
   __esModule: true,
@@ -33,7 +34,9 @@ jest.mock("@hcaptcha/react-hcaptcha", () => ({
     ref: React.Ref<unknown>,
   ) {
     lastHCaptchaProps = props as never;
-    useImperativeHandle(ref, () => ({ resetCaptcha }));
+    useImperativeHandle(ref, () =>
+      attachCaptchaRef ? { resetCaptcha } : null,
+    );
     return <div data-testid="hcaptcha" />;
   }),
 }));
@@ -51,6 +54,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   lastHCaptchaProps = null;
+  attachCaptchaRef = true;
   resetCaptcha.mockClear();
   mockedAreCookiesSupported.mockReturnValue(false);
   mockedLoadRSVPDataFromCookies.mockReturnValue(null);
@@ -159,6 +163,91 @@ describe("RSVPForm", () => {
       block: "center",
     });
     expect(focusSpy).toHaveBeenCalled();
+  });
+
+  it("does not throw when the canAttend fieldset cannot be found in the DOM", async () => {
+    render(<RSVPForm meetingDate="2026-01-01" />);
+    await userEvent.type(screen.getByLabelText(/First Name/), "Jane");
+    await userEvent.type(screen.getByLabelText(/Last Name/), "Doe");
+    await userEvent.type(screen.getByLabelText(/Email/), "jane@example.com");
+    await userEvent.type(screen.getByLabelText(/How did you hear/), "Meetup");
+    act(() => lastHCaptchaProps!.onVerify("captcha-token"));
+    // canAttend intentionally left unselected.
+
+    const originalGetElementById = document.getElementById.bind(document);
+    const getElementByIdSpy = jest
+      .spyOn(document, "getElementById")
+      .mockImplementation((id) =>
+        id === "canAttend" ? null : originalGetElementById(id),
+      );
+
+    await userEvent.click(screen.getByRole("button", { name: "Submit RSVP" }));
+    expect(
+      await screen.findByText("Please indicate if you can attend"),
+    ).toBeInTheDocument();
+
+    getElementByIdSpy.mockRestore();
+  });
+
+  it("does not throw when the first radio option cannot be found in the DOM", async () => {
+    render(<RSVPForm meetingDate="2026-01-01" />);
+    await userEvent.type(screen.getByLabelText(/First Name/), "Jane");
+    await userEvent.type(screen.getByLabelText(/Last Name/), "Doe");
+    await userEvent.type(screen.getByLabelText(/Email/), "jane@example.com");
+    await userEvent.type(screen.getByLabelText(/How did you hear/), "Meetup");
+    act(() => lastHCaptchaProps!.onVerify("captcha-token"));
+    // canAttend intentionally left unselected.
+
+    const originalGetElementById = document.getElementById.bind(document);
+    const getElementByIdSpy = jest
+      .spyOn(document, "getElementById")
+      .mockImplementation((id) =>
+        id === "canAttend-first" ? null : originalGetElementById(id),
+      );
+    const canAttendGroup = document.getElementById("canAttend")!;
+    const scrollIntoViewMock = jest.fn();
+    canAttendGroup.scrollIntoView = scrollIntoViewMock;
+
+    await userEvent.click(screen.getByRole("button", { name: "Submit RSVP" }));
+    expect(
+      await screen.findByText("Please indicate if you can attend"),
+    ).toBeInTheDocument();
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    getElementByIdSpy.mockRestore();
+  });
+
+  it("submits successfully without resetting the captcha when the ref is not attached", async () => {
+    attachCaptchaRef = false;
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    }) as unknown as typeof fetch;
+    render(<RSVPForm meetingDate="2026-01-01" />);
+    await fillRequiredFields();
+    await userEvent.click(screen.getByRole("button", { name: "Submit RSVP" }));
+
+    expect(
+      await screen.findByText(/Thank you for your RSVP/),
+    ).toBeInTheDocument();
+    expect(resetCaptcha).not.toHaveBeenCalled();
+  });
+
+  it("shows the generic error message without resetting the captcha when the ref is not attached", async () => {
+    attachCaptchaRef = false;
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue({ ok: false }) as unknown as typeof fetch;
+    render(<RSVPForm meetingDate="2026-01-01" />);
+    await fillRequiredFields();
+    await userEvent.click(screen.getByRole("button", { name: "Submit RSVP" }));
+    expect(
+      await screen.findByText(/Failed to submit RSVP/),
+    ).toBeInTheDocument();
+    expect(resetCaptcha).not.toHaveBeenCalled();
   });
 
   it("also subscribes to the newsletter when opted in, tolerating a subscribe failure", async () => {

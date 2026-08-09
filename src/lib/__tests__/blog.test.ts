@@ -266,6 +266,10 @@ describe("getAllPosts and derived listings", () => {
     expect(getPopularTags(1)).toHaveLength(1);
   });
 
+  it("getPopularTags defaults to a limit of 25 when omitted", () => {
+    expect(getPopularTags()).toHaveLength(3);
+  });
+
   it("getBlogPosts / getPresentationPosts split by source", () => {
     expect(getBlogPosts().map((p) => p.slug)).toEqual(["blog-post"]);
     expect(getPresentationPosts().map((p) => p.slug)).toEqual(["talk"]);
@@ -275,6 +279,12 @@ describe("getAllPosts and derived listings", () => {
     expect(getRecentBlogPosts(1)).toHaveLength(1);
     expect(getRecentPresentationPosts(1)).toHaveLength(1);
     expect(getRecentPosts(1)).toHaveLength(1);
+  });
+
+  it("getRecentBlogPosts / getRecentPresentationPosts / getRecentPosts default to a limit of 5 when omitted", () => {
+    expect(getRecentBlogPosts()).toHaveLength(1);
+    expect(getRecentPresentationPosts()).toHaveLength(1);
+    expect(getRecentPosts()).toHaveLength(2);
   });
 
   it("getLatestPost returns the newest post", () => {

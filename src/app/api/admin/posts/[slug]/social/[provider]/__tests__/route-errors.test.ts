@@ -206,6 +206,61 @@ describe("test route", () => {
     expect(res.status).toBe(500);
     expect((await res.json()).error).toBe("Failed to send test");
   });
+
+  it("400s when no draft campaign exists yet", async () => {
+    jest.mocked(mockGetCachedSocialRecord).mockResolvedValue(null);
+
+    const res = await sendTest(
+      postRequest("/api/admin/posts/no-draft-post/social/mailchimp/test", {
+        emails: ["reviewer@example.com"],
+      }),
+      routeParams("no-draft-post"),
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/no draft campaign/i);
+    expect(mockMailchimpProvider.sendTest).not.toHaveBeenCalled();
+  });
+
+  it("saves a null updatedBy when the session has no email", async () => {
+    jest.mocked(getServerSession).mockResolvedValue({ user: {} } as never);
+    jest.mocked(mockGetCachedSocialRecord).mockResolvedValue({
+      provider: "mailchimp",
+      campaignId: "campaign-1",
+      campaignUrl: null,
+      status: "draft",
+      testRecipients: [],
+      sentAt: null,
+      sentBy: null,
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      updatedBy: null,
+    });
+    jest.mocked(mockMailchimpProvider.sendTest).mockResolvedValue(undefined);
+    jest.mocked(mockSaveCachedSocialRecord).mockResolvedValue({
+      provider: "mailchimp",
+      campaignId: "campaign-1",
+      campaignUrl: null,
+      status: "tested",
+      testRecipients: ["reviewer@example.com"],
+      sentAt: null,
+      sentBy: null,
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      updatedBy: null,
+    });
+
+    const res = await sendTest(
+      postRequest("/api/admin/posts/p/social/mailchimp/test", {
+        emails: ["reviewer@example.com"],
+      }),
+      routeParams("p"),
+    );
+    expect(res.status).toBe(200);
+    expect(mockSaveCachedSocialRecord).toHaveBeenCalledWith(
+      "p",
+      "mailchimp",
+      expect.objectContaining({ status: "tested" }),
+      null,
+    );
+  });
 });
 
 describe("send route", () => {

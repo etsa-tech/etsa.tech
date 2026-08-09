@@ -93,6 +93,46 @@ describe("GET /api/admin/google-maps/search", () => {
     expect((await res.json()).name).toBe("Acme");
   });
 
+  it("falls back to the formatted address when address_components is entirely absent", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () =>
+        geocodeResult({
+          address_components: undefined,
+          formatted_address: "Some Place, Anytown",
+        }),
+    }) as unknown as typeof fetch;
+    const res = await GET(req("?query=Acme"));
+    expect((await res.json()).name).toBe("Some Place");
+  });
+
+  it("falls back to an address component tagged only as a point of interest", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () =>
+        geocodeResult({
+          address_components: [
+            {
+              long_name: "Acme Park",
+              short_name: "AP",
+              types: ["point_of_interest"],
+            },
+          ],
+        }),
+    }) as unknown as typeof fetch;
+    const res = await GET(req("?query=Acme"));
+    expect((await res.json()).name).toBe("Acme Park");
+  });
+
+  it("keeps the original query as the name when formatted_address has no comma-separated segments", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => geocodeResult({ formatted_address: "SoloSegment" }),
+    }) as unknown as typeof fetch;
+    const res = await GET(req("?query=Acme"));
+    expect((await res.json()).name).toBe("Acme");
+  });
+
   it("400s when query is missing", async () => {
     const res = await GET(req(""));
     expect(res.status).toBe(400);

@@ -63,6 +63,13 @@ describe("GET /api/admin/github-status", () => {
     expect(res.status).toBe(500);
     expect((await res.json()).error).toBe("boom");
   });
+
+  it("500s with a generic message when a non-Error is thrown", async () => {
+    mockedVerifyGitHubAppConfig.mockRejectedValue("boom string");
+    const res = await GET();
+    expect(res.status).toBe(500);
+    expect((await res.json()).error).toBe("Unknown error");
+  });
 });
 
 describe("DELETE /api/admin/github-status", () => {
@@ -85,5 +92,14 @@ describe("DELETE /api/admin/github-status", () => {
     });
     const res = await DELETE();
     expect(res.status).toBe(500);
+  });
+
+  it("500s with a generic message when a non-Error is thrown", async () => {
+    mockedClearTokenCache.mockImplementation(() => {
+      throw "boom string";
+    });
+    const res = await DELETE();
+    expect(res.status).toBe(500);
+    expect((await res.json()).error).toBe("Unknown error");
   });
 });

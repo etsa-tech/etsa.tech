@@ -455,6 +455,20 @@ describe("BlogPostEditor - action buttons", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("shows Save to branch when viewingBranch explicitly matches the update branch for this post", () => {
+    render(
+      <BlogPostEditor
+        onSave={onSaveMock()}
+        initialData={editInitialData}
+        currentBranch="update-post-2026-01-01-existing-post-123"
+        viewingBranch="update-post-2026-01-01-existing-post-123"
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Save to branch" }),
+    ).toBeInTheDocument();
+  });
+
   it("shows the disabled switch-branch state for an update branch on a different post", () => {
     render(
       <BlogPostEditor
@@ -1132,6 +1146,69 @@ describe("BlogPostEditor - Google Maps location search", () => {
       ),
     );
   });
+
+  // searchGoogleMaps has its own internal try/catch that swallows every
+  // failure and resolves to null (see the test above), so the outer
+  // catch in each handler can only fire when code *after* a successful
+  // searchGoogleMaps call throws - e.g. while reading a field off the
+  // resolved result to hand to setValue. A getter that throws on access
+  // reproduces that without needing to reach into react-hook-form.
+  it("alerts with a generic error when applying a search result throws (Enter key)", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        get name(): string {
+          throw new Error("boom");
+        },
+        address: "123 Main St",
+        lat: "1.23",
+        lng: "4.56",
+      }),
+    }) as unknown as typeof fetch;
+
+    render(
+      <BlogPostEditor onSave={onSaveMock()} initialData={editInitialData} />,
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText("Search for a location..."),
+      "Some Venue{Enter}",
+    );
+
+    await waitFor(() =>
+      expect(window.alert).toHaveBeenCalledWith(
+        "Error searching for location. Please try again.",
+      ),
+    );
+  });
+
+  it("alerts with a generic error when applying a search result throws (Search button)", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        get name(): string {
+          throw new Error("boom");
+        },
+        address: "123 Main St",
+        lat: "1.23",
+        lng: "4.56",
+      }),
+    }) as unknown as typeof fetch;
+
+    render(
+      <BlogPostEditor onSave={onSaveMock()} initialData={editInitialData} />,
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText("Search for a location..."),
+      "Some Venue",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /Search/ }));
+
+    await waitFor(() =>
+      expect(window.alert).toHaveBeenCalledWith(
+        "Error searching for location. Please try again.",
+      ),
+    );
+  });
 });
 
 describe("BlogPostEditor - additional branch coverage", () => {
@@ -1201,6 +1278,31 @@ describe("BlogPostEditor - additional branch coverage", () => {
     expect((await yamlTextarea()).value).toBe("");
   });
 
+  it("falls back to an empty object when the second YAML document parses to a non-object (null)", async () => {
+    // Unlike a blank second document (which makes js-yaml's load() throw,
+    // caught by the outer try/catch), a document that's literally "null"
+    // parses successfully to the falsy value `null` without throwing - the
+    // only way to exercise the `|| {}` fallback on the *result* of load()
+    // rather than the catch block.
+    const data = {
+      ...editInitialData,
+      rawContent: "---\nnull\n---\nExisting body",
+    };
+    render(<BlogPostEditor onSave={onSaveMock()} initialData={data} />);
+    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
+    expect((await yamlTextarea()).value).toBe("null");
+  });
+
+  it("leaves the remaining-documents section empty when there's only one YAML delimiter", async () => {
+    const data = {
+      ...editInitialData,
+      rawContent: "---\ntitle: test\n",
+    };
+    render(<BlogPostEditor onSave={onSaveMock()} initialData={data} />);
+    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
+    expect((await yamlTextarea()).value).toContain("title: test");
+  });
+
   it("falls back to basic form data when the edited raw YAML parses to null", async () => {
     const onSave = onSaveMock();
     render(<BlogPostEditor onSave={onSave} initialData={editInitialData} />);
@@ -1234,6 +1336,65 @@ describe("BlogPostEditor - additional branch coverage", () => {
     render(<BlogPostEditor onSave={onSaveMock()} initialData={data} />);
     await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
     expect((await yamlTextarea()).value).toBe("");
+  });
+
+  it("falls back to dumping the frontmatter when reading rawContent throws inside the parse try block", async () => {
+    // parseMultiDocumentYaml swallows its own errors internally (see the
+    // test above), so the only way to exercise the component-level catch
+    // (which falls back to `dump(initialData.frontmatter)`) is to make
+    // *accessing* initialData.rawContent itself throw on its second read -
+    // the first read satisfies the `if (initialData.rawContent)` guard,
+    // and the second occurs when it's passed as an argument inside the
+    // try block, so that throw lands in the catch we're targeting.
+    let rawContentAccessCount = 0;
+    const data = {
+      ...editInitialData,
+      get rawContent() {
+        rawContentAccessCount += 1;
+        if (rawContentAccessCount === 1) {
+          return "---\ntitle: Existing Post\n---\nExisting body";
+        }
+        throw new Error("boom");
+      },
+    };
+    render(
+      <BlogPostEditor onSave={onSaveMock()} initialData={data as never} />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
+    const yaml = await yamlTextarea();
+    await waitFor(() => expect(yaml.value).toContain("title: Existing Post"));
+    expect(yaml.value).toContain("published: true");
+  });
+
+  it("reflects an unchecked Published checkbox as published: false in the live YAML preview", async () => {
+    render(
+      <BlogPostEditor onSave={onSaveMock()} initialData={editInitialData} />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
+    await userEvent.click(screen.getByLabelText("Published"));
+    const yaml = await yamlTextarea();
+    await waitFor(() => expect(yaml.value).toContain("published: false"));
+  });
+
+  it("leaves the YAML editor untouched when reading rawContent throws and there is no frontmatter to fall back to", async () => {
+    let rawContentAccessCount = 0;
+    const data = {
+      slug: editInitialData.slug,
+      content: editInitialData.content,
+      get rawContent() {
+        rawContentAccessCount += 1;
+        if (rawContentAccessCount === 1) {
+          return "---\ntitle: Existing Post\n---\nExisting body";
+        }
+        throw new Error("boom");
+      },
+    };
+    render(
+      <BlogPostEditor onSave={onSaveMock()} initialData={data as never} />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
+    const yaml = await yamlTextarea();
+    expect(yaml.value).toBe("");
   });
 
   it("reconstructs frontmatter from form data only when there is no rawContent to seed the YAML editor", async () => {
@@ -1357,6 +1518,64 @@ Existing body`,
     };
     expect(frontmatter.eventLocation.coordinates.lat).toBe("35.965179");
     expect(frontmatter.eventLocation.coordinates.lng).toBe("-83.919846");
+  });
+
+  it("forces a boolean lat coordinate to a string but leaves a non-scalar lng untouched", async () => {
+    const onSave = onSaveMock();
+    const data = {
+      ...editInitialData,
+      rawContent: `---
+title: "Existing Post"
+date: "2026-01-01"
+eventLocation:
+  name: Venue
+  coordinates:
+    lat: true
+    lng: [1, 2]
+---
+Existing body`,
+    };
+    render(<BlogPostEditor onSave={onSave} initialData={data} />);
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create Pull Request" }),
+    );
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    const { frontmatter } = onSave.mock.calls[0][0] as {
+      frontmatter: {
+        eventLocation: { coordinates: { lat: unknown; lng: unknown } };
+      };
+    };
+    expect(frontmatter.eventLocation.coordinates.lat).toBe("true");
+    expect(frontmatter.eventLocation.coordinates.lng).toEqual([1, 2]);
+  });
+
+  it("leaves a non-scalar lat coordinate untouched", async () => {
+    const onSave = onSaveMock();
+    const data = {
+      ...editInitialData,
+      rawContent: `---
+title: "Existing Post"
+date: "2026-01-01"
+eventLocation:
+  name: Venue
+  coordinates:
+    lat: [1, 2]
+    lng: 35.9
+---
+Existing body`,
+    };
+    render(<BlogPostEditor onSave={onSave} initialData={data} />);
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create Pull Request" }),
+    );
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    const { frontmatter } = onSave.mock.calls[0][0] as {
+      frontmatter: {
+        eventLocation: { coordinates: { lat: unknown; lng: unknown } };
+      };
+    };
+    expect(frontmatter.eventLocation.coordinates.lat).toEqual([1, 2]);
+    expect(frontmatter.eventLocation.coordinates.lng).toBe("35.9");
   });
 
   it("omits eventDate from the reconstructed frontmatter when the field is cleared", async () => {

@@ -166,12 +166,37 @@ describe("getExcerpt", () => {
     expect(excerpt).toContain("bold");
   });
 
+  it("defaults maxLength to 160 when omitted", () => {
+    expect(getExcerpt("short text")).toBe("short text");
+  });
+
+  it("tracks nested brackets and parens while scanning a markdown link", () => {
+    expect(
+      getExcerpt(
+        "See [nested [brackets] here](http://example.com/(path)) end.",
+        200,
+      ),
+    ).toBe(
+      "See nested [brackets] herenested [brackets] here](http://example.com/(path)) end.",
+    );
+  });
+
   it("splices the link text in place of the opening bracket only", () => {
     // The bracket-scanning replacer computes the link text correctly but
     // only substitutes the matched "[" character itself via String#replace,
     // leaving the scanned "text](url)" tail behind in the output verbatim.
     expect(getExcerpt("Check [this](https://example.com) out.", 200)).toBe(
       "Check thisthis](https://example.com) out.",
+    );
+  });
+
+  it("leaves a closed bracket with no trailing parenthetical intact", () => {
+    expect(getExcerpt("A [bracketed] note.", 200)).toBe("A [bracketed] note.");
+  });
+
+  it("leaves a closed bracket with an unterminated parenthetical intact", () => {
+    expect(getExcerpt("A [text](unterminated", 200)).toBe(
+      "A [text](unterminated",
     );
   });
 });
@@ -284,6 +309,11 @@ describe("sortByProperty", () => {
     const copy = [...items];
     sortByProperty(items, "n");
     expect(items).toEqual(copy);
+  });
+
+  it("treats equal values as equal", () => {
+    const tied = [{ n: 1 }, { n: 1 }];
+    expect(sortByProperty(tied, "n").map((i) => i.n)).toEqual([1, 1]);
   });
 });
 
