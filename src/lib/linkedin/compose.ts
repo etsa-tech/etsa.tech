@@ -45,7 +45,7 @@ function formatIntroLine(input: LinkedInPostInput): string {
 
   const speakerCredit = [formatSpeakerCredit(input), input.company]
     .filter(Boolean)
-    .join(" - ");
+    .join(" @ ");
 
   return `Join us on ${input.date} at 7:00PM and join ${speakerCredit} present on ${input.title}`;
 }
