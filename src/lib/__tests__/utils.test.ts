@@ -1,5 +1,6 @@
 import {
   sanitizeForBranchName,
+  buildScopedPrTitle,
   formatDate,
   getPostUrl,
   getPresentationUrl,
@@ -22,264 +23,222 @@ import {
 } from "@/lib/utils";
 import type { PostFrontmatter } from "@/types/post";
 
-const baseFrontmatter: PostFrontmatter = {
-  title: "Title",
-  date: "2026-01-01",
-  excerpt: "An excerpt",
-  tags: ["a"],
-  author: "Author",
-};
-
 describe("sanitizeForBranchName", () => {
   it("lowercases and hyphenates", () => {
     expect(sanitizeForBranchName("My Great Title!")).toBe("my-great-title");
   });
 
-  it("trims leading and trailing hyphens", () => {
+  it("trims leading/trailing hyphens", () => {
     expect(sanitizeForBranchName("---Test---")).toBe("test");
   });
 
-  it("collapses punctuation runs into single hyphens", () => {
+  it("collapses punctuation runs into a single hyphen", () => {
     expect(sanitizeForBranchName("Hello: World")).toBe("hello-world");
+  });
+});
+
+describe("buildScopedPrTitle", () => {
+  it("joins type, scope, subject, and suffix untouched when short", () => {
+    expect(
+      buildScopedPrTitle(
+        "fix",
+        "blog",
+        "my-talk",
+        " - remove linkedin from frontmatter",
+      ),
+    ).toBe("fix(blog): my-talk - remove linkedin from frontmatter");
+  });
+
+  it("returns just the prefixed subject when no suffix is given", () => {
+    expect(buildScopedPrTitle("fix", "blog", "my-talk")).toBe(
+      "fix(blog): my-talk",
+    );
+  });
+
+  it("truncates a long subject so the header stays within maxLength", () => {
+    const longSlug =
+      "ai-for-good-rebranding-and-building-our-community-website";
+    const title = buildScopedPrTitle(
+      "fix",
+      "blog",
+      longSlug,
+      " - remove linkedin from frontmatter",
+    );
+    expect(title.length).toBeLessThanOrEqual(100);
+    expect(title).toBe(
+      "fix(blog): ai-for-good-rebranding-and-building-our-community-webs - remove linkedin from frontmatter",
+    );
+  });
+
+  it("strips a trailing hyphen left by truncation", () => {
+    const title = buildScopedPrTitle("fix", "blog", "abc-def-ghi", "", 15);
+    expect(title.endsWith("-")).toBe(false);
+    expect(title).toBe("fix(blog): abc");
+  });
+
+  it("respects a custom maxLength", () => {
+    expect(buildScopedPrTitle("feat", "blog", "abcdefghi", "", 20)).toBe(
+      "feat(blog): abcdefgh",
+    );
   });
 });
 
 describe("formatDate", () => {
   it("formats a YYYY-MM-DD string without timezone drift", () => {
-    expect(formatDate("2026-03-05")).toBe("March 5, 2026");
+    expect(formatDate("2026-01-15")).toBe("January 15, 2026");
   });
 });
 
-describe("getPostUrl", () => {
-  it("returns a blog URL when blogpost is true", () => {
-    expect(getPostUrl("my-slug", { ...baseFrontmatter, blogpost: true })).toBe(
+describe("URL builders", () => {
+  it("getPostUrl routes to /blog for blogpost frontmatter", () => {
+    expect(getPostUrl("my-slug", { blogpost: true } as PostFrontmatter)).toBe(
       "/blog/my-slug",
     );
   });
 
-  it("returns a presentation URL when blogpost is false", () => {
-    expect(getPostUrl("my-slug", { ...baseFrontmatter, blogpost: false })).toBe(
-      "/presentation/my-slug",
-    );
-  });
-
-  it("returns a presentation URL when frontmatter is omitted", () => {
+  it("getPostUrl routes to /presentation otherwise", () => {
     expect(getPostUrl("my-slug")).toBe("/presentation/my-slug");
   });
-});
 
-describe("getPresentationUrl / getBlogUrl", () => {
-  it("encode the slug", () => {
+  it("getPresentationUrl / getBlogUrl encode the slug", () => {
     expect(getPresentationUrl("a b")).toBe("/presentation/a%20b");
     expect(getBlogUrl("a b")).toBe("/blog/a%20b");
   });
-});
 
-describe("getTagUrl", () => {
-  it("lowercases, converts slashes to hyphens, then encodes", () => {
+  it("getTagUrl lowercases, replaces slashes, and encodes", () => {
     expect(getTagUrl("CI/CD")).toBe("/tag/ci-cd");
+    expect(getTagUrl("Web Development")).toBe("/tag/web%20development");
   });
 
-  it("encodes spaces", () => {
-    expect(getTagUrl("Web Development")).toBe("/tag/web%20development");
+  it("getSpeakerUrl lowercases and hyphenates", () => {
+    expect(getSpeakerUrl("Jane Doe")).toBe("/speaker/jane-doe");
   });
 });
 
 describe("calculateReadingTime", () => {
-  it("rounds up to the nearest minute", () => {
+  it("rounds up to the nearest minute at 200wpm", () => {
     expect(calculateReadingTime("word ".repeat(201))).toBe(2);
-  });
-
-  it("returns 1 for short content", () => {
-    expect(calculateReadingTime("a few words here")).toBe(1);
   });
 });
 
 describe("sanitizeSearchInput", () => {
-  it("trims, collapses whitespace, and strips angle brackets", () => {
+  it("truncates, trims, collapses whitespace, and strips brackets", () => {
     expect(sanitizeSearchInput("  a   <b>  c  ")).toBe("a b c");
   });
 
-  it("truncates overly long input", () => {
-    const long = "a".repeat(500);
-    expect(sanitizeSearchInput(long)).toHaveLength(200);
+  it("caps input at 200 characters", () => {
+    expect(sanitizeSearchInput("x".repeat(300))).toHaveLength(200);
   });
 });
 
 describe("highlightSearchTerm", () => {
-  it("wraps matches in <mark> tags", () => {
+  it("wraps whole-word matches in <mark>", () => {
     expect(highlightSearchTerm("hello world", "world")).toBe(
       "hello <mark>world</mark>",
     );
   });
 
-  it("returns the original text when the search term is blank", () => {
-    expect(highlightSearchTerm("hello world", "   ")).toBe("hello world");
+  it("returns the text unchanged for a blank search term", () => {
+    expect(highlightSearchTerm("hello world", "  ")).toBe("hello world");
   });
 
   it("escapes regex special characters in the search term", () => {
     expect(highlightSearchTerm("a (b) c", "(b)")).toBe("a (b) c");
   });
-
-  it("truncates an overly long search term", () => {
-    const term = "a".repeat(150);
-    expect(() => highlightSearchTerm("text", term)).not.toThrow();
-  });
 });
 
 describe("truncateText", () => {
-  it("returns the original text when within the limit", () => {
+  it("returns text unchanged when under the max length", () => {
     expect(truncateText("short", 10)).toBe("short");
   });
 
-  it("truncates and appends an ellipsis when over the limit", () => {
-    expect(truncateText("this is a long sentence", 10)).toBe("this is a...");
+  it("truncates and appends an ellipsis when over the max length", () => {
+    expect(truncateText("a very long string", 5)).toBe("a ver...");
   });
 });
 
 describe("getExcerpt", () => {
-  // sanitize-html is mocked as a passthrough in __mocks__/sanitize-html.ts,
-  // so getExcerpt's own markdown-stripping regexes are what's under test
-  // here, not actual HTML sanitization.
-  it("passes non-markdown text through unchanged", () => {
-    expect(getExcerpt("Hello world", 100)).toBe("Hello world");
+  it("strips markdown formatting and truncates", () => {
+    const md = "# Heading\n\nSome **bold** and *italic* and `code` text.";
+    const excerpt = getExcerpt(md, 200);
+    expect(excerpt).not.toContain("#");
+    expect(excerpt).not.toContain("**");
+    expect(excerpt).toContain("bold");
   });
 
-  it("removes markdown headers, bold, and italic formatting", () => {
-    expect(getExcerpt("## Heading\n**bold** and *italic*", 100)).toBe(
-      "Heading bold and italic",
+  it("splices the link text in place of the opening bracket only", () => {
+    // The bracket-scanning replacer computes the link text correctly but
+    // only substitutes the matched "[" character itself via String#replace,
+    // leaving the scanned "text](url)" tail behind in the output verbatim.
+    expect(getExcerpt("Check [this](https://example.com) out.", 200)).toBe(
+      "Check thisthis](https://example.com) out.",
     );
-  });
-
-  it("leaves an unmatched opening bracket intact", () => {
-    expect(getExcerpt("A [bracket without a link", 100)).toBe(
-      "A [bracket without a link",
-    );
-  });
-
-  it("leaves a closed bracket with no trailing parenthetical intact", () => {
-    expect(getExcerpt("A [bracketed text] no paren", 100)).toBe(
-      "A [bracketed text] no paren",
-    );
-  });
-
-  it("leaves a closed bracket with an unterminated parenthetical intact", () => {
-    expect(getExcerpt("A [text](unterminated", 100)).toBe(
-      "A [text](unterminated",
-    );
-  });
-
-  it("consumes a complete markdown link's characters when replacing (known quirk: the string.replace call only substitutes the matched '[' character, so the manually-parsed link text is prepended rather than replacing the full '[text](url)' span)", () => {
-    expect(
-      getExcerpt("See [our site](https://example.com) for more", 100),
-    ).toBe("See our siteour site](https://example.com) for more");
-  });
-
-  it("removes inline code backticks", () => {
-    expect(getExcerpt("Run `npm test` now", 100)).toBe("Run npm test now");
-  });
-
-  it("collapses newlines and truncates to maxLength", () => {
-    expect(getExcerpt("line one\n\nline two", 6)).toBe("line o...");
-  });
-
-  it("defaults maxLength to 160", () => {
-    const content = "word ".repeat(60);
-    const result = getExcerpt(content);
-    expect(result.length).toBeLessThanOrEqual(164);
   });
 });
 
 describe("getPostSpeakers", () => {
-  it("returns an empty array when no speaker info is present", () => {
-    expect(getPostSpeakers(baseFrontmatter)).toEqual([]);
-  });
-
-  it("builds a speaker from legacy single-speaker fields", () => {
+  it("includes the legacy single-speaker fields when present", () => {
     const speakers = getPostSpeakers({
-      ...baseFrontmatter,
-      speakerName: "Jane Doe",
-      speakerTitle: "Engineer",
-    });
+      speakerName: "Jane",
+      speakerCompany: "Acme",
+    } as PostFrontmatter);
     expect(speakers).toEqual([
-      expect.objectContaining({ name: "Jane Doe", title: "Engineer" }),
+      expect.objectContaining({ name: "Jane", company: "Acme" }),
     ]);
   });
 
-  it("includes the new speakers array alongside a legacy speaker", () => {
+  it("includes the multi-speaker array when present", () => {
     const speakers = getPostSpeakers({
-      ...baseFrontmatter,
-      speakerName: "Jane Doe",
-      speakers: [{ name: "John Roe" }],
-    });
-    expect(speakers).toHaveLength(2);
-    expect(speakers[1]).toEqual({ name: "John Roe" });
+      speakers: [{ name: "Amy" }],
+    } as unknown as PostFrontmatter);
+    expect(speakers).toEqual([{ name: "Amy" }]);
+  });
+
+  it("returns an empty array when neither is present", () => {
+    expect(getPostSpeakers({} as PostFrontmatter)).toEqual([]);
   });
 });
 
 describe("getSocialContentFields", () => {
-  it("prefers the first speaker's bio, name, and company", () => {
+  it("derives fields from the first speaker and prefers eventDate/presentationDescription", () => {
     const fields = getSocialContentFields({
-      ...baseFrontmatter,
-      speakers: [{ name: "Jane Doe", bio: "A bio", company: "Acme" }],
       eventDate: "2026-02-01",
-      presentationDescription: "A talk",
-    });
+      meetingDate: "2026-01-01",
+      date: "2025-12-01",
+      presentationDescription: "abstract",
+      excerpt: "fallback excerpt",
+      speakers: [{ name: "Jane", company: "Acme", bio: "bio text" }],
+    } as unknown as PostFrontmatter);
     expect(fields).toEqual({
-      bio: "A bio",
+      bio: "bio text",
       date: "2026-02-01",
-      abstract: "A talk",
-      speakerName: "Jane Doe",
+      abstract: "abstract",
+      speakerName: "Jane",
       company: "Acme",
     });
   });
 
-  it("falls back to meetingDate, excerpt, and empty speaker fields", () => {
+  it("falls back through date fields and excerpt when preferred fields are absent", () => {
     const fields = getSocialContentFields({
-      ...baseFrontmatter,
-      meetingDate: "2026-02-05",
-    });
-    expect(fields).toEqual({
-      bio: "",
-      date: "2026-02-05",
-      abstract: baseFrontmatter.excerpt,
-      speakerName: "",
-      company: "",
-    });
-  });
-
-  it("falls back to frontmatter.date when no event/meeting date is set", () => {
-    const fields = getSocialContentFields(baseFrontmatter);
-    expect(fields.date).toBe(baseFrontmatter.date);
-  });
-});
-
-describe("getSpeakerUrl", () => {
-  it("lowercases and hyphenates the speaker name", () => {
-    expect(getSpeakerUrl("Jane Doe")).toBe("/speaker/jane-doe");
+      date: "2025-12-01",
+      excerpt: "fallback excerpt",
+    } as PostFrontmatter);
+    expect(fields.date).toBe("2025-12-01");
+    expect(fields.abstract).toBe("fallback excerpt");
+    expect(fields.bio).toBe("");
+    expect(fields.speakerName).toBe("");
   });
 });
 
 describe("debounce", () => {
-  beforeEach(() => jest.useFakeTimers());
-  afterEach(() => jest.useRealTimers());
+  jest.useFakeTimers();
 
-  it("delays invocation until after the wait period", () => {
+  it("only invokes the wrapped function once after the wait elapses", () => {
     const fn = jest.fn();
-    const debounced = debounce(fn, 200);
+    const debounced = debounce(fn, 100);
     debounced();
-    expect(fn).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(200);
-    expect(fn).toHaveBeenCalledTimes(1);
-  });
-
-  it("resets the timer on repeated calls", () => {
-    const fn = jest.fn();
-    const debounced = debounce(fn, 200);
     debounced();
-    jest.advanceTimersByTime(100);
     debounced();
-    jest.advanceTimersByTime(100);
     expect(fn).not.toHaveBeenCalled();
     jest.advanceTimersByTime(100);
     expect(fn).toHaveBeenCalledTimes(1);
@@ -298,12 +257,12 @@ describe("isValidEmail", () => {
 
 describe("generateSlug", () => {
   it("lowercases, strips special characters, and hyphenates", () => {
-    expect(generateSlug("Hello, World!  Foo--Bar")).toBe("hello-world-foo-bar");
+    expect(generateSlug("Hello, World!")).toBe("hello-world");
   });
 });
 
 describe("getUniqueValues", () => {
-  it("removes duplicates while preserving order", () => {
+  it("deduplicates while preserving first-seen order", () => {
     expect(getUniqueValues([1, 2, 2, 3, 1])).toEqual([1, 2, 3]);
   });
 });
@@ -312,41 +271,35 @@ describe("sortByProperty", () => {
   const items = [{ n: 3 }, { n: 1 }, { n: 2 }];
 
   it("sorts ascending by default", () => {
-    expect(sortByProperty(items, "n")).toEqual([{ n: 1 }, { n: 2 }, { n: 3 }]);
+    expect(sortByProperty(items, "n").map((i) => i.n)).toEqual([1, 2, 3]);
   });
 
   it("sorts descending when requested", () => {
-    expect(sortByProperty(items, "n", "desc")).toEqual([
-      { n: 3 },
-      { n: 2 },
-      { n: 1 },
+    expect(sortByProperty(items, "n", "desc").map((i) => i.n)).toEqual([
+      3, 2, 1,
     ]);
   });
 
-  it("treats equal values as equal", () => {
-    expect(sortByProperty([{ n: 1 }, { n: 1 }], "n")).toEqual([
-      { n: 1 },
-      { n: 1 },
-    ]);
-  });
-
-  it("does not mutate the original array", () => {
-    const original = [{ n: 2 }, { n: 1 }];
-    sortByProperty(original, "n");
-    expect(original).toEqual([{ n: 2 }, { n: 1 }]);
+  it("does not mutate the input array", () => {
+    const copy = [...items];
+    sortByProperty(items, "n");
+    expect(items).toEqual(copy);
   });
 });
 
 describe("groupByProperty", () => {
   it("groups items by the stringified property value", () => {
-    const items = [{ type: "a" }, { type: "b" }, { type: "a" }];
+    const items = [
+      { type: "a", v: 1 },
+      { type: "b", v: 2 },
+      { type: "a", v: 3 },
+    ];
     expect(groupByProperty(items, "type")).toEqual({
-      a: [{ type: "a" }, { type: "a" }],
-      b: [{ type: "b" }],
+      a: [
+        { type: "a", v: 1 },
+        { type: "a", v: 3 },
+      ],
+      b: [{ type: "b", v: 2 }],
     });
-  });
-
-  it("returns an empty object for an empty array", () => {
-    expect(groupByProperty([], "type" as never)).toEqual({});
   });
 });

@@ -258,7 +258,7 @@ describe("EditPostPage", () => {
     expect(await screen.findByText("Post not found")).toBeInTheDocument();
   });
 
-  it("loads the post and passes it to the editor, showing the Mailchimp link for a presentation", async () => {
+  it("loads the post and passes it to the editor, showing the Social Integrations link for a presentation", async () => {
     global.fetch = jest.fn().mockImplementation((url: string) => {
       if (url.includes("/pr"))
         return Promise.resolve(jsonResponse({ openPR: null }));
@@ -275,11 +275,11 @@ describe("EditPostPage", () => {
       await screen.findByRole("heading", { name: /Edit Blog Post: My Post/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /Mailchimp announcement/ }),
+      screen.getByRole("link", { name: /Social Integrations/ }),
     ).toHaveAttribute("href", "/admin/posts/my-post/social");
   });
 
-  it("hides the Mailchimp announcement link for a blog post", async () => {
+  it("hides the Social Integrations link for a blog post", async () => {
     global.fetch = jest.fn().mockImplementation((url: string) => {
       if (url.includes("/pr"))
         return Promise.resolve(jsonResponse({ openPR: null }));
@@ -294,7 +294,7 @@ describe("EditPostPage", () => {
     renderPage();
     await screen.findByRole("heading", { name: /Edit Blog Post/ });
     expect(
-      screen.queryByRole("link", { name: /Mailchimp announcement/ }),
+      screen.queryByRole("link", { name: /Social Integrations/ }),
     ).not.toBeInTheDocument();
   });
 
