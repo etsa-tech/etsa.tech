@@ -23,9 +23,7 @@ describe("AdminDashboard", () => {
       }),
     }) as unknown as typeof fetch;
     render(<AdminDashboard />);
-    await waitFor(() =>
-      expect(screen.getByText("Total Posts")).toBeInTheDocument(),
-    );
+    expect(await screen.findByText("Total Posts")).toBeInTheDocument();
     expect(screen.getAllByText("2").length).toBeGreaterThan(0); // 2 total... but published/draft are 1 each
     expect(
       screen.getByRole("link", { name: "Create New Post" }),
@@ -37,7 +35,7 @@ describe("AdminDashboard", () => {
     jest.spyOn(console, "error").mockImplementation(() => {});
     render(<AdminDashboard />);
     expect(await screen.findByText("Configuration Error")).toBeInTheDocument();
-    expect(screen.getAllByText("—").length).toBe(3);
+    expect(screen.getAllByText("—")).toHaveLength(3);
   });
 
   it("falls back to an empty post list when the response omits posts", async () => {

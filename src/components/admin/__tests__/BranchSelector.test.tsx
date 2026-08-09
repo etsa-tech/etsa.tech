@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import BranchSelector from "@/components/admin/BranchSelector";
 import { AdminProvider } from "@/contexts/AdminContext";
@@ -28,18 +28,14 @@ describe("BranchSelector", () => {
       json: async () => ({ branches: ["main", "dev"] }),
     }) as unknown as typeof fetch;
     renderWithProvider();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Branch:")).toBeInTheDocument(),
-    );
+    expect(await screen.findByLabelText("Branch:")).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "dev" })).toBeInTheDocument();
   });
 
   it("falls back to ['main'] and shows an error indicator when the fetch fails", async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: false });
     renderWithProvider();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Branch:")).toBeInTheDocument(),
-    );
+    expect(await screen.findByLabelText("Branch:")).toBeInTheDocument();
     expect(screen.getByTitle("Failed to load branches")).toBeInTheDocument();
   });
 
@@ -49,7 +45,7 @@ describe("BranchSelector", () => {
       json: async () => ({ branches: ["main", "update-post-x-123"] }),
     }) as unknown as typeof fetch;
     renderWithProvider();
-    await waitFor(() => screen.getByLabelText("Branch:"));
+    await screen.findByLabelText("Branch:");
     await userEvent.selectOptions(
       screen.getByLabelText("Branch:"),
       "update-post-x-123",
@@ -63,7 +59,7 @@ describe("BranchSelector", () => {
       json: async () => ({ branches: ["main", "feature/x"] }),
     }) as unknown as typeof fetch;
     renderWithProvider();
-    await waitFor(() => screen.getByLabelText("Branch:"));
+    await screen.findByLabelText("Branch:");
     await userEvent.selectOptions(
       screen.getByLabelText("Branch:"),
       "feature/x",

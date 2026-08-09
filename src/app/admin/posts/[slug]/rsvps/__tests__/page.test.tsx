@@ -104,9 +104,7 @@ describe("RsvpReportPage - loading from live sources (no cache)", () => {
     expect(
       await screen.findByRole("heading", { name: /RSVP Report: My Talk/ }),
     ).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.getByText("All sources loaded.")).toBeInTheDocument(),
-    );
+    expect(await screen.findByText("All sources loaded.")).toBeInTheDocument();
 
     // "2" and "5" also appear in the "Total for partners" summary <dd>s.
     expect(screen.getAllByText("2").length).toBeGreaterThan(0); // sheet count

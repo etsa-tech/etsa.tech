@@ -38,9 +38,7 @@ describe("GoogleMapEmbed", () => {
       .fn()
       .mockResolvedValue({ ok: false }) as unknown as typeof fetch;
     render(<GoogleMapEmbed address="123 Main St" />);
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to load map/)).toBeInTheDocument(),
-    );
+    expect(await screen.findByText(/Failed to load map/)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /Open in Google Maps/ }),
     ).toHaveAttribute(
@@ -52,9 +50,7 @@ describe("GoogleMapEmbed", () => {
   it("shows an error state when fetch itself rejects", async () => {
     global.fetch = jest.fn().mockRejectedValue(new Error("network down"));
     render(<GoogleMapEmbed address="123 Main St" />);
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to load map/)).toBeInTheDocument(),
-    );
+    expect(await screen.findByText(/Failed to load map/)).toBeInTheDocument();
   });
 
   it("does not fetch when address is empty", () => {

@@ -953,35 +953,26 @@ describe("BlogPostEditor - presentation/recording template buttons", () => {
     await userEvent.click(screen.getByRole("button", { name: "Show Assets" }));
   }
 
-  it("fills presentationSlides via the Local Git Storage template", async () => {
-    await withTitleAndDate();
-    await userEvent.click(
-      screen.getByRole("button", { name: "Local Git Storage" }),
-    );
-    expect(screen.getByLabelText(/Presentation Slides URL/)).toHaveValue(
-      "presentation.pdf",
-    );
-  });
-
-  it("fills presentationSlides via the Google Slides template", async () => {
-    await withTitleAndDate();
-    await userEvent.click(
-      screen.getByRole("button", { name: "Google Slides Template" }),
-    );
-    expect(screen.getByLabelText(/Presentation Slides URL/)).toHaveValue(
+  it.each([
+    ["Local Git Storage", "presentation.pdf"],
+    [
+      "Google Slides Template",
       "https://docs.google.com/presentation/d/YOUR_PRESENTATION_ID/edit#slide=id.p",
-    );
-  });
-
-  it("fills presentationSlides via the SlideShare template using title + date", async () => {
-    await withTitleAndDate();
-    await userEvent.click(
-      screen.getByRole("button", { name: "SlideShare Template" }),
-    );
-    expect(screen.getByLabelText(/Presentation Slides URL/)).toHaveValue(
+    ],
+    [
+      "SlideShare Template",
       "https://www.slideshare.net/YOUR_USERNAME/existing-post-2026-01-01",
-    );
-  });
+    ],
+  ])(
+    "fills presentationSlides via the %s template",
+    async (buttonName, expectedValue) => {
+      await withTitleAndDate();
+      await userEvent.click(screen.getByRole("button", { name: buttonName }));
+      expect(screen.getByLabelText(/Presentation Slides URL/)).toHaveValue(
+        expectedValue,
+      );
+    },
+  );
 
   it("fills recordingUrl via the YouTube and Vimeo templates", async () => {
     await withTitleAndDate();
@@ -1261,37 +1252,36 @@ describe("BlogPostEditor - additional branch coverage", () => {
     expect((await yamlTextarea()).value).toContain("No Delimiters");
   });
 
-  it("falls back to an empty object when a single-document rawContent parses to a non-object (null)", async () => {
-    const data = { ...editInitialData, rawContent: "null" };
-    render(<BlogPostEditor onSave={onSaveMock()} initialData={data} />);
-    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
-    expect((await yamlTextarea()).value).toBe("null");
-  });
-
-  it("falls back to an empty object when the second YAML document is blank", async () => {
-    const data = {
-      ...editInitialData,
-      rawContent: "---\n---\n---\n   \n---\nExisting body",
-    };
-    render(<BlogPostEditor onSave={onSaveMock()} initialData={data} />);
-    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
-    expect((await yamlTextarea()).value).toBe("");
-  });
-
-  it("falls back to an empty object when the second YAML document parses to a non-object (null)", async () => {
-    // Unlike a blank second document (which makes js-yaml's load() throw,
-    // caught by the outer try/catch), a document that's literally "null"
-    // parses successfully to the falsy value `null` without throwing - the
-    // only way to exercise the `|| {}` fallback on the *result* of load()
-    // rather than the catch block.
-    const data = {
-      ...editInitialData,
-      rawContent: "---\nnull\n---\nExisting body",
-    };
-    render(<BlogPostEditor onSave={onSaveMock()} initialData={data} />);
-    await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
-    expect((await yamlTextarea()).value).toBe("null");
-  });
+  it.each([
+    [
+      "a single-document rawContent parses to a non-object (null)",
+      "null",
+      "null",
+    ],
+    [
+      "the second YAML document is blank",
+      "---\n---\n---\n   \n---\nExisting body",
+      "",
+    ],
+    [
+      // Unlike a blank second document (which makes js-yaml's load() throw,
+      // caught by the outer try/catch), a document that's literally "null"
+      // parses successfully to the falsy value `null` without throwing - the
+      // only way to exercise the `|| {}` fallback on the *result* of load()
+      // rather than the catch block.
+      "the second YAML document parses to a non-object (null)",
+      "---\nnull\n---\nExisting body",
+      "null",
+    ],
+  ])(
+    "falls back to an empty object when %s",
+    async (_label, rawContent, expectedValue) => {
+      const data = { ...editInitialData, rawContent };
+      render(<BlogPostEditor onSave={onSaveMock()} initialData={data} />);
+      await userEvent.click(screen.getByRole("button", { name: "Show YAML" }));
+      expect((await yamlTextarea()).value).toBe(expectedValue);
+    },
+  );
 
   it("leaves the remaining-documents section empty when there's only one YAML delimiter", async () => {
     const data = {

@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
@@ -16,11 +16,9 @@ describe("ThemeToggle", () => {
   it("renders a placeholder before mount, then the real button after", async () => {
     mockedUseTheme.mockReturnValue({ theme: "light", setTheme: jest.fn() });
     render(<ThemeToggle />);
-    await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Toggle theme" }),
-      ).toBeInTheDocument(),
-    );
+    expect(
+      await screen.findByRole("button", { name: "Toggle theme" }),
+    ).toBeInTheDocument();
   });
 
   it("toggles from light to dark on click", async () => {
