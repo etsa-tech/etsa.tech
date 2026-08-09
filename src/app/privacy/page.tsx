@@ -140,7 +140,7 @@ export default function PrivacyPage() {
             >
               contact form
             </a>
-            .
+            {"."}
           </p>
         </section>
 
@@ -240,7 +240,7 @@ export default function PrivacyPage() {
             >
               website@etsa.tech
             </a>
-            .
+            {"."}
           </p>
         </section>
       </div>
