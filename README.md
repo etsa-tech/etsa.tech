@@ -171,7 +171,7 @@ The ETSA website includes a secure admin interface for content management access
 - **Blog Post Management**: Create, edit, and manage blog posts with markdown editor
 - **GitHub Integration**: Automatic pull request creation for content changes
 - **Asset Management**: Upload and manage images and files (coming soon)
-- **Social Media Integration**: Mailchimp campaign drafting, contact search, test sends, and a confirmation-gated live send, per presentation post; LinkedIn integration (coming soon)
+- **Social Media Integration**: Mailchimp campaign drafting, contact search, test sends, and a confirmation-gated live send, per presentation post; LinkedIn company-page posting via per-post board member OAuth (no stored credentials)
 
 ### Required Environment Variables
 
@@ -195,6 +195,17 @@ MAILCHIMP_API_KEY=your_mailchimp_api_key
 MAILCHIMP_SERVER_PREFIX=us1  # the "usX" suffix on your API key
 MAILCHIMP_LIST_ID=your_audience_id
 MAILCHIMP_TEMPLATE_ID_PRESENTATION=your_template_id  # admin social portal, presentation posts only
+
+# LinkedIn (admin social portal - company page posting)
+# No API key is stored: each post is authorized live by whichever board
+# member is signed into LinkedIn, via OAuth. These are only the app's own
+# OAuth registration credentials. Two separate LinkedIn Developer apps are
+# required - see "How to set up the LinkedIn app" below for why.
+LINKEDIN_CLIENT_ID=your_linkedin_community_management_app_client_id
+LINKEDIN_CLIENT_SECRET=your_linkedin_community_management_app_client_secret
+LINKEDIN_ORGANIZATION_ID=your_linkedin_company_page_numeric_id
+LINKEDIN_SPEAKER_CLIENT_ID=your_linkedin_speaker_connect_app_client_id
+LINKEDIN_SPEAKER_CLIENT_SECRET=your_linkedin_speaker_connect_app_client_secret
 ```
 
 #### How to create GitHub App
@@ -238,6 +249,32 @@ The GitHub App implementation uses efficient connection pooling to minimize API 
 
 - Use `/api/admin/github-status` to check connection status
 - Use `DELETE /api/admin/github-status` to clear token cache if needed
+
+#### How to set up the LinkedIn apps
+
+Two separate LinkedIn Developer apps are required. LinkedIn's manual review
+for the Community Management API product is tied to one specific app, and
+requesting it on an app that also has the Sign In with LinkedIn product has
+caused LinkedIn to reject the org-posting scope outright
+(`unauthorized_scope_error`) - so the two flows are kept on entirely separate
+apps.
+
+##### App 1 - Community Management API (org-page posting)
+
+1. Create an app at the [LinkedIn Developer Portal](https://www.linkedin.com/developers/apps) and associate it with the ETSA Company Page.
+1. Request access to the **Community Management API** product - this requires LinkedIn's manual review and a "Verify" step confirming the app belongs to the ETSA page. This is the product that grants the `w_organization_social` scope used to post to the page.
+1. Under Auth settings, add this exact authorized redirect URL (LinkedIn requires an exact match - no wildcards - so the callback route is a fixed path that reads which post it's for from the OAuth `state` param, not the URL): `{NEXTAUTH_URL}/api/admin/posts/social/linkedin/callback`.
+1. Copy the Client ID and Client Secret into `LINKEDIN_CLIENT_ID` / `LINKEDIN_CLIENT_SECRET`.
+1. Find the company page's numeric organization ID (visible in the page admin URL, or via the Organization Lookup API) and set `LINKEDIN_ORGANIZATION_ID`.
+
+##### App 2 - Sign In with LinkedIn using OpenID Connect (speaker connect)
+
+1. Create a second, separate app at the [LinkedIn Developer Portal](https://www.linkedin.com/developers/apps) - it does not need to be associated with the ETSA Company Page, since it only ever authorizes as the speaker themselves.
+1. Add the **Sign In with LinkedIn using OpenID Connect** product - this is self-serve and doesn't require manual review. This is the product that grants the `openid profile` scope used to capture a speaker's mentionable member URN.
+1. Under Auth settings, add this exact authorized redirect URL: `{NEXTAUTH_URL}/api/admin/posts/social/linkedin/speaker/callback`.
+1. Copy the Client ID and Client Secret into `LINKEDIN_SPEAKER_CLIENT_ID` / `LINKEDIN_SPEAKER_CLIENT_SECRET`.
+
+No LinkedIn access token is ever stored by this app. Posting a presentation to LinkedIn redirects whichever board member is signed in to LinkedIn's own consent screen; they must be an admin on the ETSA Company Page. The resulting token is used once, to publish that one post, then discarded. Getting a real, notifying `@mention` for the speaker (instead of a plain profile link) requires that speaker to separately complete a one-time LinkedIn connect of their own (via App 2), from the same admin social page.
 
 ### Setup Instructions
 
@@ -352,6 +389,7 @@ All speaker fields are optional but recommended for speaker presentations. You c
   - **bio**: Professional background and expertise (optional)
   - **image**: Path to speaker's profile photo (optional)
   - **linkedIn**: LinkedIn profile URL (optional)
+  - **linkedInUrn**: LinkedIn member URN, e.g. from `urn:li:person:{id}` (optional, advanced) - lets the admin social page's LinkedIn post tag this speaker with a real, notifying `@mention` without them going through the one-time LinkedIn connect flow. Usually left unset; the connect flow populates the equivalent automatically per-speaker.
   - **twitter**: Twitter/X profile URL (optional)
   - **github**: GitHub profile URL (optional)
   - **website**: Personal or professional website URL (optional)
