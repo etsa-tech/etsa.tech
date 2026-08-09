@@ -67,6 +67,16 @@ export default function SocialMailingPage() {
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
 
+  const [linkedInRecord, setLinkedInRecord] =
+    useState<SocialCacheRecord | null>(null);
+  const [isLinkedInSpeakerConnected, setIsLinkedInSpeakerConnected] =
+    useState(false);
+  const [isLoadingLinkedIn, setIsLoadingLinkedIn] = useState(true);
+  const [linkedInBanner, setLinkedInBanner] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
   const refreshStatus = useCallback(async () => {
     setIsLoadingStatus(true);
     try {
@@ -82,6 +92,68 @@ export default function SocialMailingPage() {
     }
   }, [slug]);
 
+  const refreshLinkedInStatus = useCallback(
+    async (speakerName: string) => {
+      setIsLoadingLinkedIn(true);
+      try {
+        const query = speakerName
+          ? `?speaker=${encodeURIComponent(speakerName)}`
+          : "";
+        const response = await fetch(
+          `/api/admin/posts/${slug}/social/linkedin/status${query}`,
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setLinkedInRecord(data.cached);
+          setIsLinkedInSpeakerConnected(Boolean(data.speakerConnected));
+        }
+      } finally {
+        setIsLoadingLinkedIn(false);
+      }
+    },
+    [slug],
+  );
+
+  // The LinkedIn authorize/callback routes are full-page redirects (an
+  // OAuth consent screen can't happen inside a fetch()), so their result
+  // comes back as query params on this page rather than a fetch response.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const success = url.searchParams.get("linkedin_success");
+    const error = url.searchParams.get("linkedin_error");
+    const speakerSuccess = url.searchParams.get("linkedin_speaker_success");
+    const speakerError = url.searchParams.get("linkedin_speaker_error");
+
+    if (success) {
+      setLinkedInBanner({ type: "success", message: "Posted to LinkedIn." });
+    } else if (error) {
+      setLinkedInBanner({
+        type: "error",
+        message: `LinkedIn post failed: ${error}`,
+      });
+    } else if (speakerSuccess) {
+      setLinkedInBanner({
+        type: "success",
+        message: `Connected ${speakerSuccess}'s LinkedIn for mentions.`,
+      });
+    } else if (speakerError) {
+      setLinkedInBanner({
+        type: "error",
+        message: `LinkedIn connect failed: ${speakerError}`,
+      });
+    }
+
+    if (success || error || speakerSuccess || speakerError) {
+      [
+        "linkedin_success",
+        "linkedin_error",
+        "linkedin_speaker_success",
+        "linkedin_speaker_error",
+      ].forEach((key) => url.searchParams.delete(key));
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
   useEffect(() => {
     if (!slug) return;
 
@@ -93,6 +165,7 @@ export default function SocialMailingPage() {
         if (!response.ok) throw new Error("Failed to load post");
         const { frontmatter } = await response.json();
         const speaker = frontmatter.speakers?.[0];
+        const speakerName = speaker?.name ?? frontmatter.speakerName ?? "";
         setPost({
           title: frontmatter.title,
           bio: speaker?.bio ?? frontmatter.speakerBio ?? "",
@@ -101,10 +174,11 @@ export default function SocialMailingPage() {
             frontmatter.meetingDate ??
             frontmatter.date,
           abstract: frontmatter.presentationDescription ?? frontmatter.excerpt,
-          speakerName: speaker?.name ?? frontmatter.speakerName ?? "",
+          speakerName,
           company: speaker?.company ?? frontmatter.speakerCompany ?? "",
           isBlogpost: frontmatter.blogpost === true,
         });
+        refreshLinkedInStatus(speakerName);
       } catch {
         setLoadError("Failed to load post.");
       } finally {
@@ -113,7 +187,7 @@ export default function SocialMailingPage() {
     })();
 
     refreshStatus();
-  }, [slug, refreshStatus]);
+  }, [slug, refreshStatus, refreshLinkedInStatus]);
 
   const createDraft = async () => {
     setIsDrafting(true);
@@ -481,6 +555,81 @@ export default function SocialMailingPage() {
           3. Send to audience
         </h2>
         {sendSectionContent}
+      </section>
+
+      {/* LinkedIn */}
+      <section className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          LinkedIn
+        </h2>
+        {linkedInBanner && (
+          <p
+            className={`mb-3 text-sm ${
+              linkedInBanner.type === "success"
+                ? "text-green-700 dark:text-green-400"
+                : "text-red-600"
+            }`}
+          >
+            {linkedInBanner.message}
+          </p>
+        )}
+        {!isLoadingLinkedIn && linkedInRecord?.status === "sent" ? (
+          <p className="text-sm text-green-700 dark:text-green-400">
+            Posted
+            {linkedInRecord.sentAt &&
+              ` ${new Date(linkedInRecord.sentAt).toLocaleString()}`}{" "}
+            by {linkedInRecord.sentBy}.{" "}
+            {linkedInRecord.campaignUrl && (
+              <a
+                href={linkedInRecord.campaignUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-etsa-primary hover:text-etsa-primary-dark underline"
+              >
+                View on LinkedIn ↗
+              </a>
+            )}
+          </p>
+        ) : (
+          <>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Posting requires your own LinkedIn login and admin access to the
+              ETSA company page. No credentials are stored - you authorize each
+              post individually.
+            </p>
+            <a
+              href={`/api/admin/posts/${slug}/social/linkedin/authorize`}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-etsa-primary hover:bg-etsa-primary-dark"
+            >
+              Post to LinkedIn
+            </a>
+          </>
+        )}
+        {post.speakerName && (
+          <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+            Speaker mention:{" "}
+            {isLinkedInSpeakerConnected ? (
+              <span className="text-green-700 dark:text-green-400">
+                {post.speakerName} will be tagged.
+              </span>
+            ) : (
+              <>
+                <span>
+                  {post.speakerName} hasn&apos;t connected LinkedIn - the post
+                  will link their profile instead of tagging them.
+                </span>{" "}
+                <a
+                  href={`/api/admin/posts/${slug}/social/linkedin/speaker/authorize?speaker=${encodeURIComponent(
+                    post.speakerName,
+                  )}`}
+                  className="text-etsa-primary hover:text-etsa-primary-dark underline"
+                >
+                  Connect {post.speakerName}&apos;s LinkedIn
+                </a>
+              </>
+            )}
+          </p>
+        )}
       </section>
     </div>
   );
