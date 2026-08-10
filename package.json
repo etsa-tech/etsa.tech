@@ -56,7 +56,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/sanitize-html": "^2.16.0",
-    "@types/testing-library__jest-dom": "^5.14.9",
+    "@types/testing-library__jest-dom": "^6.0.0",
     "autoprefixer": "^10.4.21",
     "conventional-changelog": "^8.0.0",
     "eslint": "^9.0.0",
