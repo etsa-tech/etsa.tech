@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- **deps**: update dependency @testing-library/jest-dom to v7.0.1 ([#450](https://github.com/etsa-tech/etsa.tech/pull/450)) by @renovate[bot]
+
+## [5.5.0] - 2026-08-10
+
+### 🔧 Chores
+
 - **deps**: update dependency @types/testing-library__jest-dom to v6 ([#451](https://github.com/etsa-tech/etsa.tech/pull/451)) by @renovate[bot]
 
 ## [5.5.0] - 2026-08-09
