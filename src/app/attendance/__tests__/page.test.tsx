@@ -38,7 +38,7 @@ describe("AttendancePage (public)", () => {
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
-  it("falls back to an empty data set when Blobs isn't reachable at build time", async () => {
+  it("falls back to an empty data set when Blobs isn't reachable", async () => {
     mockedListAttendanceRecords.mockRejectedValue(
       new Error("no blobs context"),
     );
