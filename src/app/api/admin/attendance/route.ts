@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "node:crypto";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isAuthorizedUser } from "@/lib/auth-utils";
@@ -54,38 +53,27 @@ export async function POST(request: NextRequest) {
 
   try {
     const now = new Date().toISOString();
+    const id = validation.data.postSlug;
 
-    // At most one record is expected per post (see getAttendanceRecordByPostSlug) -
-    // enforce that server-side too, not just via the bulk-import UI's dedup, so a
-    // stale client (e.g. a second import run before the record list reloads) can't
-    // create a duplicate for the same event.
-    const existing = await getAttendanceRecordByPostSlug(
-      validation.data.postSlug,
+    // Records are keyed by postSlug (id === postSlug), so at most one can
+    // ever exist per post - a repeat POST for the same post (e.g. the
+    // bulk-import UI re-running against a stale record list) updates that
+    // record in place instead of creating a duplicate.
+    const existing = await getAttendanceRecordByPostSlug(id);
+
+    const { record } = await saveAttendanceRecord(
+      {
+        ...existing,
+        ...validation.data,
+        id,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+        updatedBy: session!.user?.email ?? null,
+      },
+      existing,
     );
 
-    if (existing) {
-      const { record } = await saveAttendanceRecord(
-        {
-          ...existing,
-          ...validation.data,
-          updatedAt: now,
-          updatedBy: session!.user?.email ?? null,
-        },
-        existing,
-      );
-
-      return NextResponse.json({ record });
-    }
-
-    const { record } = await saveAttendanceRecord({
-      id: randomUUID(),
-      ...validation.data,
-      createdAt: now,
-      updatedAt: now,
-      updatedBy: session!.user?.email ?? null,
-    });
-
-    return NextResponse.json({ record }, { status: 201 });
+    return NextResponse.json({ record }, { status: existing ? 200 : 201 });
   } catch (error) {
     console.error("Error creating attendance record:", error);
     return NextResponse.json(

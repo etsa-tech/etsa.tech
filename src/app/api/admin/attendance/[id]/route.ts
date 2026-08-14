@@ -63,17 +63,34 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     );
   }
 
+  // Records are keyed by postSlug, so re-linking this record to a different
+  // post (the picker allows that outside the locked-post view) means moving
+  // it to a new key - make sure that doesn't clobber another post's record.
+  const newId = validation.data.postSlug;
+  if (newId !== id && (await getAttendanceRecord(newId))) {
+    return NextResponse.json(
+      { error: "Another attendance record is already linked to that post" },
+      { status: 409 },
+    );
+  }
+
   try {
     const { record } = await saveAttendanceRecord(
       {
         ...existing,
         ...validation.data,
-        id,
+        id: newId,
         updatedAt: new Date().toISOString(),
         updatedBy: session!.user?.email ?? null,
       },
-      existing,
+      newId === id ? existing : null,
     );
+
+    // Only drop the old key once the new one is confirmed written, so a
+    // failed save (e.g. the Sheets mirror) leaves the original untouched.
+    if (newId !== id) {
+      await deleteAttendanceRecord(id);
+    }
 
     return NextResponse.json({ record });
   } catch (error) {

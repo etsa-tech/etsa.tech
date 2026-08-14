@@ -87,20 +87,20 @@ describe("getAttendanceRecord", () => {
 });
 
 describe("getAttendanceRecordByPostSlug", () => {
-  it("returns null when no record links to that post", async () => {
+  it("returns null when no record exists for that post", async () => {
     expect(await getAttendanceRecordByPostSlug("no-such-post")).toBeNull();
   });
 
-  it("returns the record whose postSlug matches", async () => {
+  it("returns the record stored under that postSlug (id === postSlug)", async () => {
     await saveAttendanceRecord(
-      makeRecord("a", "2024-01-01", { postSlug: "post-a" }),
+      makeRecord("post-a", "2024-01-01", { postSlug: "post-a" }),
     );
     await saveAttendanceRecord(
-      makeRecord("b", "2024-02-01", { postSlug: "post-b" }),
+      makeRecord("post-b", "2024-02-01", { postSlug: "post-b" }),
     );
 
     const found = await getAttendanceRecordByPostSlug("post-b");
-    expect(found?.id).toBe("b");
+    expect(found?.id).toBe("post-b");
   });
 });
 
