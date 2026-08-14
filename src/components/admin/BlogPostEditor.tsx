@@ -158,7 +158,7 @@ function generateSlugFromDateAndTitle(date: string, title: string): string {
     .replace(/-+/g, "-")
     .trim();
 
-  return date ? `${date}-${titleSlug}` : titleSlug;
+  return `${date}-${titleSlug}`;
 }
 
 // Default meeting location (from meeting-info page)
@@ -1132,8 +1132,6 @@ export default function BlogPostEditor({
 
   // Function to handle asset deletion
   const handleAssetDelete = async (assetName: string) => {
-    if (!slug) return;
-
     const confirmDelete = globalThis.confirm(
       `Are you sure you want to delete "${assetName}"? This action cannot be undone.`,
     );
@@ -1297,7 +1295,7 @@ export default function BlogPostEditor({
     img.name.toLowerCase().includes(speakerSearchQuery.toLowerCase()),
   );
 
-  const onSubmit = async (data: BlogPostFormData, createPR: boolean = true) => {
+  const onSubmit = async (data: BlogPostFormData, createPR: boolean) => {
     // Use the YAML reconstruction function to preserve format and handle multi-document YAML
     const frontmatter = reconstructYamlContent(data, rawYaml);
 

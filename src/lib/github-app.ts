@@ -17,21 +17,15 @@ let appInstance: App | null = null;
 const TOKEN_REFRESH_BUFFER = 5 * 60 * 1000; // Refresh 5 minutes before expiry
 
 /**
- * Lazily initialize the GitHub App instance
- * This prevents errors during build time when env vars might not be set
+ * Lazily initialize the GitHub App instance.
+ * Its only caller, createInstallationToken(), already validates both env
+ * vars before reaching this, so they're asserted rather than re-checked here.
  */
 function getAppInstance(): App {
   if (!appInstance) {
-    if (!process.env.GITHUB_APP_ID) {
-      throw new Error("GITHUB_APP_ID environment variable is not set");
-    }
-    if (!process.env.GITHUB_APP_PRIVATE_KEY) {
-      throw new Error("GITHUB_APP_PRIVATE_KEY environment variable is not set");
-    }
-
     appInstance = new App({
-      appId: process.env.GITHUB_APP_ID,
-      privateKey: process.env.GITHUB_APP_PRIVATE_KEY,
+      appId: process.env.GITHUB_APP_ID!,
+      privateKey: process.env.GITHUB_APP_PRIVATE_KEY!,
     });
   }
   return appInstance;
