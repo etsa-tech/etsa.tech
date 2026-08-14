@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getPresentationPosts } from "@/lib/blog";
 import { getPostSpeakers } from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
@@ -80,13 +81,15 @@ export default function MeetingInfoPage() {
               </div>
               {latestPost && (
                 <div className="space-y-2">
-                  <a
-                    href={`/presentation/${encodeURIComponent(
-                      latestPost.slug,
-                    )}`}
-                    className="block group hover:bg-gray-50 dark:hover:bg-gray-800 -mx-2 px-2 py-2 rounded-lg transition-colors"
-                  >
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-etsa-primary transition-colors">
+                  <div className="relative block group hover:bg-gray-50 dark:hover:bg-gray-800 -mx-2 px-2 py-2 rounded-lg transition-colors">
+                    <Link
+                      href={`/presentation/${encodeURIComponent(
+                        latestPost.slug,
+                      )}`}
+                      className="absolute inset-0 z-0"
+                      aria-label={latestPost.frontmatter.title}
+                    />
+                    <h3 className="relative z-[1] pointer-events-none font-semibold text-gray-900 dark:text-gray-100 group-hover:text-etsa-primary transition-colors">
                       {latestPost.frontmatter.title}
                       <svg
                         className="w-4 h-4 inline-block ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -102,20 +105,21 @@ export default function MeetingInfoPage() {
                         />
                       </svg>
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
+                    <p className="relative z-[1] pointer-events-none text-gray-600 dark:text-gray-300 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
                       {latestPost.frontmatter.excerpt}
                     </p>
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                    <div className="relative z-[1] flex items-center text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
                       {(() => {
                         const speakers = getPostSpeakers(
                           latestPost.frontmatter,
                         );
                         return speakers.length > 0 ? (
-                          <span>
+                          <span className="pointer-events-none">
                             Speaker{speakers.length > 1 ? "s" : ""}:{" "}
                             <SpeakerList
                               speakers={speakers}
                               showTitles={false}
+                              className="pointer-events-auto"
                             />
                           </span>
                         ) : (
@@ -123,7 +127,7 @@ export default function MeetingInfoPage() {
                         );
                       })()}
                     </div>
-                  </a>
+                  </div>
                 </div>
               )}
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
