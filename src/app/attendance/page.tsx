@@ -2,11 +2,14 @@ import { listAttendanceRecords } from "@/lib/attendance-store";
 import { computeAttendanceStats } from "@/lib/attendance-stats";
 import { AttendanceStats } from "@/components/AttendanceStats";
 
-// Static export - regenerates on the next site build/deploy, same
-// staleness model the rest of the public site already has for git-based
-// content. Deliberately renders only aggregates (see
-// src/app/api/attendance/stats/route.ts), never a per-event table.
-export const dynamic = "force-static";
+// Rendered per-request, not statically - Netlify Blobs' automatic context
+// (siteID/token) is only available to a live Function invocation, not the
+// `next build` step that would run this page's data fetch under
+// force-static (confirmed by the MissingBlobsEnvironmentError that static
+// mode threw in production). Deliberately renders only aggregates (see
+// src/app/api/attendance/stats/route.ts, the same read this page does),
+// never a per-event table.
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Attendance - ETSA",
@@ -15,15 +18,14 @@ export const metadata = {
 };
 
 export default async function AttendancePage() {
-  // Blobs needs a live Netlify site context (siteID/token), which is only
-  // present during an actual Netlify build/deploy - not a plain local
-  // `next build`. Fall back to an empty data set rather than crashing static
-  // generation when that context isn't available.
+  // Local `next build`/`next dev` (outside an actual Netlify Function
+  // invocation) still has no Blobs context - fall back to an empty data set
+  // rather than crashing the page when that's the case.
   let records: Awaited<ReturnType<typeof listAttendanceRecords>> = [];
   try {
     records = await listAttendanceRecords();
   } catch (error) {
-    console.error("Error loading attendance records for static page:", error);
+    console.error("Error loading attendance records:", error);
   }
   const stats = computeAttendanceStats(records);
 
