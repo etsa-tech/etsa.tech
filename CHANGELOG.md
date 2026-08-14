@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.3] - 2026-08-14
+
+### 🐛 Bug Fixes
+
+- render the public attendance page via ISR instead of at build time ([#457](https://github.com/etsa-tech/etsa.tech/pull/457)) by @wesleykirkland
+
 ## [5.6.2] - 2026-08-14
 
 ### 🐛 Bug Fixes
