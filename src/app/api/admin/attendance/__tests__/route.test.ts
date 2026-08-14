@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { isAuthorizedUser } from "@/lib/auth-utils";
 import { isAttendanceSheetsConfigured } from "@/lib/attendance-sheets-sync";
 import {
+  getAttendanceRecordByPostSlug,
   listAttendanceRecords,
   saveAttendanceRecord,
 } from "@/lib/attendance-store";
@@ -15,6 +16,7 @@ jest.mock("@/lib/attendance-sheets-sync", () => ({
   isAttendanceSheetsConfigured: jest.fn(),
 }));
 jest.mock("@/lib/attendance-store", () => ({
+  getAttendanceRecordByPostSlug: jest.fn(),
   listAttendanceRecords: jest.fn(),
   saveAttendanceRecord: jest.fn(),
 }));
@@ -24,6 +26,9 @@ const mockedGetServerSession = jest.mocked(getServerSession);
 const mockedIsAuthorizedUser = jest.mocked(isAuthorizedUser);
 const mockedIsAttendanceSheetsConfigured = jest.mocked(
   isAttendanceSheetsConfigured,
+);
+const mockedGetAttendanceRecordByPostSlug = jest.mocked(
+  getAttendanceRecordByPostSlug,
 );
 const mockedListAttendanceRecords = jest.mocked(listAttendanceRecords);
 const mockedSaveAttendanceRecord = jest.mocked(saveAttendanceRecord);
@@ -51,6 +56,7 @@ beforeEach(() => {
   } as never);
   mockedIsAuthorizedUser.mockReturnValue(true);
   mockedIsAttendanceSheetsConfigured.mockReturnValue(false);
+  mockedGetAttendanceRecordByPostSlug.mockResolvedValue(null);
 });
 
 afterEach(() => jest.clearAllMocks());
@@ -101,6 +107,30 @@ describe("POST /api/admin/attendance", () => {
         ...validInput,
         updatedBy: "board@etsa.tech",
       }),
+    );
+  });
+
+  it("updates the existing record instead of creating a duplicate when a record for the postSlug already exists", async () => {
+    const existing = {
+      id: "existing-id",
+      ...validInput,
+      inPersonCount: 1,
+      createdAt: "2025-01-01T00:00:00.000Z",
+      updatedAt: "2025-01-01T00:00:00.000Z",
+      updatedBy: null,
+    };
+    mockedGetAttendanceRecordByPostSlug.mockResolvedValue(existing as never);
+    mockedSaveAttendanceRecord.mockResolvedValue({
+      record: { ...existing, ...validInput } as never,
+    });
+
+    const res = await POST(postReq(validInput));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.record.id).toBe("existing-id");
+    expect(mockedSaveAttendanceRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "existing-id", ...validInput }),
+      existing,
     );
   });
 
