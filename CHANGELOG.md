@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.2] - 2026-08-14
+
+### 🐛 Bug Fixes
+
+- verify attendance Sheets writes actually land, not just report success ([#456](https://github.com/etsa-tech/etsa.tech/pull/456)) by @wesleykirkland
+
 ## [5.6.1] - 2026-08-14
 
 ### 🐛 Bug Fixes
