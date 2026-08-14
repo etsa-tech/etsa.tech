@@ -1,6 +1,6 @@
 {
   "name": "etsa.tech",
-  "version": "5.6.3",
+  "version": "5.6.4",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
