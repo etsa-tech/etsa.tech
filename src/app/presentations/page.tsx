@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   getPresentationPosts,
   getAllTags,
@@ -36,6 +37,12 @@ export default function PresentationsPage() {
           },
         ]}
       />
+      <Link
+        href="/attendance"
+        className="card block text-sm font-medium text-etsa-primary hover:underline p-5"
+      >
+        See our attendance history →
+      </Link>
     </>
   );
 
