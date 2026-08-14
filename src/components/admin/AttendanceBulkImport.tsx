@@ -19,7 +19,11 @@ interface AttendanceBulkImportProps {
   readonly onComplete: () => void;
 }
 
-const VALID_FORMATS: AttendanceFormat[] = ["in-person", "virtual", "hybrid"];
+const VALID_FORMATS: Set<AttendanceFormat> = new Set([
+  "in-person",
+  "virtual",
+  "hybrid",
+]);
 
 export function parseBulkImportLine(
   line: string,
@@ -38,7 +42,7 @@ export function parseBulkImportLine(
   if (
     !eventDate ||
     !postSlug ||
-    !VALID_FORMATS.includes(format as AttendanceFormat) ||
+    !VALID_FORMATS.has(format as AttendanceFormat) ||
     Number.isNaN(inPersonCount) ||
     Number.isNaN(virtualCount)
   ) {

@@ -116,6 +116,85 @@ export default function AttendanceBySpeakerPage() {
     });
   }, [speakers, searchTerm, sortField, sortDirection]);
 
+  let cardContent: React.ReactNode;
+  if (isLoading) {
+    cardContent = (
+      <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+    );
+  } else if (speakers.length === 0) {
+    cardContent = (
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        No speaker attendance data yet.
+      </p>
+    );
+  } else {
+    cardContent = (
+      <>
+        <div className="max-w-xs">
+          <label htmlFor="speaker-search" className="sr-only">
+            Search speakers
+          </label>
+          <input
+            id="speaker-search"
+            type="text"
+            placeholder="Search speakers..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-500 shadow-sm focus:border-etsa-primary focus:outline-none focus:ring-1 focus:ring-etsa-primary"
+          />
+        </div>
+
+        {visibleSpeakers.length === 0 ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            No speakers match your search.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead>
+                <tr className="text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                  <th className="w-8 py-2 pr-2">
+                    <span className="sr-only">Expand</span>
+                  </th>
+                  {columns.map((column) => (
+                    <th
+                      key={column.field}
+                      className="py-2 pr-4 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200"
+                      onClick={() => handleSort(column.field)}
+                    >
+                      <div className="flex items-center space-x-1">
+                        <span>{column.label}</span>
+                        <SortIcon
+                          field={column.field}
+                          currentSortField={sortField}
+                          sortDirection={sortDirection}
+                        />
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-sm text-gray-900 dark:text-white">
+                {visibleSpeakers.map((speaker) => {
+                  const isExpanded = expandedSpeakers.has(speaker.speakerName);
+                  return (
+                    <SpeakerRows
+                      key={speaker.speakerName}
+                      speaker={speaker}
+                      isExpanded={isExpanded}
+                      onToggle={() => toggleSpeaker(speaker.speakerName)}
+                      columnCount={columns.length + 1}
+                    />
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -141,83 +220,7 @@ export default function AttendanceBySpeakerPage() {
       )}
 
       <div className="card">
-        <div className="card-content space-y-3">
-          {isLoading ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Loading...
-            </p>
-          ) : speakers.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              No speaker attendance data yet.
-            </p>
-          ) : (
-            <>
-              <div className="max-w-xs">
-                <label htmlFor="speaker-search" className="sr-only">
-                  Search speakers
-                </label>
-                <input
-                  id="speaker-search"
-                  type="text"
-                  placeholder="Search speakers..."
-                  value={searchTerm}
-                  onChange={(event) => setSearchTerm(event.target.value)}
-                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-500 shadow-sm focus:border-etsa-primary focus:outline-none focus:ring-1 focus:ring-etsa-primary"
-                />
-              </div>
-
-              {visibleSpeakers.length === 0 ? (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  No speakers match your search.
-                </p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead>
-                      <tr className="text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
-                        <th className="w-8 py-2 pr-2">
-                          <span className="sr-only">Expand</span>
-                        </th>
-                        {columns.map((column) => (
-                          <th
-                            key={column.field}
-                            className="py-2 pr-4 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200"
-                            onClick={() => handleSort(column.field)}
-                          >
-                            <div className="flex items-center space-x-1">
-                              <span>{column.label}</span>
-                              <SortIcon
-                                field={column.field}
-                                currentSortField={sortField}
-                                sortDirection={sortDirection}
-                              />
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-sm text-gray-900 dark:text-white">
-                      {visibleSpeakers.map((speaker) => {
-                        const isExpanded = expandedSpeakers.has(
-                          speaker.speakerName,
-                        );
-                        return (
-                          <SpeakerRows
-                            key={speaker.speakerName}
-                            speaker={speaker}
-                            isExpanded={isExpanded}
-                            onToggle={() => toggleSpeaker(speaker.speakerName)}
-                            columnCount={columns.length + 1}
-                          />
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+        <div className="card-content space-y-3">{cardContent}</div>
       </div>
     </div>
   );

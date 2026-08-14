@@ -132,8 +132,8 @@ function Legend({
   swatchClassName,
   label,
 }: {
-  swatchClassName: string;
-  label: string;
+  readonly swatchClassName: string;
+  readonly label: string;
 }) {
   return (
     <span className="flex items-center space-x-1.5">

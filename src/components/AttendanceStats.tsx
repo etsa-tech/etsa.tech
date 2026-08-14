@@ -95,7 +95,13 @@ export function AttendanceStats({ stats, records }: AttendanceStatsProps) {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({
+  label,
+  value,
+}: {
+  readonly label: string;
+  readonly value: number;
+}) {
   return (
     <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow p-5">
       <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">

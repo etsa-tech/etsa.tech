@@ -110,6 +110,85 @@ export default function PostAttendancePage() {
 
   const { postTitle, record } = data;
 
+  let cardContent: React.ReactNode;
+  if (isEditing) {
+    cardContent = (
+      <AttendanceForm
+        lockedPost={{ slug, title: postTitle, date: data.postDate }}
+        initial={
+          record
+            ? {
+                eventDate: record.eventDate,
+                postSlug: record.postSlug,
+                eventTitle: record.eventTitle,
+                format: record.format,
+                inPersonCount: record.inPersonCount,
+                virtualCount: record.virtualCount,
+                notes: record.notes,
+              }
+            : undefined
+        }
+        submitLabel={record ? "Save changes" : "Add record"}
+        onSubmit={handleSubmit}
+        onCancel={() => setIsEditing(false)}
+      />
+    );
+  } else if (record) {
+    cardContent = (
+      <>
+        <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Stat label="Format" value={formatLabels[record.format]} />
+          <Stat label="In-person" value={record.inPersonCount} />
+          <Stat label="Virtual" value={record.virtualCount} />
+          <Stat
+            label="Total"
+            value={record.inPersonCount + record.virtualCount}
+          />
+        </dl>
+        {record.notes && (
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            {record.notes}
+          </p>
+        )}
+        <button
+          type="button"
+          className="rounded-md bg-etsa-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-etsa-primary-dark"
+          onClick={() => setIsEditing(true)}
+        >
+          Edit
+        </button>
+
+        {allRecords.length > 0 && (
+          <div className="pt-2">
+            <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {record.eventDate.slice(0, 4)} attendance by event
+            </h3>
+            <YearAttendanceBreakdown
+              year={Number(record.eventDate.slice(0, 4))}
+              records={allRecords}
+              highlightId={record.id}
+            />
+          </div>
+        )}
+      </>
+    );
+  } else {
+    cardContent = (
+      <>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          No attendance recorded for this event yet.
+        </p>
+        <button
+          type="button"
+          className="rounded-md bg-etsa-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-etsa-primary-dark"
+          onClick={() => setIsEditing(true)}
+        >
+          Add attendance record
+        </button>
+      </>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -128,85 +207,19 @@ export default function PostAttendancePage() {
       </div>
 
       <div className="card">
-        <div className="card-content space-y-4">
-          {isEditing ? (
-            <AttendanceForm
-              lockedPost={{ slug, title: postTitle, date: data.postDate }}
-              initial={
-                record
-                  ? {
-                      eventDate: record.eventDate,
-                      postSlug: record.postSlug,
-                      eventTitle: record.eventTitle,
-                      format: record.format,
-                      inPersonCount: record.inPersonCount,
-                      virtualCount: record.virtualCount,
-                      notes: record.notes,
-                    }
-                  : undefined
-              }
-              submitLabel={record ? "Save changes" : "Add record"}
-              onSubmit={handleSubmit}
-              onCancel={() => setIsEditing(false)}
-            />
-          ) : record ? (
-            <>
-              <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <Stat label="Format" value={formatLabels[record.format]} />
-                <Stat label="In-person" value={record.inPersonCount} />
-                <Stat label="Virtual" value={record.virtualCount} />
-                <Stat
-                  label="Total"
-                  value={record.inPersonCount + record.virtualCount}
-                />
-              </dl>
-              {record.notes && (
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  {record.notes}
-                </p>
-              )}
-              <button
-                type="button"
-                className="rounded-md bg-etsa-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-etsa-primary-dark"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit
-              </button>
-
-              {allRecords.length > 0 && (
-                <div className="pt-2">
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {record.eventDate.slice(0, 4)} attendance by event
-                  </h3>
-                  <YearAttendanceBreakdown
-                    year={Number(record.eventDate.slice(0, 4))}
-                    records={allRecords}
-                    highlightId={record.id}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                No attendance recorded for this event yet.
-              </p>
-              <button
-                type="button"
-                className="rounded-md bg-etsa-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-etsa-primary-dark"
-                onClick={() => setIsEditing(true)}
-              >
-                Add attendance record
-              </button>
-            </>
-          )}
-        </div>
+        <div className="card-content space-y-4">{cardContent}</div>
       </div>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+function Stat({
+  label,
+  value,
+}: {
+  readonly label: string;
+  readonly value: string | number;
+}) {
   return (
     <div>
       <dt className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
