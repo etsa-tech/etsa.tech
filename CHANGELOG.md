@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.1] - 2026-08-14
+
+### 🐛 Bug Fixes
+
+- key attendance records by postSlug instead of a random UUID ([#455](https://github.com/etsa-tech/etsa.tech/pull/455)) by @wesleykirkland
+
 ## [5.6.0] - 2026-08-14
 
 ### 🐛 Bug Fixes
