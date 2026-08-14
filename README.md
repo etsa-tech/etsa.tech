@@ -172,6 +172,7 @@ The ETSA website includes a secure admin interface for content management access
 - **GitHub Integration**: Automatic pull request creation for content changes
 - **Asset Management**: Upload and manage images and files (coming soon)
 - **Social Media Integration**: Mailchimp campaign drafting, contact search, test sends, and a confirmation-gated live send, per presentation post; LinkedIn company-page posting via per-post board member OAuth (no stored credentials)
+- **Attendance Tracking**: Per-event in-person/virtual headcounts, linked to the corresponding post, with yearly and overall averages (admins can click a year to see a per-event breakdown). The records table is searchable, filterable by format, and sortable by any column (default: date); a companion "By speaker" view aggregates the same data per presenter. Stored in Netlify Blobs and mirrored to a Google Sheet on every create/edit - bulk-importing a post that already has a record updates it instead of creating a duplicate. Deleting a record is only allowed when `ATTENDANCE_SHEETS_WEBHOOK_URL` isn't configured (i.e. local development, since that var is only set once deployed) and never touches the Sheet, so the Sheet stays the durable copy. A public `/attendance` page shows only the computed aggregates - never the raw per-event breakdown.
 
 ### Required Environment Variables
 
@@ -206,6 +207,11 @@ LINKEDIN_CLIENT_SECRET=your_linkedin_community_management_app_client_secret
 LINKEDIN_ORGANIZATION_ID=your_linkedin_company_page_numeric_id
 LINKEDIN_SPEAKER_CLIENT_ID=your_linkedin_speaker_connect_app_client_id
 LINKEDIN_SPEAKER_CLIENT_SECRET=your_linkedin_speaker_connect_app_client_secret
+
+# Attendance tracking (admin - mirrors Blobs writes to a Google Sheet)
+# A separate Apps Script deployment/sheet from GOOGLE_SHEETS_WEBHOOK_URL
+# above - see docs/attendance-sheets-setup.md.
+ATTENDANCE_SHEETS_WEBHOOK_URL=your_attendance_apps_script_webhook_url
 ```
 
 #### How to create GitHub App

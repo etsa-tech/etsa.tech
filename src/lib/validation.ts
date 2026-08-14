@@ -282,3 +282,65 @@ export function validateComments(comments: string): string | null {
     return "Invalid comments";
   }
 }
+
+// Admin attendance record validation schema
+export const attendanceRecordInputSchema = z.object({
+  eventDate: z
+    .string()
+    .min(1, "Event date is required")
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Event date must be in YYYY-MM-DD format"),
+
+  postSlug: z.string().min(1, "A linked post is required"),
+
+  eventTitle: z.string().min(1, "Event title is required"),
+
+  format: z.enum(["in-person", "virtual", "hybrid"]).default("hybrid"),
+
+  inPersonCount: z
+    .number()
+    .int("In-person count must be a whole number")
+    .min(0, "In-person count cannot be negative"),
+
+  virtualCount: z
+    .number()
+    .int("Virtual count must be a whole number")
+    .min(0, "Virtual count cannot be negative"),
+
+  notes: z
+    .string()
+    .max(1000, "Notes must be less than 1000 characters")
+    .optional(),
+});
+
+export type AttendanceRecordInputData = z.infer<
+  typeof attendanceRecordInputSchema
+>;
+
+export function validateAttendanceRecordInput(
+  data: unknown,
+):
+  | { success: true; data: AttendanceRecordInputData }
+  | { success: false; errors: Record<string, string[]> } {
+  try {
+    const validatedData = attendanceRecordInputSchema.parse(data);
+    return { success: true, data: validatedData };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors: Record<string, string[]> = {};
+      error.issues.forEach((err) => {
+        const path = err.path.join(".");
+        if (!errors[path]) {
+          errors[path] = [];
+        }
+        errors[path].push(err.message);
+      });
+      return { success: false, errors };
+    }
+    return {
+      success: false,
+      errors: {
+        general: ["An unexpected validation error occurred"],
+      },
+    };
+  }
+}
