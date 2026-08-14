@@ -16,8 +16,10 @@ jest.mock("@netlify/blobs", () => ({
 }));
 
 const mockedSync = jest.fn();
+const mockedIsConfigured = jest.fn();
 jest.mock("@/lib/attendance-sheets-sync", () => ({
   syncAttendanceRecordToSheets: (...args: unknown[]) => mockedSync(...args),
+  isAttendanceSheetsConfigured: () => mockedIsConfigured(),
 }));
 
 import {
@@ -53,6 +55,8 @@ beforeEach(() => {
   blobStore.clear();
   mockedSync.mockReset();
   mockedSync.mockResolvedValue(undefined);
+  mockedIsConfigured.mockReset();
+  mockedIsConfigured.mockReturnValue(true);
 });
 
 describe("listAttendanceRecords", () => {
@@ -140,6 +144,23 @@ describe("saveAttendanceRecord", () => {
     );
 
     expect(await getAttendanceRecord("a")).toEqual(original);
+  });
+
+  it("writes to Blobs only and never calls Sheets when the webhook isn't configured (local dev)", async () => {
+    mockedIsConfigured.mockReturnValue(false);
+    const result = await saveAttendanceRecord(makeRecord("a", "2024-01-01"));
+    expect(result.record).toEqual(makeRecord("a", "2024-01-01"));
+    expect(mockedSync).not.toHaveBeenCalled();
+    expect(await getAttendanceRecord("a")).not.toBeNull();
+  });
+
+  it("succeeds locally even though a Sheets sync would have failed, since it's never attempted", async () => {
+    mockedIsConfigured.mockReturnValue(false);
+    mockedSync.mockRejectedValue(new Error("sheets down"));
+
+    await expect(
+      saveAttendanceRecord(makeRecord("a", "2024-01-01")),
+    ).resolves.toEqual({ record: makeRecord("a", "2024-01-01") });
   });
 });
 

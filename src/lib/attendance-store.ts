@@ -1,7 +1,10 @@
 import "server-only";
 import { getStore } from "@netlify/blobs";
 import { AttendanceRecord } from "@/types/attendance";
-import { syncAttendanceRecordToSheets } from "@/lib/attendance-sheets-sync";
+import {
+  isAttendanceSheetsConfigured,
+  syncAttendanceRecordToSheets,
+} from "@/lib/attendance-sheets-sync";
 
 const STORE_NAME = "attendance";
 
@@ -40,15 +43,23 @@ export async function getAttendanceRecordByPostSlug(
   return records.find((record) => record.postSlug === postSlug) ?? null;
 }
 
-// Blobs and Sheets are written concurrently, but a record must not end up
-// persisted locally unless both succeed - if the Sheets mirror fails, the
-// Blobs write is rolled back (deleted for a new record, restored to
-// `previous` for an edit) rather than left half-committed.
+// When the Sheets webhook isn't configured, we're in local development (see
+// isAttendanceSheetsConfigured) - there's no Sheet to sync to, so just write
+// to Blobs. Once it *is* configured, Blobs and Sheets are written
+// concurrently and a record must not end up persisted unless both succeed -
+// if the Sheets mirror fails, the Blobs write is rolled back (deleted for a
+// new record, restored to `previous` for an edit) rather than left
+// half-committed.
 export async function saveAttendanceRecord(
   record: AttendanceRecord,
   previous: AttendanceRecord | null = null,
 ): Promise<{ record: AttendanceRecord }> {
   const store = getAttendanceStore();
+
+  if (!isAttendanceSheetsConfigured()) {
+    await store.setJSON(record.id, record);
+    return { record };
+  }
 
   try {
     await Promise.all([

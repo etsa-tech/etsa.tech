@@ -12,11 +12,18 @@ update a row by ID when an admin edits an existing attendance record.
 Netlify Blobs is the app's read/aggregation store for attendance data (fast
 reads for the yearly/overall averages shown in the admin portal and on the
 public `/attendance` page), and this webhook keeps a Google Sheet copy in
-sync with it. The two writes happen concurrently, but a create/edit in
-`/admin/attendance` only succeeds if **both** succeed - if this webhook
-fails, the Blobs write is rolled back (the new record is deleted, or an
-edited record is restored to its previous value) and the admin request
-fails, so the two stores can't drift apart.
+sync with it.
+
+When `ATTENDANCE_SHEETS_WEBHOOK_URL` is configured, a create/edit in
+`/admin/attendance` writes to Blobs and this webhook concurrently, and only
+succeeds if **both** succeed - if this webhook fails, the Blobs write is
+rolled back (the new record is deleted, or an edited record is restored to
+its previous value) and the admin request fails, so the two stores can't
+drift apart. When it **isn't** configured (local development - see
+`isAttendanceSheetsConfigured` in `src/lib/attendance-sheets-sync.ts`), a
+create/edit skips the Sheets call entirely and just writes to Blobs, so
+local testing never needs a real webhook and never fails because one isn't
+set up.
 
 **Deletes never reach this webhook at all.** Deleting an attendance record
 is only allowed when `ATTENDANCE_SHEETS_WEBHOOK_URL` isn't configured -
