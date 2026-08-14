@@ -19,7 +19,20 @@ When `ATTENDANCE_SHEETS_WEBHOOK_URL` is configured, a create/edit in
 succeeds if **both** succeed - if this webhook fails, the Blobs write is
 rolled back (the new record is deleted, or an edited record is restored to
 its previous value) and the admin request fails, so the two stores can't
-drift apart. When it **isn't** configured (local development - see
+drift apart. "Succeeds" isn't just a 200 from `doPost` - the app also reads
+the row back via `doGet(?id=...)` and checks the counts match
+(`verifyAttendanceRecordInSheets` in `src/lib/attendance-sheets-sync.ts`),
+because bulk import fires many creates/edits concurrently and an unlocked
+Apps Script write can silently drop or clobber a row while still reporting
+success. The `LockService` call in `doPost` below and the `doGet(?id=...)`
+lookup exist specifically for that: the lock stops the collision from
+happening, the read-back catches it if it somehow still does. **Both
+pieces are required together** - the read-back can't do its job against an
+older deployment of this script that doesn't have `doGet(?id=...)` (every
+save's verification step will fail), and the lock alone doesn't give the
+app a way to confirm the write actually landed.
+
+When it **isn't** configured (local development - see
 `isAttendanceSheetsConfigured` in `src/lib/attendance-sheets-sync.ts`), a
 create/edit skips the Sheets call entirely and just writes to Blobs, so
 local testing never needs a real webhook and never fails because one isn't
@@ -79,6 +92,23 @@ function getAttendanceSheet() {
 }
 
 function doPost(e) {
+  // Bulk import can fire many creates/edits concurrently. Without a lock,
+  // two requests can both read "no existing row for this id" and both
+  // append, or one can overwrite the other's write mid-flight - the script
+  // would still report success either way, so the app-side caller (see
+  // verifyAttendanceRecordInSheets in src/lib/attendance-sheets-sync.ts)
+  // can't tell from the response alone. The lock makes each request's
+  // find-then-write atomic relative to the others.
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch {
+    return jsonResponse({
+      success: false,
+      error: "Could not acquire lock - too many concurrent writes",
+    });
+  }
+
   try {
     const sheet = getAttendanceSheet();
     const data = JSON.parse(e.postData.contents);
@@ -108,17 +138,57 @@ function doPost(e) {
       sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
     }
 
+    SpreadsheetApp.flush();
     return jsonResponse({ success: true });
   } catch (error) {
     console.error("Error processing attendance sync:", error);
     return jsonResponse({ success: false, error: error.toString() });
+  } finally {
+    lock.releaseLock();
   }
 }
 
-function doGet() {
-  return ContentService.createTextOutput(
-    "ETSA Attendance webhook is running - " + new Date().toISOString(),
-  ).setMimeType(ContentService.MimeType.TEXT);
+// No `id` param: health check (used to confirm the deployment is live).
+// With `id`: looks up that row - used by verifyAttendanceRecordInSheets to
+// confirm a write actually landed, since doPost reporting success doesn't
+// guarantee that on its own (see the lock comment above).
+function doGet(e) {
+  const id = e.parameter && e.parameter.id;
+
+  if (!id) {
+    return ContentService.createTextOutput(
+      "ETSA Attendance webhook is running - " + new Date().toISOString(),
+    ).setMimeType(ContentService.MimeType.TEXT);
+  }
+
+  try {
+    const sheet = getAttendanceSheet();
+    const rowIndex = findRowById(sheet, id);
+
+    if (rowIndex === -1) {
+      return jsonResponse({ found: false });
+    }
+
+    const values = sheet.getRange(rowIndex, 1, 1, 10).getValues()[0];
+    return jsonResponse({
+      found: true,
+      row: {
+        id: values[0],
+        eventDate: values[1],
+        postSlug: values[2],
+        eventTitle: values[3],
+        format: values[4],
+        inPersonCount: values[5],
+        virtualCount: values[6],
+        notes: values[7],
+        updatedAt: values[8],
+        updatedBy: values[9],
+      },
+    });
+  } catch (error) {
+    console.error("Error reading attendance row:", error);
+    return jsonResponse({ found: false, error: error.toString() });
+  }
 }
 
 function findRowById(sheet, id) {
@@ -137,6 +207,16 @@ function jsonResponse(payload) {
 ```
 
 ## Step 3: Deploy
+
+> **Already have this webhook deployed?** The `LockService` locking and the
+> `doGet(?id=...)` row lookup above are required by the app's verification
+> step (see Overview) - an older deployment without them will fail
+> verification on **every** save, since `syncAttendanceRecordToSheets`
+> always calls `doGet(?id=...)` after posting. Update the script and
+> redeploy it (**Deploy → Manage deployments → edit the existing
+> deployment → New version**, which keeps the same web app URL, so
+> `ATTENDANCE_SHEETS_WEBHOOK_URL` doesn't need to change) **before** the
+> updated app code ships - not after.
 
 Same as the RSVP webhook (see
 [docs/google-apps-script-setup.md](./google-apps-script-setup.md#step-5-deploy-as-web-app)):
@@ -170,3 +250,14 @@ curl -X POST "YOUR_WEBHOOK_URL" \
 Should add or update a row keyed on `id`. Re-run with different counts and
 the same `id` to confirm it updates the existing row rather than appending a
 new one.
+
+Then confirm the read-back the app relies on for verification:
+
+```bash
+curl "YOUR_WEBHOOK_URL?id=test-id"
+```
+
+Should return `{"found":true,"row":{...}}` with the counts from the last
+POST. `curl "YOUR_WEBHOOK_URL?id=no-such-id"` should return
+`{"found":false}`, and `curl "YOUR_WEBHOOK_URL"` (no `id`) should still
+return the plain-text health check.
