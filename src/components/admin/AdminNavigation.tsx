@@ -17,8 +17,7 @@ interface AdminNavigationProps {
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: "📊" },
   { name: "Blog Posts", href: "/admin/posts", icon: "📝" },
-  { name: "Assets", href: "/admin/assets", icon: "🖼️" },
-  { name: "Settings", href: "/admin/settings", icon: "⚙️" },
+  { name: "Attendance", href: "/admin/attendance", icon: "📈" },
 ];
 
 export default function AdminNavigation({

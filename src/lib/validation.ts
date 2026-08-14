@@ -1,5 +1,39 @@
 import { z } from "zod";
 
+// Shared by every `validateXForm`/`validateXInput` below - runs a zod schema
+// and normalizes the failure shape (per-field messages keyed by path, or a
+// generic message for a non-Zod throw) so each caller only supplies its own
+// schema.
+function parseWithZodErrors<T>(
+  schema: z.ZodType<T>,
+  data: unknown,
+):
+  | { success: true; data: T }
+  | { success: false; errors: Record<string, string[]> } {
+  try {
+    const validatedData = schema.parse(data);
+    return { success: true, data: validatedData };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors: Record<string, string[]> = {};
+      error.issues.forEach((err) => {
+        const path = err.path.join(".");
+        if (!errors[path]) {
+          errors[path] = [];
+        }
+        errors[path].push(err.message);
+      });
+      return { success: false, errors };
+    }
+    return {
+      success: false,
+      errors: {
+        general: ["An unexpected validation error occurred"],
+      },
+    };
+  }
+}
+
 // Contact form validation schema
 export const contactFormSchema = z.object({
   name: z
@@ -46,28 +80,7 @@ export function validateContactForm(
 ):
   | { success: true; data: ContactFormData }
   | { success: false; errors: Record<string, string[]> } {
-  try {
-    const validatedData = contactFormSchema.parse(data);
-    return { success: true, data: validatedData };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errors: Record<string, string[]> = {};
-      error.issues.forEach((err) => {
-        const path = err.path.join(".");
-        if (!errors[path]) {
-          errors[path] = [];
-        }
-        errors[path].push(err.message);
-      });
-      return { success: false, errors };
-    }
-    return {
-      success: false,
-      errors: {
-        general: ["An unexpected validation error occurred"],
-      },
-    };
-  }
+  return parseWithZodErrors(contactFormSchema, data);
 }
 
 // Client-side validation helper
@@ -210,28 +223,7 @@ export function validateRSVPForm(
 ):
   | { success: true; data: RSVPFormData }
   | { success: false; errors: Record<string, string[]> } {
-  try {
-    const validatedData = rsvpFormSchema.parse(data);
-    return { success: true, data: validatedData };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errors: Record<string, string[]> = {};
-      error.issues.forEach((err) => {
-        const path = err.path.join(".");
-        if (!errors[path]) {
-          errors[path] = [];
-        }
-        errors[path].push(err.message);
-      });
-      return { success: false, errors };
-    }
-    return {
-      success: false,
-      errors: {
-        general: ["An unexpected validation error occurred"],
-      },
-    };
-  }
+  return parseWithZodErrors(rsvpFormSchema, data);
 }
 
 // RSVP field validation functions for real-time validation
@@ -281,4 +273,45 @@ export function validateComments(comments: string): string | null {
     }
     return "Invalid comments";
   }
+}
+
+// Admin attendance record validation schema
+export const attendanceRecordInputSchema = z.object({
+  eventDate: z
+    .string()
+    .min(1, "Event date is required")
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Event date must be in YYYY-MM-DD format"),
+
+  postSlug: z.string().min(1, "A linked post is required"),
+
+  eventTitle: z.string().min(1, "Event title is required"),
+
+  format: z.enum(["in-person", "virtual", "hybrid"]).default("hybrid"),
+
+  inPersonCount: z
+    .number()
+    .int("In-person count must be a whole number")
+    .min(0, "In-person count cannot be negative"),
+
+  virtualCount: z
+    .number()
+    .int("Virtual count must be a whole number")
+    .min(0, "Virtual count cannot be negative"),
+
+  notes: z
+    .string()
+    .max(1000, "Notes must be less than 1000 characters")
+    .optional(),
+});
+
+export type AttendanceRecordInputData = z.infer<
+  typeof attendanceRecordInputSchema
+>;
+
+export function validateAttendanceRecordInput(
+  data: unknown,
+):
+  | { success: true; data: AttendanceRecordInputData }
+  | { success: false; errors: Record<string, string[]> } {
+  return parseWithZodErrors(attendanceRecordInputSchema, data);
 }
