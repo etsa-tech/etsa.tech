@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.4] - 2026-08-14
+
+### ✨ Features
+
+- reduce Netlify Function usage, remove dead code, fix meeting-info hydration error ([#458](https://github.com/etsa-tech/etsa.tech/pull/458)) by @wesleykirkland
+
 ## [5.6.3] - 2026-08-14
 
 ### 🐛 Bug Fixes
