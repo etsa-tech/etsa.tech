@@ -6,6 +6,7 @@ import { isAuthorizedUser } from "@/lib/auth-utils";
 import { isAttendanceSheetsConfigured } from "@/lib/attendance-sheets-sync";
 import { validateAttendanceRecordInput } from "@/lib/validation";
 import {
+  getAttendanceRecordByPostSlug,
   listAttendanceRecords,
   saveAttendanceRecord,
 } from "@/lib/attendance-store";
@@ -53,6 +54,29 @@ export async function POST(request: NextRequest) {
 
   try {
     const now = new Date().toISOString();
+
+    // At most one record is expected per post (see getAttendanceRecordByPostSlug) -
+    // enforce that server-side too, not just via the bulk-import UI's dedup, so a
+    // stale client (e.g. a second import run before the record list reloads) can't
+    // create a duplicate for the same event.
+    const existing = await getAttendanceRecordByPostSlug(
+      validation.data.postSlug,
+    );
+
+    if (existing) {
+      const { record } = await saveAttendanceRecord(
+        {
+          ...existing,
+          ...validation.data,
+          updatedAt: now,
+          updatedBy: session!.user?.email ?? null,
+        },
+        existing,
+      );
+
+      return NextResponse.json({ record });
+    }
+
     const { record } = await saveAttendanceRecord({
       id: randomUUID(),
       ...validation.data,
