@@ -16,6 +16,8 @@ import {
   validateComments,
   contactFormSchema,
   rsvpFormSchema,
+  validateAttendanceRecordInput,
+  attendanceRecordInputSchema,
 } from "@/lib/validation";
 import { z } from "zod";
 
@@ -292,6 +294,82 @@ describe("field validators fall back to a generic message for a ZodError with no
       throw new z.ZodError([]);
     });
     expect(run()).toBe(expected);
+    spy.mockRestore();
+  });
+});
+
+describe("validateAttendanceRecordInput", () => {
+  const validInput = {
+    eventDate: "2025-01-01",
+    postSlug: "2025-01-01-some-event",
+    eventTitle: "Some Event",
+    format: "hybrid" as const,
+    inPersonCount: 10,
+    virtualCount: 4,
+  };
+
+  it("accepts a valid record", () => {
+    const result = validateAttendanceRecordInput(validInput);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.postSlug).toBe(validInput.postSlug);
+    }
+  });
+
+  it("defaults format to hybrid when omitted", () => {
+    const { format: _format, ...rest } = validInput;
+    const result = validateAttendanceRecordInput(rest);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.format).toBe("hybrid");
+    }
+  });
+
+  it("rejects a missing post slug", () => {
+    const result = validateAttendanceRecordInput({
+      ...validInput,
+      postSlug: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a malformed event date", () => {
+    const result = validateAttendanceRecordInput({
+      ...validInput,
+      eventDate: "01/01/2025",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects negative counts", () => {
+    const result = validateAttendanceRecordInput({
+      ...validInput,
+      inPersonCount: -1,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects an invalid format value", () => {
+    const result = validateAttendanceRecordInput({
+      ...validInput,
+      format: "remote",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("returns a general error for a non-Zod failure", () => {
+    const spy = jest
+      .spyOn(attendanceRecordInputSchema, "parse")
+      .mockImplementation(() => {
+        throw new Error("boom");
+      });
+    const result = validateAttendanceRecordInput(validInput);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.errors.general).toContain(
+        "An unexpected validation error occurred",
+      );
+    }
     spy.mockRestore();
   });
 });

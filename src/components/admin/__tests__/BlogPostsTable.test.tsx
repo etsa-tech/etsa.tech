@@ -127,6 +127,16 @@ describe("BlogPostsTable", () => {
     ).toHaveLength(0);
   });
 
+  it("shows an Attendance action link for every post", () => {
+    render(<BlogPostsTable posts={[post("2026-01-01-a-talk")]} />);
+    const links = screen.getAllByLabelText(/Attendance for a talk/);
+    expect(links.length).toBeGreaterThan(0);
+    expect(links[0]).toHaveAttribute(
+      "href",
+      "/admin/posts/2026-01-01-a-talk/attendance",
+    );
+  });
+
   it("sorts by clicking column headers and toggles direction", async () => {
     render(
       <BlogPostsTable
