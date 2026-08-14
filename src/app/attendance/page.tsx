@@ -2,14 +2,22 @@ import { listAttendanceRecords } from "@/lib/attendance-store";
 import { computeAttendanceStats } from "@/lib/attendance-stats";
 import { AttendanceStats } from "@/components/AttendanceStats";
 
-// Rendered per-request, not statically - Netlify Blobs' automatic context
-// (siteID/token) is only available to a live Function invocation, not the
-// `next build` step that would run this page's data fetch under
-// force-static (confirmed by the MissingBlobsEnvironmentError that static
-// mode threw in production). Deliberately renders only aggregates (see
+// ISR, not force-static - Netlify Blobs' automatic context (siteID/token)
+// is only available to a live Function invocation, not the `next build`
+// step that force-static would run this page's data fetch under (confirmed
+// by the MissingBlobsEnvironmentError that threw in production, and by the
+// same error still showing up in a plain local `next build` below - the
+// try/catch's empty-data fallback is what that build bakes in). The
+// difference from force-static is that this page doesn't stay wrong forever:
+// once this window elapses, the next request triggers a background
+// regeneration inside a real Function invocation - where Blobs works - and
+// that refreshed result is what gets cached and served after that. So this
+// is still a cached/static page for nearly all traffic, not a Function call
+// per visit, while self-healing within a day of an admin edit instead of
+// needing a rebuild. Renders only aggregates (see
 // src/app/api/attendance/stats/route.ts, the same read this page does),
 // never a per-event table.
-export const dynamic = "force-dynamic";
+export const revalidate = 86400; // 1 day
 
 export const metadata = {
   title: "Attendance - ETSA",
