@@ -97,7 +97,7 @@ NEXT_PUBLIC_ORG_LOCATION=Knoxville           # City shown in metadata/descriptio
 NEXT_PUBLIC_ORG_FOUNDED_YEAR=2012            # Used to compute "years running" on the homepage
 NEXT_PUBLIC_MEMBER_COUNT=500                 # Displayed member count on homepage/about
 NEXT_PUBLIC_SITE_URL=https://etsa.tech       # Canonical URL for sitemap/robots/RSS
-NEXT_PUBLIC_WEBSITE_URL=https://etsa.tech    # Used in Open Graph metadata and maps embed referrer
+NEXT_PUBLIC_WEBSITE_URL=https://etsa.tech    # Used in Open Graph metadata
 
 # Social/external links (footer, contact page)
 NEXT_PUBLIC_GITHUB_URL=https://github.com/etsa-tech

@@ -11,19 +11,11 @@ export default function ErrorPage({
   readonly reset: () => void;
 }) {
   useEffect(() => {
-    // Log error server-side only (not in production client console)
-    if (globalThis.window === undefined) {
-      // Server-side logging
-      console.error("Error boundary caught:", {
-        message: error.message,
-        digest: error.digest,
-        timestamp: new Date().toISOString(),
-      });
-    } else if (process.env.NODE_ENV === "development") {
-      // Client-side logging only in development
+    // Log to client console only in development, to prevent information
+    // disclosure in production
+    if (process.env.NODE_ENV === "development") {
       console.error("Error:", error.message);
     }
-    // In production, don't log to client console to prevent information disclosure
   }, [error]);
 
   return (

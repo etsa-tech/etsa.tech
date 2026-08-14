@@ -48,7 +48,6 @@ function requiresNoCacheHeaders(pathname: string): boolean {
     "/admin", // Admin pages
     "/api/admin/", // Admin API endpoints
     "/api/contact", // Contact form (may contain sensitive data)
-    "/api/maps/", // API endpoints
   ];
 
   return noCachePaths.some((path) => pathname.startsWith(path));
