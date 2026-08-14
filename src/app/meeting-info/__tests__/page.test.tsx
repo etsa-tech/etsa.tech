@@ -102,6 +102,27 @@ describe("MeetingInfoPage", () => {
     expect(screen.getByText("Speaker: TBA")).toBeInTheDocument();
   });
 
+  it("does not nest the speaker link inside the presentation card link", () => {
+    mockedGetPresentationPosts.mockReturnValue([
+      {
+        slug: "a",
+        readingTime: 1,
+        frontmatter: {
+          title: "Great Talk",
+          date: "2026-01-01",
+          excerpt: "e",
+          tags: [],
+          speakerName: "Jane Doe",
+        } as never,
+      },
+    ]);
+    render(<MeetingInfoPage />);
+    const cardLink = screen.getByRole("link", { name: "Great Talk" });
+    const speakerLink = screen.getByRole("link", { name: "Jane Doe" });
+    expect(cardLink).not.toContainElement(speakerLink);
+    expect(speakerLink).not.toContainElement(cardLink);
+  });
+
   it("uses a custom meeting location from post frontmatter when present", () => {
     mockedGetPresentationPosts.mockReturnValue([
       {

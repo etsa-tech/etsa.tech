@@ -13,7 +13,6 @@ interface SpeakerData {
   talkCount: number;
   latestTalk: PostSummary | null;
   allTalks: PostSummary[];
-  totalViews?: number;
   averageRating?: number;
 }
 
@@ -21,7 +20,7 @@ interface SpeakersTableProps {
   speakers: SpeakerData[];
 }
 
-type SortField = "name" | "talkCount" | "latestTalk" | "totalViews";
+type SortField = "name" | "talkCount" | "latestTalk";
 type SortDirection = "asc" | "desc";
 
 interface SortIconProps {
@@ -117,10 +116,6 @@ export function SpeakersTable({ speakers }: Readonly<SpeakersTableProps>) {
         case "latestTalk":
           aValue = a.latestTalk?.frontmatter.date || "1900-01-01";
           bValue = b.latestTalk?.frontmatter.date || "1900-01-01";
-          break;
-        case "totalViews":
-          aValue = a.totalViews || 0;
-          bValue = b.totalViews || 0;
           break;
         default:
           aValue = a.name;

@@ -164,10 +164,6 @@ export function getExcerpt(content: string, maxLength: number = 160): string {
   const sanitizedContent = sanitizeHtml(content, {
     allowedTags: [], // Remove all HTML tags
     allowedAttributes: {}, // Remove all attributes
-    textFilter: function (text) {
-      // Additional text filtering if needed
-      return text;
-    },
   });
 
   // Then remove markdown formatting using safe, non-backtracking patterns
