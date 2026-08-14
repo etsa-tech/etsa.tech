@@ -20,7 +20,6 @@ jest.mock("@/lib/attendance-store", () => ({
   listAttendanceRecords: jest.fn(),
   saveAttendanceRecord: jest.fn(),
 }));
-jest.mock("node:crypto", () => ({ randomUUID: () => "generated-id" }));
 
 const mockedGetServerSession = jest.mocked(getServerSession);
 const mockedIsAuthorizedUser = jest.mocked(isAuthorizedUser);
@@ -92,27 +91,28 @@ describe("GET /api/admin/attendance", () => {
 });
 
 describe("POST /api/admin/attendance", () => {
-  it("creates a record with a generated id and the session email", async () => {
+  it("creates a record keyed by postSlug, with the session email", async () => {
     mockedSaveAttendanceRecord.mockResolvedValue({
-      record: { id: "generated-id", ...validInput } as never,
+      record: { id: validInput.postSlug, ...validInput } as never,
     });
 
     const res = await POST(postReq(validInput));
     expect(res.status).toBe(201);
     const body = await res.json();
-    expect(body.record.id).toBe("generated-id");
+    expect(body.record.id).toBe(validInput.postSlug);
     expect(mockedSaveAttendanceRecord).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: "generated-id",
+        id: validInput.postSlug,
         ...validInput,
         updatedBy: "board@etsa.tech",
       }),
+      null,
     );
   });
 
-  it("updates the existing record instead of creating a duplicate when a record for the postSlug already exists", async () => {
+  it("updates the existing record in place instead of creating a duplicate when a record for the postSlug already exists", async () => {
     const existing = {
-      id: "existing-id",
+      id: validInput.postSlug,
       ...validInput,
       inPersonCount: 1,
       createdAt: "2025-01-01T00:00:00.000Z",
@@ -127,9 +127,13 @@ describe("POST /api/admin/attendance", () => {
     const res = await POST(postReq(validInput));
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.record.id).toBe("existing-id");
+    expect(body.record.id).toBe(validInput.postSlug);
     expect(mockedSaveAttendanceRecord).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "existing-id", ...validInput }),
+      expect.objectContaining({
+        id: validInput.postSlug,
+        ...validInput,
+        createdAt: existing.createdAt,
+      }),
       existing,
     );
   });
