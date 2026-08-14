@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.5.0] - 2026-08-14
+
+### ✨ Features
+
+- attendance tracking ([#453](https://github.com/etsa-tech/etsa.tech/pull/453)) by @wesleykirkland
+
 ## [5.5.0] - 2026-08-10
 
 ### 🔧 Chores
