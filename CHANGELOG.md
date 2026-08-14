@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.0] - 2026-08-14
+
+### 🐛 Bug Fixes
+
+- prevent duplicate attendance records for the same post ([#454](https://github.com/etsa-tech/etsa.tech/pull/454)) by @wesleykirkland
+
 ## [5.5.0] - 2026-08-14
 
 ### ✨ Features
