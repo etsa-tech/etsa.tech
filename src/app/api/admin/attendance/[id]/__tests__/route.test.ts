@@ -30,8 +30,10 @@ const mockedGetAttendanceRecord = jest.mocked(getAttendanceRecord);
 const mockedSaveAttendanceRecord = jest.mocked(saveAttendanceRecord);
 const mockedDeleteAttendanceRecord = jest.mocked(deleteAttendanceRecord);
 
+// Records are keyed by postSlug (id === postSlug - see the POST/PUT routes),
+// so the fixture's id matches its postSlug.
 const existingRecord = {
-  id: "a",
+  id: "2025-01-01-some-event",
   eventDate: "2025-01-01",
   postSlug: "2025-01-01-some-event",
   eventTitle: "Some Event",
@@ -43,10 +45,11 @@ const existingRecord = {
   updatedBy: null,
 };
 
+// A content-only edit - same post, so same id.
 const validInput = {
-  eventDate: "2025-02-01",
-  postSlug: "2025-02-01-other-event",
-  eventTitle: "Other Event",
+  eventDate: "2025-01-01",
+  postSlug: "2025-01-01-some-event",
+  eventTitle: "Some Event",
   format: "virtual" as const,
   inPersonCount: 0,
   virtualCount: 20,
@@ -57,11 +60,14 @@ function routeParams(id: string) {
 }
 
 function req(method: string, body?: unknown) {
-  return new NextRequest(`http://localhost/api/admin/attendance/a`, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  return new NextRequest(
+    `http://localhost/api/admin/attendance/${existingRecord.id}`,
+    {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    },
+  );
 }
 
 beforeEach(() => {
@@ -79,14 +85,14 @@ afterEach(() => jest.clearAllMocks());
 
 describe("GET /api/admin/attendance/[id]", () => {
   it("returns the record", async () => {
-    const res = await GET(req("GET"), routeParams("a"));
+    const res = await GET(req("GET"), routeParams(existingRecord.id));
     expect(res.status).toBe(200);
     expect((await res.json()).record).toEqual(existingRecord);
   });
 
   it("401s for an unauthorized user", async () => {
     mockedIsAuthorizedUser.mockReturnValue(false);
-    const res = await GET(req("GET"), routeParams("a"));
+    const res = await GET(req("GET"), routeParams(existingRecord.id));
     expect(res.status).toBe(401);
   });
 
@@ -103,21 +109,72 @@ describe("PUT /api/admin/attendance/[id]", () => {
       record: { ...existingRecord, ...validInput },
     });
 
-    const res = await PUT(req("PUT", validInput), routeParams("a"));
+    const res = await PUT(
+      req("PUT", validInput),
+      routeParams(existingRecord.id),
+    );
     expect(res.status).toBe(200);
     expect(mockedSaveAttendanceRecord).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: "a",
+        id: existingRecord.id,
         ...validInput,
         updatedBy: "board@etsa.tech",
       }),
       existingRecord,
     );
+    expect(mockedDeleteAttendanceRecord).not.toHaveBeenCalled();
+  });
+
+  it("moves the record to the new post's key when postSlug changes, deleting the old key only after the save succeeds", async () => {
+    const renamedInput = { ...validInput, postSlug: "2025-02-01-other-event" };
+    mockedGetAttendanceRecord.mockImplementation(async (id: string) =>
+      id === existingRecord.id ? existingRecord : null,
+    );
+    mockedSaveAttendanceRecord.mockResolvedValue({
+      record: { ...existingRecord, ...renamedInput, id: renamedInput.postSlug },
+    });
+
+    const res = await PUT(
+      req("PUT", renamedInput),
+      routeParams(existingRecord.id),
+    );
+    expect(res.status).toBe(200);
+    expect(mockedSaveAttendanceRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "2025-02-01-other-event",
+        ...renamedInput,
+      }),
+      null,
+    );
+    expect(mockedDeleteAttendanceRecord).toHaveBeenCalledWith(
+      existingRecord.id,
+    );
+  });
+
+  it("409s instead of clobbering another record already linked to the target post", async () => {
+    const renamedInput = { ...validInput, postSlug: "2025-02-01-other-event" };
+    const otherRecord = { ...existingRecord, id: renamedInput.postSlug };
+    mockedGetAttendanceRecord.mockImplementation(async (id: string) => {
+      if (id === existingRecord.id) return existingRecord;
+      if (id === renamedInput.postSlug) return otherRecord;
+      return null;
+    });
+
+    const res = await PUT(
+      req("PUT", renamedInput),
+      routeParams(existingRecord.id),
+    );
+    expect(res.status).toBe(409);
+    expect(mockedSaveAttendanceRecord).not.toHaveBeenCalled();
+    expect(mockedDeleteAttendanceRecord).not.toHaveBeenCalled();
   });
 
   it("401s for an unauthorized user", async () => {
     mockedIsAuthorizedUser.mockReturnValue(false);
-    const res = await PUT(req("PUT", validInput), routeParams("a"));
+    const res = await PUT(
+      req("PUT", validInput),
+      routeParams(existingRecord.id),
+    );
     expect(res.status).toBe(401);
   });
 
@@ -130,7 +187,7 @@ describe("PUT /api/admin/attendance/[id]", () => {
   it("400s for an invalid body", async () => {
     const res = await PUT(
       req("PUT", { ...validInput, inPersonCount: -1 }),
-      routeParams("a"),
+      routeParams(existingRecord.id),
     );
     expect(res.status).toBe(400);
     expect(mockedSaveAttendanceRecord).not.toHaveBeenCalled();
@@ -138,7 +195,10 @@ describe("PUT /api/admin/attendance/[id]", () => {
 
   it("500s with the underlying error when saving fails (e.g. the Sheets mirror)", async () => {
     mockedSaveAttendanceRecord.mockRejectedValue(new Error("sheets down"));
-    const res = await PUT(req("PUT", validInput), routeParams("a"));
+    const res = await PUT(
+      req("PUT", validInput),
+      routeParams(existingRecord.id),
+    );
     expect(res.status).toBe(500);
     expect((await res.json()).details).toBe("sheets down");
   });
@@ -147,20 +207,22 @@ describe("PUT /api/admin/attendance/[id]", () => {
 describe("DELETE /api/admin/attendance/[id]", () => {
   it("deletes the record by id when the Sheets webhook isn't configured", async () => {
     mockedDeleteAttendanceRecord.mockResolvedValue(undefined);
-    const res = await DELETE(req("DELETE"), routeParams("a"));
+    const res = await DELETE(req("DELETE"), routeParams(existingRecord.id));
     expect(res.status).toBe(200);
-    expect(mockedDeleteAttendanceRecord).toHaveBeenCalledWith("a");
+    expect(mockedDeleteAttendanceRecord).toHaveBeenCalledWith(
+      existingRecord.id,
+    );
   });
 
   it("401s for an unauthorized user", async () => {
     mockedIsAuthorizedUser.mockReturnValue(false);
-    const res = await DELETE(req("DELETE"), routeParams("a"));
+    const res = await DELETE(req("DELETE"), routeParams(existingRecord.id));
     expect(res.status).toBe(401);
   });
 
   it("403s when the Sheets webhook is configured (deployed), without touching the store", async () => {
     mockedIsAttendanceSheetsConfigured.mockReturnValue(true);
-    const res = await DELETE(req("DELETE"), routeParams("a"));
+    const res = await DELETE(req("DELETE"), routeParams(existingRecord.id));
     expect(res.status).toBe(403);
     expect(mockedGetAttendanceRecord).not.toHaveBeenCalled();
     expect(mockedDeleteAttendanceRecord).not.toHaveBeenCalled();
@@ -174,7 +236,7 @@ describe("DELETE /api/admin/attendance/[id]", () => {
 
   it("500s with the underlying error when deletion fails", async () => {
     mockedDeleteAttendanceRecord.mockRejectedValue(new Error("blobs down"));
-    const res = await DELETE(req("DELETE"), routeParams("a"));
+    const res = await DELETE(req("DELETE"), routeParams(existingRecord.id));
     expect(res.status).toBe(500);
     expect((await res.json()).details).toBe("blobs down");
   });

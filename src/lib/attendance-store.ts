@@ -34,13 +34,13 @@ export async function getAttendanceRecord(
 }
 
 // Powers the per-post attendance view linked from the blog post's admin
-// actions - at most one record is expected per post, so the first match
-// (if any) is returned.
+// actions. Records are keyed in Blobs by postSlug (id === postSlug - see the
+// /api/admin/attendance routes, which own that invariant), so this is a
+// direct lookup rather than a list+filter.
 export async function getAttendanceRecordByPostSlug(
   postSlug: string,
 ): Promise<AttendanceRecord | null> {
-  const records = await listAttendanceRecords();
-  return records.find((record) => record.postSlug === postSlug) ?? null;
+  return getAttendanceRecord(postSlug);
 }
 
 // When the Sheets webhook isn't configured, we're in local development (see
