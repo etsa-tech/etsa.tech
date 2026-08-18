@@ -412,7 +412,7 @@ export default function SocialMailingPage() {
     if (!post?.speakerName) return;
     const url = `${
       window.location.origin
-    }/api/admin/posts/${slug}/social/linkedin/speaker/authorize?speaker=${encodeURIComponent(
+    }/api/posts/${slug}/social/linkedin/speaker/authorize?speaker=${encodeURIComponent(
       post.speakerName,
     )}`;
     try {
@@ -944,7 +944,7 @@ export default function SocialMailingPage() {
                     <span className="font-mono break-all">
                       {`${
                         window.location.origin
-                      }/api/admin/posts/${slug}/social/linkedin/speaker/authorize?speaker=${encodeURIComponent(
+                      }/api/posts/${slug}/social/linkedin/speaker/authorize?speaker=${encodeURIComponent(
                         post.speakerName,
                       )}`}
                     </span>

@@ -900,7 +900,7 @@ describe("SocialMailingPage", () => {
     );
 
     expect(writeText).toHaveBeenCalledWith(
-      "http://localhost/api/admin/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
+      "http://localhost/api/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
     );
     expect(
       await screen.findByRole("button", { name: "Link copied!" }),
