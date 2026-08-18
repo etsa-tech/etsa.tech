@@ -51,7 +51,7 @@ export async function GET(
 
     const { clientId } = getLinkedInSpeakerConfig();
     // Fixed, pre-registered path - see the post authorize route for why.
-    const redirectUri = `${getSiteOrigin()}/api/admin/posts/social/linkedin/speaker/callback`;
+    const redirectUri = `${getSiteOrigin()}/api/posts/social/linkedin/speaker/callback`;
     const state = signState({ purpose: "speaker-connect", slug, speakerName });
 
     const authorizeUrl = buildAuthorizeUrl({

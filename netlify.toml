@@ -46,6 +46,16 @@
     Pragma = "no-cache"
     Expires = "0"
 
+# No-cache headers for the public LinkedIn speaker-connect OAuth routes -
+# unauthenticated (the speaker isn't an ETSA admin), but the URLs carry
+# one-time auth codes and must never be cached.
+[[headers]]
+  for = "/api/posts/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
 # No-cache headers for admin pages
 [[headers]]
   for = "/admin/*"

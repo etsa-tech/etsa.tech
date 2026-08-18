@@ -54,7 +54,7 @@ describe("linkedin speaker authorize route", () => {
   it("is reachable without an admin session - the speaker isn't an ETSA admin", async () => {
     const res = await GET(
       getRequest(
-        "/api/admin/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
+        "/api/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
       ),
       routeParams(),
     );
@@ -66,7 +66,7 @@ describe("linkedin speaker authorize route", () => {
 
   it("redirects to the public error page on a missing speaker query param", async () => {
     const res = await GET(
-      getRequest("/api/admin/posts/my-talk/social/linkedin/speaker/authorize"),
+      getRequest("/api/posts/my-talk/social/linkedin/speaker/authorize"),
       routeParams(),
     );
     expect(res.status).toBe(307);
@@ -78,7 +78,7 @@ describe("linkedin speaker authorize route", () => {
   it("redirects to the public error page for a speaker not listed on this post", async () => {
     const res = await GET(
       getRequest(
-        "/api/admin/posts/my-talk/social/linkedin/speaker/authorize?speaker=Someone%20Else",
+        "/api/posts/my-talk/social/linkedin/speaker/authorize?speaker=Someone%20Else",
       ),
       routeParams(),
     );
@@ -88,7 +88,7 @@ describe("linkedin speaker authorize route", () => {
   it("matches speaker names case-insensitively", async () => {
     const res = await GET(
       getRequest(
-        "/api/admin/posts/my-talk/social/linkedin/speaker/authorize?speaker=jane%20doe",
+        "/api/posts/my-talk/social/linkedin/speaker/authorize?speaker=jane%20doe",
       ),
       routeParams(),
     );
@@ -100,7 +100,7 @@ describe("linkedin speaker authorize route", () => {
   it("redirects to the built LinkedIn authorize url with openid/profile scope", async () => {
     const res = await GET(
       getRequest(
-        "/api/admin/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
+        "/api/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
       ),
       routeParams(),
     );
@@ -116,7 +116,7 @@ describe("linkedin speaker authorize route", () => {
     expect(buildAuthorizeUrl).toHaveBeenCalledWith({
       clientId: "client-id",
       redirectUri:
-        "http://localhost:3000/api/admin/posts/social/linkedin/speaker/callback",
+        "http://localhost:3000/api/posts/social/linkedin/speaker/callback",
       state: "signed-state",
       scope: "openid profile",
     });
@@ -128,7 +128,7 @@ describe("linkedin speaker authorize route", () => {
       .mockRejectedValue(new Error("GitHub is down"));
     const res = await GET(
       getRequest(
-        "/api/admin/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
+        "/api/posts/my-talk/social/linkedin/speaker/authorize?speaker=Jane%20Doe",
       ),
       routeParams(),
     );

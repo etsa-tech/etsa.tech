@@ -52,9 +52,7 @@ beforeEach(() => {
 describe("linkedin speaker callback route (public, no admin session)", () => {
   it("is reachable without an admin session and lands on the public confirmation page", async () => {
     const res = await GET(
-      getRequest(
-        "/api/admin/posts/social/linkedin/speaker/callback?code=c&state=s",
-      ),
+      getRequest("/api/posts/social/linkedin/speaker/callback?code=c&state=s"),
     );
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toContain("/linkedin-connected?");
@@ -65,7 +63,7 @@ describe("linkedin speaker callback route (public, no admin session)", () => {
   it("forwards a LinkedIn-reported error", async () => {
     const res = await GET(
       getRequest(
-        "/api/admin/posts/social/linkedin/speaker/callback?error=access_denied",
+        "/api/posts/social/linkedin/speaker/callback?error=access_denied",
       ),
     );
     expect(locationParam(res, "status")).toBe("error");
@@ -74,14 +72,14 @@ describe("linkedin speaker callback route (public, no admin session)", () => {
 
   it("rejects a request with no state param at all", async () => {
     const res = await GET(
-      getRequest("/api/admin/posts/social/linkedin/speaker/callback?code=c"),
+      getRequest("/api/posts/social/linkedin/speaker/callback?code=c"),
     );
     expect(locationParam(res, "error")).toBe("invalid_state");
   });
 
   it("rejects a missing code", async () => {
     const res = await GET(
-      getRequest("/api/admin/posts/social/linkedin/speaker/callback?state=s"),
+      getRequest("/api/posts/social/linkedin/speaker/callback?state=s"),
     );
     expect(locationParam(res, "error")).toBe("invalid_state");
   });
@@ -90,7 +88,7 @@ describe("linkedin speaker callback route (public, no admin session)", () => {
     jest.mocked(verifyState).mockReturnValue(null);
     const res = await GET(
       getRequest(
-        "/api/admin/posts/social/linkedin/speaker/callback?code=c&state=bad",
+        "/api/posts/social/linkedin/speaker/callback?code=c&state=bad",
       ),
     );
     expect(locationParam(res, "error")).toBe("invalid_state");
@@ -101,24 +99,20 @@ describe("linkedin speaker callback route (public, no admin session)", () => {
       .mocked(verifyState)
       .mockReturnValue({ purpose: "post", slug: "my-talk" });
     const res = await GET(
-      getRequest(
-        "/api/admin/posts/social/linkedin/speaker/callback?code=c&state=s",
-      ),
+      getRequest("/api/posts/social/linkedin/speaker/callback?code=c&state=s"),
     );
     expect(locationParam(res, "error")).toBe("invalid_state");
   });
 
   it("saves the captured urn with no connecting-admin identity, using the exact fixed redirect_uri", async () => {
     const res = await GET(
-      getRequest(
-        "/api/admin/posts/social/linkedin/speaker/callback?code=c&state=s",
-      ),
+      getRequest("/api/posts/social/linkedin/speaker/callback?code=c&state=s"),
     );
     expect(locationParam(res, "speaker")).toBe("Jane Doe");
     expect(exchangeCodeForToken).toHaveBeenCalledWith(
       expect.objectContaining({
         redirectUri:
-          "http://localhost:3000/api/admin/posts/social/linkedin/speaker/callback",
+          "http://localhost:3000/api/posts/social/linkedin/speaker/callback",
       }),
     );
     expect(saveSpeakerLinkedInUrn).toHaveBeenCalledWith(
@@ -131,9 +125,7 @@ describe("linkedin speaker callback route (public, no admin session)", () => {
   it("redirects with connect_failed when an unexpected error occurs", async () => {
     jest.mocked(getMemberSub).mockRejectedValue(new Error("LinkedIn is down"));
     const res = await GET(
-      getRequest(
-        "/api/admin/posts/social/linkedin/speaker/callback?code=c&state=s",
-      ),
+      getRequest("/api/posts/social/linkedin/speaker/callback?code=c&state=s"),
     );
     expect(locationParam(res, "error")).toBe("connect_failed");
   });

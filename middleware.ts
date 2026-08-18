@@ -50,7 +50,15 @@ function requiresNoCacheHeaders(pathname: string): boolean {
     "/api/contact", // Contact form (may contain sensitive data)
   ];
 
-  return noCachePaths.some((path) => pathname.startsWith(path));
+  if (noCachePaths.some((path) => pathname.startsWith(path))) {
+    return true;
+  }
+
+  // Public, unauthenticated LinkedIn speaker-connect OAuth routes - live
+  // under /api/posts/ (not /api/admin/) since the speaker completing them
+  // isn't an ETSA admin, but the URLs still carry one-time auth codes and
+  // must never be cached.
+  return pathname.includes("/social/linkedin/speaker/");
 }
 
 /**

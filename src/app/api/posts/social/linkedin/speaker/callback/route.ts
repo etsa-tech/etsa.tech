@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { clientId, clientSecret } = getLinkedInSpeakerConfig();
-    const redirectUri = `${getSiteOrigin()}/api/admin/posts/social/linkedin/speaker/callback`;
+    const redirectUri = `${getSiteOrigin()}/api/posts/social/linkedin/speaker/callback`;
     const { accessToken } = await exchangeCodeForToken({
       code,
       redirectUri,

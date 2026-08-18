@@ -4,9 +4,41 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isAuthorizedUser } from "@/lib/auth-utils";
 import { getCachedSocialRecord } from "@/lib/social-cache";
-import { getSpeakerLinkedInUrn } from "@/lib/speaker-linkedin-store";
+import {
+  getSpeakerLinkedInUrn,
+  saveSpeakerLinkedInUrn,
+} from "@/lib/speaker-linkedin-store";
+import { getBlogPost } from "@/lib/github";
+import matter from "gray-matter";
+import { getSpeakerLinkedInUrnFromFrontmatter } from "@/lib/linkedin-frontmatter";
+import type { PostFrontmatter } from "@/types/post";
 
 export const dynamic = "force-dynamic";
+
+// A speaker's urn can arrive two ways: they complete the OAuth connect flow
+// (written straight to the Blobs store), or the urn is already sitting in
+// this post's frontmatter (hand-written, or copied from another post). The
+// Blobs store is just a cache for reuse across future posts, so if
+// frontmatter already has it and the cache doesn't, backfill the cache
+// instead of showing "not connected" until someone redoes the OAuth flow.
+async function resolveSpeakerUrn(
+  slug: string,
+  speakerName: string,
+): Promise<string | null> {
+  const cachedUrn = await getSpeakerLinkedInUrn(speakerName);
+  if (cachedUrn) return cachedUrn;
+
+  const rawContent = await getBlogPost(slug, "main");
+  const { data } = matter(rawContent);
+  const frontmatterUrn = getSpeakerLinkedInUrnFromFrontmatter(
+    data as PostFrontmatter,
+    speakerName,
+  );
+  if (!frontmatterUrn) return null;
+
+  await saveSpeakerLinkedInUrn(speakerName, frontmatterUrn, null);
+  return frontmatterUrn;
+}
 
 export async function GET(
   request: NextRequest,
@@ -23,7 +55,9 @@ export async function GET(
 
     const [cached, speakerUrn] = await Promise.all([
       getCachedSocialRecord(slug, "linkedin"),
-      speakerName ? getSpeakerLinkedInUrn(speakerName) : Promise.resolve(null),
+      speakerName
+        ? resolveSpeakerUrn(slug, speakerName)
+        : Promise.resolve(null),
     ]);
 
     return NextResponse.json({
