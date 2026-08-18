@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.7.1] - 2026-08-18
+
+### 🐛 Bug Fixes
+
+- **social**: backfill LinkedIn speaker urn cache, move speaker OAuth routes off /api/admin ([#461](https://github.com/etsa-tech/etsa.tech/pull/461)) by @wesleykirkland
+
 ## [5.7.1] - 2026-08-17
 
 ### 🔧 Chores
