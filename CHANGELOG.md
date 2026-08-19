@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.7.2] - 2026-08-19
+
+### 🐛 Bug Fixes
+
+- **blog**: improving-environments-and-career-resilience-through-information-science ([#462](https://github.com/etsa-tech/etsa.tech/pull/462)) by @etsa-admin-interface[bot]
+
 ## [5.7.1] - 2026-08-18
 
 ### 🐛 Bug Fixes
