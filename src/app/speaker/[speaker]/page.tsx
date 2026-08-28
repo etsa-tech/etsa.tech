@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getAllSpeakers, getPostsBySpeaker } from "@/lib/blog";
 import { PostCard } from "@/components/PostCard";
+import { PresentationCalendar } from "@/components/PresentationCalendar";
 
 interface PageProps {
   params: Promise<{ speaker: string }>;
@@ -99,6 +100,11 @@ export default async function SpeakerPage({ params }: Readonly<PageProps>) {
             {posts.length} presentation{posts.length !== 1 ? "s" : ""} at ETSA
           </p>
         </div>
+      </div>
+
+      {/* Presentation Calendar */}
+      <div className="mb-12 max-w-sm mx-auto">
+        <PresentationCalendar posts={posts} />
       </div>
 
       {/* Posts Grid */}
