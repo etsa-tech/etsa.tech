@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-09-01
+
+### 🐛 Bug Fixes
+
+- **blog**: post-quantum-cryptography-how-to-prepare-and-improve-your-security-posture ([#468](https://github.com/etsa-tech/etsa.tech/pull/468)) by @etsa-admin-interface[bot]
+
 ## [6.0.0] - 2026-08-26
 
 ### ✨ Features
