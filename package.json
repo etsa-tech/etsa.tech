@@ -66,6 +66,6 @@
     "jest-environment-node": "^30.4.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   }
 }
