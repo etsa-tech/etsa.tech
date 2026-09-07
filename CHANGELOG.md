@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-09-07
+
+### 🔧 Chores
+
+- **deps**: upgrade next from 16.3.2 to 16.3.3 ([#466](https://github.com/etsa-tech/etsa.tech/pull/466)) by @wesleykirkland
+
 ## [6.1.1] - 2026-09-07
 
 ### 🔧 Chores
