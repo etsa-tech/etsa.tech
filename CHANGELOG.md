@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔧 Chores
 
+- remove duplicate mike-williams.jpeg speaker image ([#470](https://github.com/etsa-tech/etsa.tech/pull/470)) by @wesleykirkland
+
+## [8.0.0] - 2026-09-19
+
+### 🔧 Chores
+
 - **deps**: update all non-major dependencies ([#467](https://github.com/etsa-tech/etsa.tech/pull/467)) by @renovate[bot]
 
 ## [7.0.0] - 2026-09-07
