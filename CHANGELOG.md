@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.0.0] - 2026-09-21
+
+### 🔧 Chores
+
+- **deps**: update all non-major dependencies to v21.2.3 ([#471](https://github.com/etsa-tech/etsa.tech/pull/471)) by @renovate[bot]
+
 ## [8.0.0] - 2026-09-19
 
 ### 🔧 Chores
