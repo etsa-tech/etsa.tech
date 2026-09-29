@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.0.0] - 2026-09-29
+
+### ✨ Features
+
+- **posts**: add October 2026 speaker meeting ([#473](https://github.com/etsa-tech/etsa.tech/pull/473)) by @bataylor976
+
 ## [8.0.0] - 2026-09-21
 
 ### 🔧 Chores
