@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.1.0] - 2026-10-06
+
+### 🐛 Bug Fixes
+
+- **blog**: file-descriptors-the-heart-and-soul-of-unix ([#474](https://github.com/etsa-tech/etsa.tech/pull/474)) by @etsa-admin-interface[bot]
+
 ## [8.0.0] - 2026-09-29
 
 ### ✨ Features
