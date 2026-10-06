@@ -1,6 +1,6 @@
 // Utility functions that can be used on both client and server
 import sanitizeHtml from "sanitize-html";
-import { PostFrontmatter, Speaker } from "@/types/post";
+import { EventLocation, PostFrontmatter, Speaker } from "@/types/post";
 
 /**
  * Sanitize a title or text for use in branch names, URLs, or file names.
@@ -257,10 +257,28 @@ export function getSocialContentFields(frontmatter: PostFrontmatter): {
   const [speaker] = getPostSpeakers(frontmatter);
   return {
     bio: speaker?.bio ?? "",
-    date: frontmatter.eventDate ?? frontmatter.meetingDate ?? frontmatter.date,
+    date: frontmatter.eventDate ?? frontmatter.date,
     abstract: frontmatter.presentationDescription ?? frontmatter.excerpt,
     speakerName: speaker?.name ?? "",
     company: speaker?.company ?? "",
+  };
+}
+
+// Resolve `eventLocation` frontmatter - which may be a bare venue name or a
+// full object - into a single shape. The venue name stands in for the address
+// when no address is given, so maps and directions links always have a query.
+export function normalizeEventLocation(
+  eventLocation: PostFrontmatter["eventLocation"],
+): (EventLocation & { address: string }) | null {
+  if (!eventLocation) {
+    return null;
+  }
+  if (typeof eventLocation === "string") {
+    return { name: eventLocation, address: eventLocation };
+  }
+  return {
+    ...eventLocation,
+    address: eventLocation.address ?? eventLocation.name,
   };
 }
 

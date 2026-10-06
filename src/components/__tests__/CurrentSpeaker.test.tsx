@@ -37,6 +37,26 @@ describe("CurrentSpeaker", () => {
     expect(screen.getByText(/Room A/)).toBeInTheDocument();
   });
 
+  it("shows the venue name when eventLocation is an object", () => {
+    const post: PostSummary = {
+      slug: "my-talk",
+      readingTime: 5,
+      frontmatter: {
+        title: "Talk",
+        date: "2026-01-01",
+        excerpt: "x",
+        tags: [],
+        eventDate: "2026-02-01",
+        eventLocation: {
+          name: "TekSystems",
+          address: "800 South Gay Street, Knoxville, TN 37929",
+        },
+      } as never,
+    };
+    render(<CurrentSpeaker latestPost={post} />);
+    expect(screen.getByText(/TekSystems/)).toBeInTheDocument();
+  });
+
   it("falls back to the post title when there's no presentationTitle, and hides speaker block when no speakerName", () => {
     const post: PostSummary = {
       slug: "my-talk",

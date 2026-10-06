@@ -8,7 +8,12 @@ import {
   getPresentationPostSlugs,
   getRecentPresentationPosts,
 } from "@/lib/blog";
-import { formatDate, getTagUrl, getPostSpeakers } from "@/lib/utils";
+import {
+  formatDate,
+  getTagUrl,
+  getPostSpeakers,
+  normalizeEventLocation,
+} from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
 
 interface PageProps {
@@ -73,6 +78,8 @@ export default async function PresentationPage({
     eventLocation,
   } = frontmatter;
 
+  const locationName = normalizeEventLocation(eventLocation)?.name;
+
   const speakers = getPostSpeakers(frontmatter);
 
   const recentPosts = getRecentPresentationPosts(3).filter(
@@ -123,14 +130,10 @@ export default async function PresentationPage({
                     <span>Event: {formatDate(eventDate)}</span>
                   </>
                 )}
-                {eventLocation && (
+                {locationName && (
                   <>
                     <span>•</span>
-                    <span>
-                      {typeof eventLocation === "string"
-                        ? eventLocation
-                        : eventLocation.name}
-                    </span>
+                    <span>{locationName}</span>
                   </>
                 )}
               </div>

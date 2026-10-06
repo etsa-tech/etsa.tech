@@ -13,6 +13,7 @@ import {
   getExcerpt,
   getPostSpeakers,
   getSocialContentFields,
+  normalizeEventLocation,
   getSpeakerUrl,
   debounce,
   isValidEmail,
@@ -228,7 +229,6 @@ describe("getSocialContentFields", () => {
   it("derives fields from the first speaker and prefers eventDate/presentationDescription", () => {
     const fields = getSocialContentFields({
       eventDate: "2026-02-01",
-      meetingDate: "2026-01-01",
       date: "2025-12-01",
       presentationDescription: "abstract",
       excerpt: "fallback excerpt",
@@ -252,6 +252,42 @@ describe("getSocialContentFields", () => {
     expect(fields.abstract).toBe("fallback excerpt");
     expect(fields.bio).toBe("");
     expect(fields.speakerName).toBe("");
+  });
+});
+
+describe("normalizeEventLocation", () => {
+  it("returns null when no location is set", () => {
+    expect(normalizeEventLocation(undefined)).toBeNull();
+  });
+
+  it("treats a bare string as both the venue name and the address", () => {
+    expect(normalizeEventLocation("Kerns Food Hall")).toEqual({
+      name: "Kerns Food Hall",
+      address: "Kerns Food Hall",
+    });
+  });
+
+  it("keeps every field of an object location", () => {
+    expect(
+      normalizeEventLocation({
+        name: "KEC",
+        address: "17 Market Square",
+        coordinates: { lat: "1", lng: "2" },
+        parking: "Garage next door",
+      }),
+    ).toEqual({
+      name: "KEC",
+      address: "17 Market Square",
+      coordinates: { lat: "1", lng: "2" },
+      parking: "Garage next door",
+    });
+  });
+
+  it("falls back to the venue name when an object has no address", () => {
+    expect(normalizeEventLocation({ name: "KEC" })).toEqual({
+      name: "KEC",
+      address: "KEC",
+    });
   });
 });
 

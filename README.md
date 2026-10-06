@@ -337,15 +337,13 @@ presentationDescription: "Detailed description" # Extended description of the co
 presentationSlides: "https://slides.example.com" # Link to slides (Google Slides, SlideShare, etc.)
 
 # Event Information (Optional)
-eventDate: "2024-01-15" # Date when presentation was given
-eventLocation: "Event Location" # Physical location where event occurred
-meetingDate: "First Tuesday of each month at 7:00 PM" # Next meeting date/schedule
-meetingLocation: # Custom meeting location object
+eventDate: "2024-01-15" # Date of the event (also drives /meeting-info and /rsvp)
+eventLocation: # Venue - a bare name string, or the object below
   name: "Knoxville Entrepreneur Center" # Venue name
   address: "17 Market Square SUITE 101, Knoxville, TN 37902" # Full address
   coordinates: # GPS coordinates (optional)
-    lat: 35.965179
-    lng: -83.919846
+    lat: "35.965179"
+    lng: "-83.919846"
   description: "Our regular meeting location" # Venue description
   parking: "Free street parking available" # Parking information
   accessibility: "Wheelchair accessible" # Accessibility details
@@ -409,27 +407,32 @@ All speaker fields are optional but recommended for speaker presentations. You c
 
 #### Event Details
 
-- **eventDate**: Date when the presentation was actually given
-- **eventLocation**: Physical location where the event took place
-- **meetingDate**: Custom meeting date/schedule (overrides default "First Tuesday")
-- **meetingLocation**: Custom venue object with detailed location information
+- **eventDate**: Date of the event. The latest presentation post's `eventDate`
+  is what `/meeting-info` and `/rsvp` show as the next meeting date.
+- **eventLocation**: Where the event takes place - either a bare venue name
+  string or the object below. The latest presentation post's `eventLocation`
+  is what `/meeting-info` shows (address, map, directions, parking).
 
-#### Meeting Location Object
+#### Event Location Object
 
-When specifying a custom meeting location, use this structure:
+When specifying a venue in full, use this structure:
 
 ```yaml
-meetingLocation:
+eventLocation:
   name: "Venue Name" # Official venue name
   address: "Full Street Address" # Complete address for GPS/directions
-  coordinates: # Optional GPS coordinates
-    lat: 35.965179 # Latitude
-    lng: -83.919846 # Longitude
+  coordinates: # Optional GPS coordinates (quoted strings)
+    lat: "35.965179" # Latitude
+    lng: "-83.919846" # Longitude
   description: "Venue description" # Brief description of the location
   parking: "Parking instructions" # Detailed parking information
   accessibility: "Accessibility info" # Wheelchair access, elevators, etc.
   contact: "Additional contact info" # Extra location details or contact info
 ```
+
+Omitting `address` falls back to `name` for the map and directions links.
+When no post sets `eventLocation`, `/meeting-info` shows the default
+Knoxville Entrepreneur Center details.
 
 #### Publishing Options
 
@@ -485,7 +488,7 @@ published: true
 ---
 ```
 
-#### Custom Meeting Location
+#### Custom Event Location
 
 ```yaml
 ---
@@ -494,13 +497,13 @@ date: "2024-04-20"
 excerpt: "Hands-on workshop covering Terraform and infrastructure automation"
 tags: ["Terraform", "IaC", "Workshop"]
 author: "ETSA"
-meetingDate: "Saturday, April 20th at 10:00 AM"
-meetingLocation:
+eventDate: "2024-04-20"
+eventLocation:
   name: "University of Tennessee - Engineering Building"
   address: "1512 Middle Dr, Knoxville, TN 37996"
   coordinates:
-    lat: 35.9544
-    lng: -83.9295
+    lat: "35.9544"
+    lng: "-83.9295"
   description: "Special workshop location at UT campus"
   parking: "Visitor parking available in Lot 62 ($5/day)"
   accessibility: "Building is fully wheelchair accessible with elevator access"

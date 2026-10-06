@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PostSummary } from "@/types/post";
-import { formatDate, getPostUrl } from "@/lib/utils";
+import { formatDate, getPostUrl, normalizeEventLocation } from "@/lib/utils";
 
 interface CurrentSpeakerProps {
   latestPost: PostSummary | null;
@@ -41,13 +41,15 @@ export function CurrentSpeaker({ latestPost }: Readonly<CurrentSpeakerProps>) {
     eventLocation,
   } = frontmatter;
 
+  const locationName = normalizeEventLocation(eventLocation)?.name;
+
   return (
     <div className="card">
       <div className="card-header">
         <h2 className="card-title">Latest Presentation</h2>
         {eventDate && (
           <p className="card-description">
-            {formatDate(eventDate)} {eventLocation && `• ${eventLocation}`}
+            {formatDate(eventDate)} {locationName && `• ${locationName}`}
           </p>
         )}
       </div>

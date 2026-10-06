@@ -7,8 +7,7 @@ tags:
   - Meet and Greet
 author: ETSA
 eventDate: "2025-07-01"
-eventLocation: Kerns Food Hall
-meetingLocation:
+eventLocation:
   name: Kerns Food Hall
   address: 2201 Kerns Rising Way, Knoxville, TN 37920
   coordinates:

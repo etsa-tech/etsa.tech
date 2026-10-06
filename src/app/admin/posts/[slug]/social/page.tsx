@@ -209,10 +209,7 @@ export default function SocialMailingPage() {
         setPost({
           title: frontmatter.title,
           bio: speaker?.bio ?? frontmatter.speakerBio ?? "",
-          date:
-            frontmatter.eventDate ??
-            frontmatter.meetingDate ??
-            frontmatter.date,
+          date: frontmatter.eventDate ?? frontmatter.date,
           abstract: frontmatter.presentationDescription ?? frontmatter.excerpt,
           speakerName,
           company: speaker?.company ?? frontmatter.speakerCompany ?? "",

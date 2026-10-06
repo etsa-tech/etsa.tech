@@ -53,13 +53,13 @@ describe("MeetingInfoPage", () => {
           date: "2026-01-01",
           excerpt: "e",
           tags: [],
-          meetingDate: "January 6th at 7 PM",
+          eventDate: "2026-01-06",
           speakerName: "Jane Doe",
         } as never,
       },
     ]);
     render(<MeetingInfoPage />);
-    expect(screen.getByText("January 6th at 7 PM")).toBeInTheDocument();
+    expect(screen.getByText("January 6, 2026")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Great Talk/ })).toHaveAttribute(
       "href",
       "/presentation/a",
@@ -123,7 +123,7 @@ describe("MeetingInfoPage", () => {
     expect(speakerLink).not.toContainElement(cardLink);
   });
 
-  it("uses a custom meeting location from post frontmatter when present", () => {
+  it("uses the event location from post frontmatter when present", () => {
     mockedGetPresentationPosts.mockReturnValue([
       {
         slug: "a",
@@ -133,7 +133,7 @@ describe("MeetingInfoPage", () => {
           date: "2026-01-01",
           excerpt: "e",
           tags: [],
-          meetingLocation: {
+          eventLocation: {
             name: "Custom Venue",
             address: "123 Custom St",
           },
@@ -144,7 +144,54 @@ describe("MeetingInfoPage", () => {
     expect(screen.getByText("Custom Venue")).toBeInTheDocument();
     // Appears once in the location card, once in the (mocked) map embed.
     expect(screen.getAllByText("123 Custom St").length).toBeGreaterThan(0);
-    // Custom location has no parking/accessibility/contact/description set.
+    // Event location has no parking/accessibility/contact/description set.
     expect(screen.queryByText(/Parking:/)).not.toBeInTheDocument();
+  });
+
+  it("renders the optional prose fields an event location carries", () => {
+    mockedGetPresentationPosts.mockReturnValue([
+      {
+        slug: "a",
+        readingTime: 1,
+        frontmatter: {
+          title: "Great Talk",
+          date: "2026-01-01",
+          excerpt: "e",
+          tags: [],
+          eventLocation: {
+            name: "Custom Venue",
+            address: "123 Custom St",
+            description: "A fine venue",
+            parking: "Garage next door",
+            accessibility: "Step-free entry",
+            contact: "hello@example.com",
+          },
+        } as never,
+      },
+    ]);
+    render(<MeetingInfoPage />);
+    expect(screen.getByText("A fine venue")).toBeInTheDocument();
+    expect(screen.getByText("Garage next door")).toBeInTheDocument();
+    expect(screen.getByText("Step-free entry")).toBeInTheDocument();
+    expect(screen.getByText("hello@example.com")).toBeInTheDocument();
+  });
+
+  it("falls back to the venue name as the address for a string event location", () => {
+    mockedGetPresentationPosts.mockReturnValue([
+      {
+        slug: "a",
+        readingTime: 1,
+        frontmatter: {
+          title: "Great Talk",
+          date: "2026-01-01",
+          excerpt: "e",
+          tags: [],
+          eventLocation: "Kerns Food Hall",
+        } as never,
+      },
+    ]);
+    render(<MeetingInfoPage />);
+    expect(screen.getAllByText("Kerns Food Hall").length).toBeGreaterThan(0);
+    expect(screen.getByTestId("map")).toHaveTextContent("Kerns Food Hall");
   });
 });

@@ -36,6 +36,24 @@ describe("RSVPPage", () => {
     expect(screen.getByText("Come learn things")).toBeInTheDocument();
   });
 
+  it("formats the latest post's event date as the meeting date", () => {
+    mockedGetPresentationPosts.mockReturnValue([
+      {
+        slug: "a",
+        readingTime: 1,
+        frontmatter: {
+          title: "January Meetup",
+          date: "2025-12-01",
+          excerpt: "e",
+          tags: [],
+          eventDate: "2026-01-06",
+        } as never,
+      },
+    ]);
+    render(<RSVPPage />);
+    expect(screen.getAllByText(/January 6, 2026/).length).toBeGreaterThan(0);
+  });
+
   it("falls back to defaults when there are no posts yet", () => {
     mockedGetPresentationPosts.mockReturnValue([]);
     render(<RSVPPage />);
