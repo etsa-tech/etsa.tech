@@ -3,10 +3,10 @@ author: "ETSA"
 date: "2026-09-29"
 eventDate: "2026-10-06"
 eventLocation:
-  address: "17 Market Square SUITE 101, Knoxville, TN 37902"
+  address: "800 South Gay Street, Suite 1501, Knoxville, TN 37929"
   coordinates:
-    lat: "35.965179"
-    lng: "-83.919846"
+    lat: "35.9624455"
+    lng: "-83.9162124"
   name: "Knoxville Entrepreneur Center"
 excerpt: "Explore file descriptors, a fundamental UNIX abstraction that connects files, pipes, network sockets, and the UNIX philosophy of building programs that work together."
 published: true
