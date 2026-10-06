@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.1.1] - 2026-10-06
+
+### 🐛 Bug Fixes
+
+- migrate meetingLocation to eventLocation and fix speaker image LFS ([#476](https://github.com/etsa-tech/etsa.tech/pull/476)) by @wesleykirkland
+
 ## [8.1.0] - 2026-10-06
 
 ### 🐛 Bug Fixes
