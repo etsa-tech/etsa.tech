@@ -1,4 +1,4 @@
-import { dump, strTag, type Node } from "js-yaml";
+import { dump, SCALAR_STYLE, strTag, type Node } from "js-yaml";
 
 /**
  * Force-quotes only actual string values when dumping YAML frontmatter,
@@ -15,7 +15,8 @@ import { dump, strTag, type Node } from "js-yaml";
 function walk(node: Node | undefined, isKey: boolean): void {
   if (!node) return;
   if (node.kind === "scalar") {
-    if (!isKey && node.tag === strTag.tagName) node.style.doubleQuoted = true;
+    if (!isKey && node.tag === strTag.tagName)
+      node.style = SCALAR_STYLE.DOUBLE_QUOTED;
   } else if (node.kind === "sequence") {
     node.items.forEach((item) => walk(item, false));
   } else if (node.kind === "mapping") {
