@@ -336,7 +336,7 @@ describe("SocialMailingPage", () => {
       speakerName: "Top-level Speaker",
       speakerCompany: "Top-level Co",
       eventDate: undefined,
-      meetingDate: "2026-03-01",
+      date: "2026-03-01",
       presentationDescription: undefined,
       excerpt: "Excerpt text",
     }) as unknown as typeof fetch;

@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getPresentationPosts } from "@/lib/blog";
-import { getPostSpeakers } from "@/lib/utils";
+import {
+  formatDate,
+  getPostSpeakers,
+  normalizeEventLocation,
+} from "@/lib/utils";
 import { SpeakerList } from "@/components/SpeakerLink";
 import GoogleMapEmbed from "@/components/GoogleMapEmbed";
 
@@ -15,8 +19,8 @@ const DEFAULT_LOCATION = {
   name: "Knoxville Entrepreneur Center",
   address: "17 Market Square SUITE 101, Knoxville, TN 37902",
   coordinates: {
-    lat: 35.965179,
-    lng: -83.919846,
+    lat: "35.965179",
+    lng: "-83.919846",
   },
   description: "Our regular meeting location in downtown Knoxville",
   parking:
@@ -30,14 +34,17 @@ export default function MeetingInfoPage() {
   const posts = getPresentationPosts();
   const latestPost = posts[0];
 
-  // Check if latest post has custom location
-  const customLocation = latestPost?.frontmatter?.meetingLocation;
-  const meetingLocation = customLocation || DEFAULT_LOCATION;
+  // Posts carry their own venue in `eventLocation`; fall back to the usual
+  // spot only when no post names one.
+  const meetingLocation =
+    normalizeEventLocation(latestPost?.frontmatter?.eventLocation) ??
+    DEFAULT_LOCATION;
 
   // Get next meeting date from latest post or default
-  const nextMeetingDate =
-    latestPost?.frontmatter?.meetingDate ||
-    "First Tuesday of each month at 7:00 PM";
+  const eventDate = latestPost?.frontmatter?.eventDate;
+  const nextMeetingDate = eventDate
+    ? formatDate(eventDate)
+    : "First Tuesday of each month at 7:00 PM";
 
   return (
     <div className="container py-12">

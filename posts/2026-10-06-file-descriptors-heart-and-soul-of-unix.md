@@ -7,13 +7,14 @@ eventLocation:
   coordinates:
     lat: "35.9624455"
     lng: "-83.9162124"
-  name: "Knoxville Entrepreneur Center"
+  name: "TekSystems"
+  parking: "Parking is available at the State Street Garage, 500 State St, Knoxville, TN 37902."
 excerpt: "Explore file descriptors, a fundamental UNIX abstraction that connects files, pipes, network sockets, and the UNIX philosophy of building programs that work together."
 published: true
 speakers:
   - bio: "Robert French is the Grinch of computing. He hates it when your systems are up, and loves it when unplanned outages cause you to miss your kids' soccer games. His ideal morning involves waking up to news of major cyberattacks, outages, or general panic across the internet. He thinks Y2K was a disappointment, but is very excited about the Year 2038 Problem."
     company: "Independent"
-    image: "/images/speakers/robert-french.jpeg"
+    image: "/images/speakers/robert_french.jpg"
     linkedIn: "https://www.linkedin.com/in/robertdanielfrench/"
     name: "Robert French"
     title: "Security Researcher"
@@ -32,4 +33,5 @@ tags:
 title: "File Descriptors: The Heart and Soul of UNIX"
 ---
 
+Last minute update! We're meeting at the Tek Systems office due to issues with out normal event location. We recommend parking at the State Street garage
 When you open a file, pipe a command, or bind to a network port, you are working with a "file descriptor." File descriptors are central to the UNIX philosophy, both in the "everything is a file" sense and the "write programs to work together" sense. In this talk, we will go under the hood to understand what these things actually are and how they facilitate every aspect of daily life on both UNIX and Penguin UNIX.

@@ -15,6 +15,21 @@ export interface Speaker {
   website?: string;
 }
 
+// Where a meetup happens. Posts may also set `eventLocation` to a bare
+// string when only the venue name is known.
+export interface EventLocation {
+  name: string;
+  address?: string;
+  coordinates?: {
+    lat: string;
+    lng: string;
+  };
+  description?: string;
+  parking?: string;
+  accessibility?: string;
+  contact?: string;
+}
+
 export interface PostFrontmatter {
   description?: string;
   title: string;
@@ -42,29 +57,7 @@ export interface PostFrontmatter {
   recordingUrl?: string;
   meetupEventId?: string;
   eventDate?: string;
-  eventLocation?:
-    | string
-    | {
-        name: string;
-        address?: string;
-        coordinates?: {
-          lat: string;
-          lng: string;
-        };
-      };
-  meetingDate?: string;
-  meetingLocation?: {
-    name: string;
-    address: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
-    description?: string;
-    parking?: string;
-    accessibility?: string;
-    contact?: string;
-  };
+  eventLocation?: string | EventLocation;
   blogpost?: boolean; // Whether this is a blog post (true) or presentation (false/undefined)
   published?: boolean;
 }

@@ -1,5 +1,6 @@
 import { getPresentationPosts } from "@/lib/blog";
 import RSVPForm from "@/components/RSVPForm";
+import { formatDate } from "@/lib/utils";
 
 export const metadata = {
   title: "RSVP - ETSA",
@@ -12,9 +13,10 @@ export default function RSVPPage() {
   const latestPost = posts[0];
 
   // Get meeting information from latest post or use defaults
-  const meetingDate =
-    latestPost?.frontmatter?.meetingDate ||
-    "First Tuesday of each month at 7:00 PM";
+  const eventDate = latestPost?.frontmatter?.eventDate;
+  const meetingDate = eventDate
+    ? formatDate(eventDate)
+    : "First Tuesday of each month at 7:00 PM";
 
   const meetingTitle = latestPost?.frontmatter?.title || "ETSA Meetup";
 
