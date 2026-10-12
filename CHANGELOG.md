@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.1.2] - 2026-10-12
+
+### 🔧 Chores
+
+- **deps**: update dependency zod to v4.6.6 ([#477](https://github.com/etsa-tech/etsa.tech/pull/477)) by @renovate[bot]
+
 ## [8.1.2] - 2026-10-11
 
 ### 🔧 Chores
